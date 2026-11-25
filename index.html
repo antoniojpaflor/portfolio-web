@@ -502,12 +502,6 @@ async function deleteVaultItem(id) {
 /* ============================================================================
    3. FONDO MULTIMEDIA DESORDENADO, SUPERPUESTO Y EN MOVIMIENTO CONTINUO
    ============================================================================ */
-// Archivos en /assets del repo + fallback visual si no se han subido aún
-const REPO_ASSETS_SEED = [
-  { src: 'assets/rotom-largo.mp4', kind: 'video', label: 'ROTOMBOT_FEED' },
-  { src: 'assets/7.png', kind: 'image', label: 'PROJECT_SNAP_07' }
-];
-
 const FLOATING_SLOTS = [
   { left: '4%',  top: '6%',  w: '44%', h: '42%', anim: 'drift-a', z: 1, title: 'FREESTYLE PICA // DART ENGINE' },
   { left: '42%', top: '3%',  w: '52%', h: '38%', anim: 'drift-b', z: 2, title: 'PROVER9-MACE4 // LOGIC SOLVER' },
@@ -517,11 +511,29 @@ const FLOATING_SLOTS = [
   { left: '46%', top: '66%', w: '49%', h: '31%', anim: 'drift-c', z: 3, title: 'BIG SCHOOL // SOFTWARE LAB' }
 ];
 
+let repoAssetsList = [];
+
+async function loadRepoManifest() {
+  try {
+    const res = await fetch('assets/manifest.json', { cache: 'no-store' });
+    if (!res.ok) {
+      repoAssetsList = [];
+      renderBackgroundMediaWall();
+      return;
+    }
+    const data = await res.json();
+    repoAssetsList = Array.isArray(data) ? data : [];
+  } catch (_) {
+    repoAssetsList = [];
+  }
+  renderBackgroundMediaWall();
+}
+
 function renderBackgroundMediaWall() {
   const wall = document.getElementById('projectMediaWall');
   if (!wall) return;
 
-  const userVisuals = vaultItems
+  const vaultVisuals = vaultItems
     .filter((m) => m.type.startsWith('video/') || m.type.startsWith('image/'))
     .map((m) => ({
       src: m.dataUrl,
@@ -529,29 +541,48 @@ function renderBackgroundMediaWall() {
       label: m.name
     }));
 
-  const pool = [...userVisuals, ...REPO_ASSETS_SEED];
+  const manifestVisuals = repoAssetsList.map((item) => ({
+    src: encodeURI(item.path),
+    kind: item.kind,
+    label: item.name
+  }));
 
-  wall.innerHTML = FLOATING_SLOTS.map((slot, idx) => {
-    const asset = pool[idx % pool.length];
-    let mediaMarkup = '';
+  const pool = [...manifestVisuals, ...vaultVisuals];
 
-    if (asset && asset.kind === 'video') {
-      mediaMarkup = `
-        <video src="${asset.src}" autoplay loop muted playsinline
-               onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(slot.title)}', ${idx})"></video>
-      `;
-    } else if (asset && asset.kind === 'image') {
-      mediaMarkup = `
-        <img src="${asset.src}" alt="${escapeHtml(asset.label)}"
-             onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(slot.title)}', ${idx})" />
-      `;
-    } else {
-      mediaMarkup = renderFallbackTile(slot.title, idx);
-    }
-
-    return `
+  if (pool.length === 0) {
+    wall.innerHTML = FLOATING_SLOTS.map((slot, idx) => `
       <div class="float-media-layer ${slot.anim}"
            style="left:${slot.left}; top:${slot.top}; width:${slot.w}; height:${slot.h}; z-index:${slot.z};">
+        ${renderFallbackTile(slot.title, idx)}
+      </div>
+    `).join('');
+    return;
+  }
+
+  const totalSlots = Math.max(FLOATING_SLOTS.length, pool.length);
+
+  wall.innerHTML = Array.from({ length: totalSlots }, (_, idx) => {
+    const baseSlot = FLOATING_SLOTS[idx % FLOATING_SLOTS.length];
+    const asset = pool[idx % pool.length];
+
+    const extraOffset = idx >= FLOATING_SLOTS.length ? ((idx * 17) % 28) : 0;
+    const leftVal = idx >= FLOATING_SLOTS.length
+      ? `calc(${baseSlot.left} + ${(extraOffset % 14) - 7}%)`
+      : baseSlot.left;
+    const topVal = idx >= FLOATING_SLOTS.length
+      ? `calc(${baseSlot.top} + ${((extraOffset * 3) % 14) - 7}%)`
+      : baseSlot.top;
+    const animClass = ['drift-a', 'drift-b', 'drift-c'][idx % 3];
+
+    const mediaMarkup = asset.kind === 'video'
+      ? `<video src="${asset.src}" autoplay loop muted playsinline
+                onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(asset.label)}', ${idx})"></video>`
+      : `<img src="${asset.src}" alt="${escapeHtml(asset.label)}"
+              onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(asset.label)}', ${idx})" />`;
+
+    return `
+      <div class="float-media-layer ${animClass}"
+           style="left:${leftVal}; top:${topVal}; width:${baseSlot.w}; height:${baseSlot.h}; z-index:${(idx % 3) + 1};">
         ${mediaMarkup}
       </div>
     `;
@@ -837,8 +868,8 @@ document.addEventListener('keydown', (e) => {
 /* ============================================================================
    6. ARRANQUE
    ============================================================================ */
-renderBackgroundMediaWall();
 renderScene('root');
+loadRepoManifest();
 loadVaultFromDB();
 </script>
 </body>

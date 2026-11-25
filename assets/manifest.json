@@ -1,0 +1,17 @@
+﻿[
+    {
+        "path":  "assets/7.png",
+        "name":  "7.png",
+        "kind":  "image"
+    },
+    {
+        "path":  "assets/gesture-glove-bg.mp4",
+        "name":  "gesture-glove-bg.mp4",
+        "kind":  "video"
+    },
+    {
+        "path":  "assets/rotom-largo.mp4",
+        "name":  "rotom-largo.mp4",
+        "kind":  "video"
+    }
+]

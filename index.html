@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>antonio-parras.sys — Porfolio CRT Ramificado</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Share Tech Mono"', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          colors: {
+            phosphor: {
+              bright: '#7dff9e',
+              main: '#39ff76',
+              mid: '#16c754',
+              dim: '#0a5c28',
+              dark: '#042410',
+              bg: '#020e06',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* =========================================================================
+       ESTÉTICA DE LABORATORIO CRT EN VERDE FÓSFORO (100VH SIN SCROLL GENERAL)
+       ========================================================================= */
+    :root {
+      --bg-void: #010804;
+      --bg-crt-base: #03150a;
+      --bg-crt-mid: #062813;
+      --phosphor: #39ff76;
+      --phosphor-bright: #8cffae;
+      --phosphor-soft: rgba(57, 255, 118, 0.24);
+      --phosphor-glow: rgba(57, 255, 118, 0.45);
+      --zoom-origin-x: 50%;
+      --zoom-origin-y: 50%;
+      --ascend-origin-x: 50%;
+      --ascend-origin-y: 50%;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    input, textarea, select, [contenteditable="true"] {
+      user-select: text;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-void);
+      color: var(--phosphor);
+      font-family: 'Share Tech Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Bisel exterior de monitor CRT antiguo con curvatura marcada */
+    .crt-outer-bezel {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      padding: clamp(8px, 1.8vw, 24px);
+      background:
+        radial-gradient(circle at 50% 50%, #17231b 0%, #0d140f 62%, #060907 100%);
+      overflow: hidden;
+    }
+
+    .crt-outer-bezel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow:
+        inset 0 0 65px rgba(0, 0, 0, 0.92),
+        inset 0 0 18px rgba(57, 255, 118, 0.08);
+      z-index: 35;
+    }
+
+    /* Pantalla CRT curvada con sombra interior y reflejos sutiles de cristal */
+    .crt-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 36px / 28px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(22, 199, 84, 0.16) 0%, rgba(4, 36, 16, 0.78) 46%, rgba(1, 12, 5, 0.98) 100%),
+        linear-gradient(180deg, #041c0d 0%, #021108 55%, #010904 100%);
+      border: 2px solid rgba(125, 255, 158, 0.24);
+      box-shadow:
+        0 0 0 4px #090e0b,
+        0 0 38px rgba(22, 199, 84, 0.18),
+        inset 0 0 90px rgba(0, 0, 0, 0.92),
+        inset 0 0 28px rgba(57, 255, 118, 0.14);
+      transform: translateZ(0);
+    }
+
+    /* =========================================================================
+       MOSAICO AMBIENTAL DE VÍDEOS E IMÁGENES DE PROYECTOS + BLUR Y FILTRO VERDE
+       ========================================================================= */
+    .project-media-wall {
+      position: absolute;
+      inset: -34px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 10px;
+      pointer-events: none;
+      transform: scale(1.08);
+      filter: blur(22px) saturate(1.3) contrast(1.15) brightness(0.76);
+      opacity: 0.95;
+      transition: opacity 320ms ease, filter 320ms ease;
+      z-index: 0;
+    }
+
+    .crt-screen.bg-dimmed .project-media-wall {
+      filter: blur(26px) saturate(1.1) contrast(1.05) brightness(0.42);
+      opacity: 0.65;
+    }
+
+    .media-tile {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #031c0d;
+    }
+
+    .media-tile video,
+    .media-tile img,
+    .media-tile canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Tinte verde laboratorio multicapa sobre el mosaico desenfocado */
+    .green-phosphor-filter {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(160deg, rgba(4, 42, 19, 0.78) 0%, rgba(7, 68, 30, 0.64) 48%, rgba(2, 22, 10, 0.86) 100%),
+        radial-gradient(circle at 50% 45%, rgba(57, 255, 118, 0.22) 0%, rgba(3, 24, 11, 0.72) 78%);
+      mix-blend-mode: multiply;
+      z-index: 1;
+    }
+
+    .green-phosphor-tint {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(57, 255, 118, 0.24), transparent 46%),
+        radial-gradient(circle at 78% 72%, rgba(22, 199, 84, 0.26), transparent 50%),
+        rgba(5, 48, 21, 0.56);
+      z-index: 2;
+    }
+
+    /* Rejilla técnica y ruido de laboratorio verde */
+    .crt-grid-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(57, 255, 118, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(57, 255, 118, 0.05) 1px, transparent 1px);
+      background-size: 44px 44px;
+      z-index: 3;
+    }
+
+    /* Líneas de barrido CRT (scanlines) pronunciadas */
+    .crt-scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0px,
+        rgba(0, 0, 0, 0) 2px,
+        rgba(0, 0, 0, 0.42) 3px,
+        rgba(0, 0, 0, 0.42) 4px
+      );
+      z-index: 25;
+      animation: scanDrift 9s linear infinite;
+    }
+
+    /* Barra de refresco horizontal CRT */
+    .crt-scanbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 11vh;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        rgba(125, 255, 158, 0) 0%,
+        rgba(125, 255, 158, 0.065) 50%,
+        rgba(125, 255, 158, 0) 100%
+      );
+      z-index: 26;
+      animation: scanSweep 6.5s linear infinite;
+    }
+
+    /* Viñeta curva de tubo catódico + leve brillo de cristal */
+    .crt-vignette-glass {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      background:
+        radial-gradient(ellipse at center, transparent 54%, rgba(0, 0, 0, 0.48) 82%, rgba(0, 0, 0, 0.88) 100%),
+        linear-gradient(135deg, rgba(160, 255, 190, 0.065) 0%, transparent 28%, transparent 74%, rgba(57, 255, 118, 0.04) 100%);
+      box-shadow: inset 0 0 42px rgba(0, 0, 0, 0.82);
+      z-index: 27;
+    }
+
+    @keyframes scanDrift {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 120px; }
+    }
+
+    @keyframes scanSweep {
+      0% { top: -16vh; }
+      100% { top: 108vh; }
+    }
+
+    .phosphor-text {
+      color: var(--phosphor);
+      text-shadow: 0 0 8px rgba(57, 255, 118, 0.42), 0 0 20px rgba(22, 199, 84, 0.22);
+    }
+
+    .phosphor-bright-text {
+      color: var(--phosphor-bright);
+      text-shadow: 0 0 10px rgba(140, 255, 174, 0.65), 0 0 24px rgba(57, 255, 118, 0.35);
+    }
+
+    /* =========================================================================
+       ESCENARIO DISPERSO DE RAMAS + ZOOM ÓPTICO HACIA LA RAMA PULSADA
+       ========================================================================= */
+    .branch-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-origin: var(--zoom-origin-x) var(--zoom-origin-y);
+      will-change: transform, opacity, filter;
+    }
+
+    /* Zoom óptico hacia el centro exacto de la rama seleccionada */
+    .branch-stage.zooming-in {
+      animation: opticalZoomIn 540ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Deszoom óptico suave al ascender desde el punto focal activo */
+    .branch-stage.zooming-out {
+      transform-origin: var(--ascend-origin-x) var(--ascend-origin-y);
+      animation: opticalZoomOut 440ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Entrada del nuevo nivel tras atravesar la rama */
+    .branch-stage.entering-level {
+      transform-origin: 50% 50%;
+      animation: levelArrive 430ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes opticalZoomIn {
+      0% {
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+        filter: blur(0px) brightness(1);
+      }
+      55% {
+        opacity: 0.92;
+        filter: blur(0.6px) brightness(1.22);
+      }
+      100% {
+        transform: scale(3.35) translateZ(0);
+        opacity: 0;
+        filter: blur(3.5px) brightness(1.55);
+      }
+    }
+
+    @keyframes opticalZoomOut {
+      0% {
+        transform: scale(1.38) translateZ(0);
+        opacity: 0.15;
+        filter: blur(2.5px) brightness(1.3);
+      }
+      100% {
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+        filter: blur(0px) brightness(1);
+      }
+    }
+
+    @keyframes levelArrive {
+      0% {
+        transform: scale(0.76) translateZ(0);
+        opacity: 0;
+        filter: blur(2px) brightness(1.25);
+      }
+      100% {
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+        filter: blur(0px) brightness(1);
+      }
+    }
+
+    /* Destello de túnel fosfórico al atravesar una rama */
+    .phosphor-tunnel-flash {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 22;
+      background:
+        radial-gradient(
+          circle at var(--zoom-origin-x) var(--zoom-origin-y),
+          rgba(140, 255, 174, 0.34) 0%,
+          rgba(57, 255, 118, 0.14) 22%,
+          rgba(3, 21, 10, 0.72) 64%,
+          rgba(1, 8, 4, 0.95) 100%
+        );
+    }
+
+    .phosphor-tunnel-flash.active {
+      animation: tunnelPulse 560ms ease-out forwards;
+    }
+
+    @keyframes tunnelPulse {
+      0% {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      38% {
+        opacity: 0.95;
+        transform: scale(1.08);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.35);
+      }
+    }
+
+    /* Nodo/rama dispersa por la pantalla (nunca en lista ni cuadrícula alineada) */
+    .scattered-branch {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+      border-radius: 14px;
+      border: 1px solid rgba(57, 255, 118, 0.34);
+      background: linear-gradient(155deg, rgba(8, 44, 21, 0.82) 0%, rgba(3, 18, 9, 0.92) 100%);
+      box-shadow:
+        0 0 18px rgba(22, 199, 84, 0.14),
+        inset 0 0 16px rgba(57, 255, 118, 0.06);
+      cursor: pointer;
+      transition:
+        transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 220ms ease,
+        box-shadow 220ms ease,
+        background 220ms ease;
+      transform: rotate(var(--node-rot, 0deg));
+      z-index: 10;
+    }
+
+    @media (min-width: 768px) {
+      .scattered-branch {
+        position: absolute;
+        left: var(--desk-x, 50%);
+        top: var(--desk-y, 50%);
+        width: var(--desk-w, 260px);
+        transform: translate(-50%, -50%) rotate(var(--node-rot, 0deg));
+      }
+    }
+
+    .scattered-branch:hover {
+      border-color: rgba(140, 255, 174, 0.85);
+      background: linear-gradient(155deg, rgba(16, 78, 38, 0.9) 0%, rgba(5, 28, 14, 0.95) 100%);
+      box-shadow:
+        0 0 28px rgba(57, 255, 118, 0.36),
+        inset 0 0 22px rgba(140, 255, 174, 0.14);
+      z-index: 18;
+    }
+
+    @media (min-width: 768px) {
+      .scattered-branch:hover {
+        transform: translate(-50%, -50%) rotate(calc(var(--node-rot, 0deg) * 0.4)) scale(1.045);
+      }
+    }
+
+    /* Rama enfocada justo antes de atravesarla con el zoom */
+    .scattered-branch.is-zoom-target {
+      border-color: var(--phosphor-bright);
+      background: rgba(24, 112, 54, 0.95);
+      box-shadow:
+        0 0 42px rgba(140, 255, 174, 0.75),
+        inset 0 0 26px rgba(140, 255, 174, 0.28);
+      z-index: 30;
+    }
+
+    /* Scroll interno sutil solo dentro de modales o paneles de lectura/edición */
+    .inner-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .inner-scroll::-webkit-scrollbar-track {
+      background: rgba(2, 18, 8, 0.7);
+    }
+    .inner-scroll::-webkit-scrollbar-thumb {
+      background: rgba(57, 255, 118, 0.35);
+      border-radius: 9999px;
+    }
+    .inner-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(125, 255, 158, 0.65);
+    }
+  </style>
+</head>
+<body>
+  <div class="crt-outer-bezel">
+    <main id="crtScreen" class="crt-screen flex flex-col justify-between">
+      <!-- Fondo dinámico: mosaico de vídeos e imágenes de proyectos + blur intenso + filtro verde -->
+      <div id="projectMediaWall" class="project-media-wall" aria-hidden="true"></div>
+      <div class="green-phosphor-filter" aria-hidden="true"></div>
+      <div class="green-phosphor-tint" aria-hidden="true"></div>
+
+      <!-- Capas ambientales CRT -->
+      <div class="crt-grid-bg" aria-hidden="true"></div>
+      <div class="crt-scanlines" aria-hidden="true"></div>
+      <div class="crt-scanbar" aria-hidden="true"></div>
+      <div id="tunnelFlash" class="phosphor-tunnel-flash" aria-hidden="true"></div>
+      <div class="crt-vignette-glass" aria-hidden="true"></div>
+
+      <!-- Barra superior compacta: breadcrumbs ramificados, ESC/Atrás y Modo Público/Edición -->
+      <header class="relative z-20 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-5 pt-2.5 pb-1.5 border-b border-emerald-500/20 bg-emerald-950/30 backdrop-blur-[1px]">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <button
+            id="btnAscend"
+            type="button"
+            onclick="ascendLevel()"
+            class="px-2.5 py-1 text-xs rounded-lg border border-emerald-400/40 bg-emerald-950/70 hover:bg-emerald-800/60 hover:border-emerald-300 text-emerald-200 transition disabled:opacity-35 disabled:pointer-events-none shrink-0"
+            title="Subir un nivel (ESC)"
+          >
+            &lt;- SUBIR [ESC]
+          </button>
+
+          <nav id="breadcrumbBar" aria-label="Ruta ramificada" class="flex items-center gap-1.5 text-xs sm:text-sm overflow-x-auto inner-scroll whitespace-nowrap py-0.5"></nav>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <button
+            id="btnBgFeed"
+            type="button"
+            onclick="toggleBgFeedIntensity()"
+            class="px-2.5 py-1 text-[11px] rounded-lg border border-emerald-400/35 bg-emerald-950/65 hover:bg-emerald-800/60 text-emerald-200 transition"
+            title="Alternar intensidad del mosaico multimedia de fondo"
+          >
+            BG_FEED: ON
+          </button>
+          <span id="statusBadge" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded-full border border-emerald-400/30 bg-emerald-950/60 text-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            MODO PÚBLICO
+          </span>
+          <button
+            id="btnToggleMode"
+            type="button"
+            onclick="toggleEditMode()"
+            class="px-2.5 py-1 text-xs rounded-lg border border-emerald-400/50 bg-emerald-900/50 hover:bg-emerald-700/60 text-emerald-100 transition"
+          >
+            ACTIVAR EDICIÓN
+          </button>
+        </div>
+      </header>
+
+      <!-- Escenario principal de 100vh con ramas dispersas y zoom óptico -->
+      <section id="stageViewport" class="relative z-10 flex-1 w-full overflow-hidden">
+        <div id="branchStage" class="branch-stage">
+          <!-- Líneas vectoriales decorativas que conectan el núcleo con las ramas dispersas -->
+          <svg id="branchConnectors" class="hidden md:block absolute inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true"></svg>
+
+          <!-- Contenedor de nodos ramificados -->
+          <div id="nodesLayer" class="relative z-10 w-full h-full flex flex-col gap-2.5 p-3 md:block md:p-0 overflow-y-auto md:overflow-hidden inner-scroll"></div>
+        </div>
+      </section>
+
+      <!-- Barra inferior de estado y ayuda rápida -->
+      <footer class="relative z-20 flex flex-wrap items-center justify-between gap-2 px-3 sm:px-5 py-1.5 border-t border-emerald-500/20 bg-emerald-950/35 text-[11px] text-emerald-300/85">
+        <div id="footerHint" class="truncate">
+          [CLIC EN RAMA] Zoom óptico y profundizar &bull; [ESC] Deszoom y subir nivel
+        </div>
+        <div id="dbStatus" class="text-emerald-400/90 shrink-0">
+          CRT-FS v2.6 &bull; IndexedDB: listo
+        </div>
+      </footer>
+
+      <!-- Modal visor y editor de nodos/archivos dentro de la pantalla CRT -->
+      <div id="modalOverlay" class="hidden fixed inset-0 z-40 items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-[2px]">
+        <div class="w-full max-w-4xl max-h-[84vh] flex flex-col rounded-2xl border border-emerald-400/50 bg-[#03170b]/95 shadow-[0_0_45px_rgba(57,255,118,0.25)] overflow-hidden">
+          <div class="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-emerald-500/30 bg-emerald-950/60">
+            <div id="modalTitle" class="text-sm sm:text-base font-semibold phosphor-bright-text truncate"></div>
+            <button
+              type="button"
+              onclick="closeModal()"
+              class="px-2.5 py-1 text-xs rounded-lg border border-emerald-400/40 hover:bg-emerald-800/60 text-emerald-200"
+            >
+              CERRAR [X]
+            </button>
+          </div>
+          <div id="modalBody" class="p-4 overflow-y-auto inner-scroll space-y-4 text-xs sm:text-sm text-emerald-100/95"></div>
+        </div>
+      </div>
+
+      <!-- Notificación flotante no intrusiva (sin alert/confirm) -->
+      <div id="toastBanner" class="hidden fixed bottom-12 right-6 z-50 max-w-xs px-3.5 py-2 rounded-xl border border-emerald-300/60 bg-emerald-950/95 text-xs text-emerald-100 shadow-[0_0_24px_rgba(57,255,118,0.35)]"></div>
+    </main>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. PERSISTENCIA EN INDEXEDDB PARA ARCHIVOS (IMÁGENES, VÍDEOS, PDFS) Y ESTADO
+       ========================================================================= */
+    const DB_NAME = 'AntonioParrasCRT_DB';
+    const DB_VERSION = 1;
+    const STORE_FILES = 'media_files';
+    const STORE_STATE = 'portfolio_state';
+    let dbInstance = null;
+    let isEditMode = false;
+    let isTransitioning = false;
+    let isBgDimmed = false;
+    let backgroundWallUrls = [];
+    let currentPath = []; // Array de IDs de nodos desde la raíz
+    let lastAscendFocal = { x: 50, y: 50 };
+
+    function toggleBgFeedIntensity() {
+      isBgDimmed = !isBgDimmed;
+      const screen = document.getElementById('crtScreen');
+      const btn = document.getElementById('btnBgFeed');
+      screen.classList.toggle('bg-dimmed', isBgDimmed);
+      btn.textContent = isBgDimmed ? 'BG_FEED: DIM' : 'BG_FEED: ON';
+      showToast(isBgDimmed ? 'Fondo multimedia atenuado (DIM).' : 'Fondo multimedia activo (ON).');
+    }
+
+    /* =========================================================================
+       1B. MOSAICO DE FONDO EN MOVIMIENTO (PROYECTOS INTEGRADOS + INDEXEDDB)
+       ========================================================================= */
+    function buildSyntheticProjectVisuals() {
+      const specs = [
+        {
+          id: 'synth_freestyle',
+          title: 'FREESTYLE PICA // FLUTTER AUDIO SYNC',
+          accent: '#39ff76',
+          secondary: '#0f7a38',
+          mode: 'waveform'
+        },
+        {
+          id: 'synth_prover9',
+          title: 'PROVER9-MACE4 // PYQT6 FOL ENGINE',
+          accent: '#8cffae',
+          secondary: '#15803d',
+          mode: 'logic'
+        },
+        {
+          id: 'synth_gesture',
+          title: 'GESTUREGLOVE // ESP32 BLE HID + MPU6050',
+          accent: '#4ade80',
+          secondary: '#065f46',
+          mode: 'imu'
+        },
+        {
+          id: 'synth_rotombot',
+          title: 'ROTOMBOT // ARDUINO SUMO + HC-SR04',
+          accent: '#22c55e',
+          secondary: '#14532d',
+          mode: 'radar'
+        },
+        {
+          id: 'synth_ugr',
+          title: 'ETSIIT UGR // COMPUTER ARCHITECTURE',
+          accent: '#86efac',
+          secondary: '#047857',
+          mode: 'circuit'
+        },
+        {
+          id: 'synth_sec',
+          title: 'BIG SCHOOL // ETHICAL HACKING LAB',
+          accent: '#39ff76',
+          secondary: '#052e16',
+          mode: 'matrix'
+        }
+      ];
+
+      return specs.map((spec) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 480;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+        let phase = Math.random() * Math.PI * 2;
+
+        function drawFrame() {
+          phase += 0.035;
+          ctx.fillStyle = '#03190c';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Bloques de color y geometría animada para que bajo el blur se note movimiento real
+          const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          grad.addColorStop(0, spec.secondary);
+          grad.addColorStop(1, '#021208');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.strokeStyle = spec.accent;
+          ctx.fillStyle = spec.accent;
+
+          if (spec.mode === 'waveform') {
+            for (let i = 0; i < 24; i++) {
+              const h = 30 + Math.abs(Math.sin(phase + i * 0.45)) * 165;
+              ctx.fillRect(18 + i * 19, (canvas.height - h) / 2, 12, h);
+            }
+          } else if (spec.mode === 'imu') {
+            for (let c = 0; c < 3; c++) {
+              ctx.beginPath();
+              ctx.lineWidth = 6;
+              for (let x = 0; x <= canvas.width; x += 16) {
+                const y = 150 + Math.sin(x * 0.02 + phase + c * 1.4) * (55 + c * 18);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+              }
+              ctx.stroke();
+            }
+          } else if (spec.mode === 'radar') {
+            const cx = 240 + Math.cos(phase * 0.7) * 50;
+            const cy = 150 + Math.sin(phase * 0.7) * 35;
+            for (let r = 30; r <= 150; r += 40) {
+              ctx.beginPath();
+              ctx.lineWidth = 4;
+              ctx.arc(cx, cy, r + ((phase * 15) % 40), 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          } else if (spec.mode === 'logic') {
+            for (let row = 0; row < 6; row++) {
+              const w = 120 + ((Math.sin(phase + row) + 1) * 140);
+              ctx.fillRect(34, 32 + row * 42, w, 22);
+            }
+          } else if (spec.mode === 'circuit') {
+            ctx.lineWidth = 5;
+            for (let i = 0; i < 8; i++) {
+              const y = 30 + i * 34;
+              const xMid = 140 + Math.sin(phase + i) * 90;
+              ctx.beginPath();
+              ctx.moveTo(0, y);
+              ctx.lineTo(xMid, y);
+              ctx.lineTo(xMid + 40, y + 20);
+              ctx.lineTo(canvas.width, y + 20);
+              ctx.stroke();
+            }
+          } else {
+            for (let col = 0; col < 14; col++) {
+              const y = ((phase * 65 + col * 47) % 320) - 40;
+              ctx.fillRect(20 + col * 33, y, 16, 75);
+            }
+          }
+        }
+
+        drawFrame();
+        return { canvas, drawFrame };
+      });
+    }
+
+    let syntheticLoops = [];
+    let syntheticRafId = null;
+
+    async function refreshProjectMediaWall() {
+      const wall = document.getElementById('projectMediaWall');
+      if (!wall) return;
+
+      backgroundWallUrls.forEach((u) => URL.revokeObjectURL(u));
+      backgroundWallUrls = [];
+      if (syntheticRafId) {
+        cancelAnimationFrame(syntheticRafId);
+        syntheticRafId = null;
+      }
+      syntheticLoops = [];
+
+      const allFiles = await getAllFiles();
+      const visualFiles = allFiles.filter(
+        (f) => f.mimeType && (f.mimeType.startsWith('image/') || f.mimeType.startsWith('video/'))
+      );
+
+      wall.innerHTML = '';
+      const totalTiles = 6;
+      const synths = buildSyntheticProjectVisuals();
+
+      for (let i = 0; i < totalTiles; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'media-tile';
+
+        if (visualFiles.length > 0) {
+          const media = visualFiles[i % visualFiles.length];
+          const url = URL.createObjectURL(media.blob);
+          backgroundWallUrls.push(url);
+
+          if (media.mimeType.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.src = url;
+            video.muted = true;
+            video.autoplay = true;
+            video.loop = true;
+            video.playsInline = true;
+            tile.appendChild(video);
+          } else {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = media.name || 'Proyecto';
+            tile.appendChild(img);
+          }
+        } else {
+          const synth = synths[i % synths.length];
+          tile.appendChild(synth.canvas);
+          syntheticLoops.push(synth.drawFrame);
+        }
+
+        wall.appendChild(tile);
+      }
+
+      if (syntheticLoops.length > 0) {
+        const animateWall = () => {
+          for (const fn of syntheticLoops) fn();
+          syntheticRafId = requestAnimationFrame(animateWall);
+        };
+        syntheticRafId = requestAnimationFrame(animateWall);
+      }
+    }
+
+    async function loadTreeState() {
+      try {
+        const db = await openPortfolioDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction(STORE_STATE, 'readonly');
+          const req = tx.objectStore(STORE_STATE).get('tree');
+          req.onsuccess = () => resolve(req.result ? req.result.data : null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toastBanner');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2800);
+    }
+
+    /* =========================================================================
+       2. ESTRUCTURA DE RAMAS DEL PORFOLIO (SIN DATOS PERSONALES SENSIBLES)
+       ========================================================================= */
+    const DEFAULT_TREE = {
+      id: 'root',
+      name: 'antonio-parras.sys',
+      tag: 'NÚCLEO DEL SISTEMA',
+      summary: 'Antonio José Parras Flores — Graduado en Ingeniería Informática (Esp. Ingeniería de Computadores, ETSIIT UGR). Inglés C1 Advanced.',
+      pos: { x: 50, y: 48, w: 300, rot: 0 },
+      children: [
+        {
+          id: 'perfil',
+          name: '01_perfil/',
+          tag: 'ETSIIT UGR · C1 · BECAS',
+          summary: 'Formación en Ingeniería de Computadores en la ETSIIT (Universidad de Granada), nivel de inglés C1 Advanced y experiencia como Becario de Automatización de Software y Datos en el Gabinete Psicopedagógico UGR.',
+          pos: { x: 21, y: 24, w: 265, rot: -1.8 },
+          children: [
+            {
+              id: 'perfil_formacion',
+              name: 'formacion_y_c1.md',
+              tag: 'GRADO · INGLÉS C1',
+              summary: 'Graduado en Ingeniería Informática con Especialidad en Ingeniería de Computadores por la ETSIIT de la Universidad de Granada. Acreditación de Inglés nivel C1 Advanced.',
+              details: [
+                'Titulación: Grado en Ingeniería Informática — Especialidad en Ingeniería de Computadores (ETSIIT, Universidad de Granada).',
+                'Idioma: Inglés nivel C1 Advanced (lectura técnica, redacción académica y comunicación profesional).',
+                'Enfoque: Arquitectura de computadores, sistemas embebidos, programación de sistemas, automatización e interfaces técnicas.'
+              ],
+              pos: { x: 24, y: 26, w: 280, rot: -1.5 }
+            },
+            {
+              id: 'perfil_gabinete',
+              name: 'gabinete_psicopedagogico_ugr.log',
+              tag: 'BECARIO SOFTWARE & DATOS',
+              summary: 'Prácticas/beca como Software & Data Automation Intern en el Gabinete Psicopedagógico de la Universidad de Granada trabajando con Python, bases de datos relacionales y LimeSurvey.',
+              details: [
+                'Rol: Becario de Automatización de Software y Datos (Gabinete Psicopedagógico, Universidad de Granada).',
+                'Stack: Python para automatización de flujos, tratamiento y validación de datos, bases de datos relacionales y LimeSurvey.',
+                'Impacto: Reducción de tareas manuales repetitivas y mayor consistencia en la gestión y explotación estructurada de encuestas y registros.'
+              ],
+              pos: { x: 72, y: 34, w: 295, rot: 1.6 }
+            },
+            {
+              id: 'perfil_media',
+              name: 'adjuntos_perfil/',
+              tag: 'CV · CERTIFICADOS · FOTOS',
+              summary: 'Carpeta interactiva para adjuntar y previsualizar tu CV en PDF, credenciales o capturas en IndexedDB.',
+              allowUpload: true,
+              pos: { x: 44, y: 68, w: 260, rot: -0.9 }
+            }
+          ]
+        },
+        {
+          id: 'proyectos',
+          name: '02_proyectos/',
+          tag: '4 SISTEMAS ACTIVOS',
+          summary: 'Explora las ramas de proyectos: Freestyle Pica (Flutter/Dart), TFG Interfaz Prover9-Mace4 (Python/PyQt6), GestureGlove BLE HID (ESP32 + MPU-6050 + KY-023) y Rotombot (Arduino + IR + HC-SR04).',
+          pos: { x: 76, y: 26, w: 270, rot: 2.1 },
+          children: [
+            {
+              id: 'proj_freestyle_pica',
+              name: 'freestyle-pica/',
+              tag: 'FLUTTER · DART · AUDIO SYNC',
+              summary: 'Aplicación móvil desarrollada en Flutter y Dart centrada en sincronización de pistas de audio y gestión de estado reactiva para sesiones de práctica.',
+              details: [
+                'Tecnologías: Flutter y Dart.',
+                'Características clave: Sincronización precisa de pistas de audio, control de tiempos/compases y gestión de estado estructurada para mantener fluidez en UI.',
+                'Estado: Disponible para adjuntar capturas, vídeos de demo o APK/documentación en el visor CRT.'
+              ],
+              allowUpload: true,
+              pos: { x: 22, y: 25, w: 265, rot: -2.0 }
+            },
+            {
+              id: 'proj_tfg_prover9',
+              name: 'tfg-prover9-mace4/',
+              tag: 'PYTHON · PYQT6 · TFG',
+              summary: 'Trabajo de Fin de Grado: interfaz gráfica de escritorio en Python y PyQt6 para trabajar con los motores de demostración automática y búsqueda de modelos finitos Prover9 y Mace4.',
+              details: [
+                'Tecnologías: Python y PyQt6.',
+                'Propósito: Facilitar la edición de premisas/objetivos, ejecución de Prover9 y Mace4 e inspección clara de resultados lógicos desde una interfaz gráfica.',
+                'Enfoque: Usabilidad técnica, organización modular y trazabilidad entre entrada formal y salida del motor.'
+              ],
+              allowUpload: true,
+              pos: { x: 75, y: 24, w: 275, rot: 1.7 }
+            },
+            {
+              id: 'proj_gesture_glove',
+              name: 'gesture-glove-esp32/',
+              tag: 'C++ · ESP32 · BLE HID · IMU',
+              summary: 'Guante inalámbrico BLE HID sobre ESP32-WROOM-32 en C++, integrando sensor inercial MPU-6050 y joystick analógico KY-023 para control gestual y de puntero/entradas.',
+              details: [
+                'Hardware & Firmware: ESP32-WROOM-32, C++, IMU MPU-6050 (acelerómetro/giroscopio) y joystick KY-023.',
+                'Conectividad: Perfil Bluetooth Low Energy HID para interactuar de forma inalámbrica como dispositivo de entrada.',
+                'Retos técnicos: Filtrado/estabilización de lecturas inerciales, mapeo del joystick y bajo consumo/latencia en BLE.'
+              ],
+              allowUpload: true,
+              pos: { x: 26, y: 69, w: 275, rot: 1.4 }
+            },
+            {
+              id: 'proj_rotombot',
+              name: 'rotombot-sumo/',
+              tag: 'ARDUINO · IR · HC-SR04',
+              summary: 'Robot autónomo de combate/sumo basado en Arduino, equipado con sensor infrarrojo (IR) de línea, parachoques delantero y trasero, y sensor ultrasónico HC-SR04.',
+              details: [
+                'Plataforma: Arduino con lógica de control autónoma y toma de decisiones en tiempo real.',
+                'Sensórica: Sensor IR para detección de borde/línea del ring, HC-SR04 para detección de distancia/objetivo y bumpers delantero y trasero.',
+                'Comportamiento: Alternancia entre búsqueda, evasión de perímetro, detección frontal y respuesta ante contacto.'
+              ],
+              allowUpload: true,
+              pos: { x: 74, y: 68, w: 265, rot: -1.9 }
+            }
+          ]
+        },
+        {
+          id: 'titulos_certs',
+          name: '03_titulos_y_certs/',
+          tag: 'ACREDITACIONES · BIG SCHOOL',
+          summary: 'Credenciales académicas y certificaciones técnicas, incluyendo Hacking Ético de 0 a Hackear Aplicaciones (BIG school) y tu Grado en Ingeniería Informática.',
+          pos: { x: 25, y: 72, w: 275, rot: 1.5 },
+          children: [
+            {
+              id: 'cert_hacking_etico',
+              name: 'hacking_etico_big_school.cert',
+              tag: 'BIG SCHOOL · SEGURIDAD WEB/APPS',
+              summary: 'Certificación en Hacking Ético de 0 a Hackear Aplicaciones impartida por BIG school. Adjunta aquí tu diploma o captura verificable.',
+              details: [
+                'Programa: Hacking Ético de 0 a Hackear Aplicaciones.',
+                'Entidad: BIG school.',
+                'Ámbito: Metodología ofensiva ética, análisis de vulnerabilidades en aplicaciones y mentalidad de seguridad.'
+              ],
+              allowUpload: true,
+              pos: { x: 30, y: 32, w: 295, rot: -1.4 }
+            },
+            {
+              id: 'cert_grado_ugr',
+              name: 'grado_ing_informatica_ugr.cred',
+              tag: 'ETSIIT UGR · ING. COMPUTADORES',
+              summary: 'Graduado en Ingeniería Informática — Especialidad en Ingeniería de Computadores por la ETSIIT (Universidad de Granada).',
+              details: [
+                'Centro: ETSIIT — Universidad de Granada.',
+                'Especialidad: Ingeniería de Computadores.',
+                'Nota de privacidad: Por seguridad, los datos identificativos sensibles no se muestran en la vista pública.'
+              ],
+              allowUpload: true,
+              pos: { x: 70, y: 64, w: 295, rot: 1.8 }
+            }
+          ]
+        },
+        {
+          id: 'boveda_archivos',
+          name: '04_boveda_archivos/',
+          tag: 'INDEXEDDB · IMÁGENES · VÍDEO · PDF',
+          summary: 'Gestor central de archivos multimedia y documentos (imágenes, vídeos MP4/WebM y PDFs) almacenados localmente en IndexedDB para previsualizar en el visor CRT.',
+          allowUpload: true,
+          isVaultManager: true,
+          pos: { x: 73, y: 71, w: 275, rot: -2.2 }
+        }
+      ]
+    };
+
+    let portfolioTree = JSON.parse(JSON.stringify(DEFAULT_TREE));
+
+    /* =========================================================================
+       3. NAVEGACIÓN RAMIFICADA, ZOOM ÓPTICO HACIA LA RAMA Y ASCENSO CON ESC
+       ========================================================================= */
+    function getNodeByPath(pathIds) {
+      let node = portfolioTree;
+      for (const id of pathIds) {
+        if (!node.children) return null;
+        const found = node.children.find((c) => c.id === id);
+        if (!found) return null;
+        node = found;
+      }
+      return node;
+    }
+
+    function getFocalPercentFromElement(el) {
+      const stageRect = document.getElementById('branchStage').getBoundingClientRect();
+      if (!el || stageRect.width === 0 || stageRect.height === 0) {
+        return { x: 50, y: 50 };
+      }
+      const rect = el.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2 - stageRect.left;
+      const centerY = rect.top + rect.height / 2 - stageRect.top;
+      const pctX = Math.max(5, Math.min(95, (centerX / stageRect.width) * 100));
+      const pctY = Math.max(8, Math.min(92, (centerY / stageRect.height) * 100));
+      return { x: Number(pctX.toFixed(2)), y: Number(pctY.toFixed(2)) };
+    }
+
+    function setStageZoomOrigin(xPct, yPct, varName = '--zoom-origin-x', varNameY = '--zoom-origin-y') {
+      const stage = document.getElementById('branchStage');
+      const flash = document.getElementById('tunnelFlash');
+      stage.style.setProperty(varName, `${xPct}%`);
+      stage.style.setProperty(varNameY, `${yPct}%`);
+      flash.style.setProperty('--zoom-origin-x', `${xPct}%`);
+      flash.style.setProperty('--zoom-origin-y', `${yPct}%`);
+    }
+
+    async function handleBranchClick(childId, clickedEl) {
+      if (isTransitioning) return;
+      const currentNode = getNodeByPath(currentPath);
+      const targetNode = currentNode?.children?.find((c) => c.id === childId);
+      if (!targetNode) return;
+
+      // Si es una hoja sin subramas, abrir visor/editor en modal CRT
+      if (!targetNode.children || targetNode.children.length === 0) {
+        openNodeModal(targetNode);
+        return;
+      }
+
+      isTransitioning = true;
+      const focal = getFocalPercentFromElement(clickedEl);
+      lastAscendFocal = focal;
+      setStageZoomOrigin(focal.x, focal.y, '--zoom-origin-x', '--zoom-origin-y');
+
+      if (clickedEl) {
+        clickedEl.classList.add('is-zoom-target');
+      }
+
+      const stage = document.getElementById('branchStage');
+      const flash = document.getElementById('tunnelFlash');
+
+      stage.classList.remove('zooming-out', 'entering-level', 'zooming-in');
+      flash.classList.remove('active');
+      void stage.offsetWidth;
+      void flash.offsetWidth;
+
+      stage.classList.add('zooming-in');
+      flash.classList.add('active');
+
+      await new Promise((r) => setTimeout(r, 490));
+
+      currentPath.push(childId);
+      renderCurrentLevel('entering-level');
+      flash.classList.remove('active');
+      isTransitioning = false;
+    }
+
+    async function ascendLevel() {
+      if (isTransitioning || currentPath.length === 0) return;
+      isTransitioning = true;
+
+      const stage = document.getElementById('branchStage');
+      stage.style.setProperty('--ascend-origin-x', `${lastAscendFocal.x}%`);
+      stage.style.setProperty('--ascend-origin-y', `${lastAscendFocal.y}%`);
+
+      currentPath.pop();
+      renderCurrentLevel('zooming-out');
+
+      await new Promise((r) => setTimeout(r, 440));
+      isTransitioning = false;
+    }
+
+    async function jumpToBreadcrumb(index) {
+      if (isTransitioning) return;
+      if (index === -1 && currentPath.length > 0) {
+        currentPath = [];
+        renderCurrentLevel('zooming-out');
+      } else if (index >= 0 && index < currentPath.length - 1) {
+        currentPath = currentPath.slice(0, index + 1);
+        renderCurrentLevel('zooming-out');
+      }
+    }
+
+    /* =========================================================================
+       4. RENDERIZADO DE NIVEL DISPERSO, LÍNEAS VECTORIALES Y MODO EDICIÓN
+       ========================================================================= */
+    function renderBreadcrumbs() {
+      const bar = document.getElementById('breadcrumbBar');
+      const btnAscend = document.getElementById('btnAscend');
+      btnAscend.disabled = currentPath.length === 0;
+
+      let html = `<button type="button" onclick="jumpToBreadcrumb(-1)" class="px-1.5 py-0.5 rounded hover:bg-emerald-800/50 text-emerald-300 font-semibold">~/${escapeHtml(portfolioTree.name)}</button>`;
+      let walk = portfolioTree;
+      currentPath.forEach((id, idx) => {
+        const next = walk.children?.find((c) => c.id === id);
+        if (next) {
+          walk = next;
+          const isLast = idx === currentPath.length - 1;
+          html += `<span class="text-emerald-500/70">/</span>`;
+          if (isLast) {
+            html += `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 phosphor-bright-text font-semibold">${escapeHtml(next.name)}</span>`;
+          } else {
+            html += `<button type="button" onclick="jumpToBreadcrumb(${idx})" class="px-1.5 py-0.5 rounded hover:bg-emerald-800/50 text-emerald-200">${escapeHtml(next.name)}</button>`;
+          }
+        }
+      });
+      bar.innerHTML = html;
+    }
+
+    function drawConnectorLines(children) {
+      const svg = document.getElementById('branchConnectors');
+      const stage = document.getElementById('branchStage');
+      const rect = stage.getBoundingClientRect();
+      if (rect.width < 768) {
+        svg.innerHTML = '';
+        return;
+      }
+
+      const hubX = rect.width * 0.5;
+      const hubY = rect.height * 0.5;
+
+      const lines = (children || []).map((child) => {
+        const p = child.pos || { x: 50, y: 50 };
+        const tx = rect.width * (p.x / 100);
+        const ty = rect.height * (p.y / 100);
+        const ctrlX = (hubX + tx) / 2;
+        const ctrlY = Math.min(hubY, ty) - 24;
+        return `
+          <path d="M ${hubX} ${hubY} Q ${ctrlX} ${ctrlY} ${tx} ${ty}"
+                fill="none"
+                stroke="rgba(57, 255, 118, 0.22)"
+                stroke-width="1.35"
+                stroke-dasharray="5 5" />
+          <circle cx="${tx}" cy="${ty}" r="3.5" fill="rgba(125, 255, 158, 0.65)" />
+        `;
+      }).join('');
+
+      svg.innerHTML = `
+        <circle cx="${hubX}" cy="${hubY}" r="5" fill="rgba(125, 255, 158, 0.8)" />
+        <circle cx="${hubX}" cy="${hubY}" r="12" fill="none" stroke="rgba(57, 255, 118, 0.35)" stroke-width="1" />
+        ${lines}
+      `;
+    }
+
+    async function renderCurrentLevel(animClass = 'entering-level') {
+      const stage = document.getElementById('branchStage');
+      stage.classList.remove('zooming-in', 'zooming-out', 'entering-level');
+      void stage.offsetWidth;
+      if (animClass) {
+        stage.classList.add(animClass);
+      }
+
+      renderBreadcrumbs();
+      const currentNode = getNodeByPath(currentPath) || portfolioTree;
+      const nodesLayer = document.getElementById('nodesLayer');
+      const children = currentNode.children || [];
+
+      const allFiles = await getAllFiles();
+      const countByNode = allFiles.reduce((acc, f) => {
+        acc[f.nodeId] = (acc[f.nodeId] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Tarjeta central del directorio/nodo actual + ramas dispersas alrededor
+      const centerCardHtml = `
+        <div class="md:hidden p-3 rounded-xl border border-emerald-400/45 bg-emerald-950/75">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400/30 text-emerald-300">${escapeHtml(currentNode.tag || 'NODO')}</span>
+            <button type="button" onclick="openNodeModal(getNodeByPath(currentPath) || portfolioTree)" class="text-xs px-2 py-0.5 rounded border border-emerald-400/40 hover:bg-emerald-800/60">INSPECCIONAR</button>
+          </div>
+          <h1 class="mt-1.5 text-base font-bold phosphor-bright-text">${escapeHtml(currentNode.name)}</h1>
+          <p class="mt-1 text-xs text-emerald-100/85 leading-relaxed">${escapeHtml(currentNode.summary || '')}</p>
+        </div>
+
+        <div class="hidden md:flex md:flex-col md:justify-between md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[320px] p-3.5 rounded-2xl border border-emerald-300/50 bg-[#052411]/90 shadow-[0_0_32px_rgba(57,255,118,0.2)] z-10">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] px-2 py-0.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-200">${escapeHtml(currentNode.tag || 'NODO ACTIVO')}</span>
+            <button type="button" onclick="openNodeModal(getNodeByPath(currentPath) || portfolioTree)" class="text-[11px] px-2 py-0.5 rounded border border-emerald-400/40 hover:bg-emerald-800/70 text-emerald-200">
+              VER / EDITAR
+            </button>
+          </div>
+          <h1 class="mt-2 text-lg font-bold phosphor-bright-text tracking-wide">${escapeHtml(currentNode.name)}</h1>
+          <p class="mt-1 text-xs text-emerald-100/85 leading-snug line-clamp-3">${escapeHtml(currentNode.summary || '')}</p>
+          <div class="mt-2.5 pt-2 border-t border-emerald-500/20 flex items-center justify-between text-[11px] text-emerald-300/80">
+            <span>${children.length} rama(s)</span>
+            ${isEditMode ? `<button type="button" onclick="addChildBranch()" class="px-2 py-0.5 rounded bg-emerald-500/25 border border-emerald-300/50 hover:bg-emerald-500/40 text-emerald-100">+ NUEVA RAMA</button>` : '<span>CLIC EN RAMA &rarr; ZOOM</span>'}
+          </div>
+        </div>
+      `;
+
+      const branchCardsHtml = children.map((child, idx) => {
+        const pos = child.pos || {
+          x: 20 + ((idx * 37) % 62),
+          y: 22 + ((idx * 29) % 56),
+          w: 270,
+          rot: idx % 2 === 0 ? -1.6 : 1.7
+        };
+        const hasSubtree = Array.isArray(child.children) && child.children.length > 0;
+        const fileCount = countByNode[child.id] || 0;
+
+        return `
+          <div
+            class="scattered-branch"
+            style="--desk-x:${pos.x}%; --desk-y:${pos.y}%; --desk-w:${pos.w}px; --node-rot:${pos.rot}deg;"
+            onclick="handleBranchClick('${escapeAttr(child.id)}', this)"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-emerald-400/35 bg-emerald-950/80 text-emerald-300 truncate">
+                ${escapeHtml(child.tag || (hasSubtree ? 'RAMA' : 'HOJA'))}
+              </span>
+              <span class="text-[10px] text-emerald-300/80 shrink-0">
+                ${hasSubtree ? `[${child.children.length} SUB]` : '[ABRIR]'}
+              </span>
+            </div>
+
+            <div class="mt-1.5 text-sm sm:text-base font-bold phosphor-bright-text truncate">
+              ${escapeHtml(child.name)}
+            </div>
+
+            <p class="mt-1 text-[11px] text-emerald-100/80 leading-snug line-clamp-2">
+              ${escapeHtml(child.summary || '')}
+            </p>
+
+            <div class="mt-2 pt-1.5 border-t border-emerald-500/20 flex items-center justify-between gap-1 text-[10px] text-emerald-300/85">
+              <span>${fileCount > 0 ? `ADJUNTOS: ${fileCount}` : 'VISOR CRT'}</span>
+              <span class="flex items-center gap-1" onclick="event.stopPropagation()">
+                <button type="button" onclick="openNodeById('${escapeAttr(child.id)}')" class="px-1.5 py-0.5 rounded border border-emerald-400/35 hover:bg-emerald-800/60">
+                  FICHA
+                </button>
+                ${isEditMode ? `
+                  <button type="button" onclick="nudgeBranchPos('${escapeAttr(child.id)}')" class="px-1.5 py-0.5 rounded border border-emerald-400/35 hover:bg-emerald-800/60" title="Reubicar rama">
+                    MOVER
+                  </button>
+                  <button type="button" onclick="deleteChildBranch('${escapeAttr(child.id)}')" class="px-1.5 py-0.5 rounded border border-red-400/40 text-red-300 hover:bg-red-950/60" title="Eliminar rama">
+                    DEL
+                  </button>
+                ` : ''}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      nodesLayer.innerHTML = centerCardHtml + branchCardsHtml;
+      drawConnectorLines(children);
+    }
+
+    function openNodeById(nodeId) {
+      const currentNode = getNodeByPath(currentPath) || portfolioTree;
+      const target = currentNode.children?.find((c) => c.id === nodeId);
+      if (target) openNodeModal(target);
+    }
+
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      const btn = document.getElementById('btnToggleMode');
+      const badge = document.getElementById('statusBadge');
+      btn.textContent = isEditMode ? 'SALIR DE EDICIÓN' : 'ACTIVAR EDICIÓN';
+      badge.innerHTML = isEditMode
+        ? `<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span>MODO EDICIÓN`
+        : `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>MODO PÚBLICO`;
+      renderCurrentLevel('');
+      showToast(isEditMode ? 'Modo Edición activado: puedes añadir/editar ramas y adjuntar archivos.' : 'Modo Público activo.');
+    }
+
+    async function addChildBranch() {
+      const parent = getNodeByPath(currentPath) || portfolioTree;
+      if (!parent.children) parent.children = [];
+      const index = parent.children.length + 1;
+      const id = `rama_${Date.now()}`;
+      const randomX = Math.floor(18 + Math.random() * 64);
+      const randomY = Math.floor(18 + Math.random() * 60);
+      const randomRot = Number(((Math.random() * 4.4) - 2.2).toFixed(1));
+
+      parent.children.push({
+        id,
+        name: `nueva_rama_${index}/`,
+        tag: 'RAMIFICACIÓN CUSTOM',
+        summary: 'Rama personalizada creada en Modo Edición. Haz clic en FICHA para editar texto o adjuntar archivos.',
+        details: ['Rama añadida dinámicamente en el sistema CRT.'],
+        allowUpload: true,
+        pos: { x: randomX, y: randomY, w: 270, rot: randomRot },
+        children: []
+      });
+
+      await saveTreeState(portfolioTree);
+      renderCurrentLevel('');
+      showToast('Nueva rama dispersa añadida.');
+    }
+
+    async function nudgeBranchPos(childId) {
+      const parent = getNodeByPath(currentPath) || portfolioTree;
+      const child = parent.children?.find((c) => c.id === childId);
+      if (!child) return;
+      child.pos = {
+        x: Math.floor(16 + Math.random() * 68),
+        y: Math.floor(16 + Math.random() * 64),
+        w: child.pos?.w || 270,
+        rot: Number(((Math.random() * 4.6) - 2.3).toFixed(1))
+      };
+      await saveTreeState(portfolioTree);
+      renderCurrentLevel('');
+      showToast(`Posición actualizada para ${child.name}`);
+    }
+
+    async function deleteChildBranch(childId) {
+      const parent = getNodeByPath(currentPath) || portfolioTree;
+      if (!parent.children) return;
+      parent.children = parent.children.filter((c) => c.id !== childId);
+      await saveTreeState(portfolioTree);
+      renderCurrentLevel('');
+      showToast('Rama eliminada.');
+    }
+
+    /* =========================================================================
+       5. MODAL VISOR / EDITOR CRT Y PREVISUALIZACIÓN DE ARCHIVOS (INDEXEDDB)
+       ========================================================================= */
+    async function openNodeModal(node) {
+      const overlay = document.getElementById('modalOverlay');
+      const titleEl = document.getElementById('modalTitle');
+      const bodyEl = document.getElementById('modalBody');
+
+      titleEl.textContent = `${node.name} — [${node.tag || 'NODO CRT'}]`;
+      const files = node.isVaultManager ? await getAllFiles() : await getFilesForNode(node.id);
+
+      let editorHtml = '';
+      if (isEditMode) {
+        editorHtml = `
+          <div class="p-3 rounded-xl border border-emerald-400/40 bg-emerald-950/50 space-y-2.5">
+            <div class="text-xs font-semibold text-emerald-300">EDITAR CONTENIDO DEL NODO</div>
+            <div>
+              <label class="block text-[11px] text-emerald-300/80 mb-1">Nombre / Etiqueta de rama</label>
+              <input id="editNodeName" type="text" value="${escapeAttr(node.name)}" class="w-full px-2.5 py-1.5 rounded-lg bg-black/60 border border-emerald-500/40 text-emerald-100 text-xs" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-emerald-300/80 mb-1">Resumen</label>
+              <textarea id="editNodeSummary" rows="2" class="w-full px-2.5 py-1.5 rounded-lg bg-black/60 border border-emerald-500/40 text-emerald-100 text-xs">${escapeHtml(node.summary || '')}</textarea>
+            </div>
+            <div>
+              <label class="block text-[11px] text-emerald-300/80 mb-1">Puntos técnicos (uno por línea)</label>
+              <textarea id="editNodeDetails" rows="3" class="w-full px-2.5 py-1.5 rounded-lg bg-black/60 border border-emerald-500/40 text-emerald-100 text-xs">${escapeHtml((node.details || []).join('\n'))}</textarea>
+            </div>
+            <button type="button" onclick="saveNodeEdits('${escapeAttr(node.id)}')" class="px-3 py-1.5 rounded-lg bg-emerald-500/25 border border-emerald-300/60 hover:bg-emerald-500/40 text-xs font-semibold text-emerald-100">
+              GUARDAR CAMBIOS
+            </button>
+          </div>
+        `;
+      }
+
+      const detailsListHtml = Array.isArray(node.details) && node.details.length > 0
+        ? `<ul class="space-y-1.5 list-disc list-inside text-emerald-100/90">
+            ${node.details.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}
+           </ul>`
+        : '';
+
+      const uploadBoxHtml = `
+        <div class="p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/35 space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-emerald-300">ADJUNTAR IMAGEN, VÍDEO O PDF (INDEXEDDB)</span>
+            <label class="cursor-pointer px-3 py-1 rounded-lg border border-emerald-400/50 bg-emerald-900/60 hover:bg-emerald-800/70 text-xs text-emerald-100">
+              SELECCIONAR ARCHIVO(S)
+              <input type="file" multiple accept="image/*,video/mp4,video/webm,video/ogg,application/pdf" class="hidden" onchange="handleFilesUpload(event, '${escapeAttr(node.id)}')" />
+            </label>
+          </div>
+          <div id="attachedFilesList" class="space-y-2 pt-1">
+            ${renderFilesListHtml(files)}
+          </div>
+        </div>
+      `;
+
+      bodyEl.innerHTML = `
+        <div class="space-y-3">
+          <p class="leading-relaxed text-emerald-100/95">${escapeHtml(node.summary || '')}</p>
+          ${detailsListHtml}
+        </div>
+        ${uploadBoxHtml}
+        ${editorHtml}
+      `;
+
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+    }
+
+    function renderFilesListHtml(files) {
+      if (!files || files.length === 0) {
+        return `<div class="text-xs text-emerald-300/65 italic">No hay archivos adjuntos en este nodo todavía.</div>`;
+      }
+      return files.map((file) => {
+        const url = URL.createObjectURL(file.blob);
+        let previewHtml = '';
+        if (file.mimeType.startsWith('image/')) {
+          previewHtml = `<img src="${url}" alt="${escapeAttr(file.name)}" class="mt-2 max-h-56 rounded-lg border border-emerald-500/30 object-contain bg-black/50" />`;
+        } else if (file.mimeType.startsWith('video/')) {
+          previewHtml = `<video src="${url}" controls class="mt-2 max-h-56 w-full rounded-lg border border-emerald-500/30 bg-black/60"></video>`;
+        } else if (file.mimeType === 'application/pdf') {
+          previewHtml = `<iframe src="${url}" title="${escapeAttr(file.name)}" class="mt-2 w-full h-60 rounded-lg border border-emerald-500/30 bg-black/60"></iframe>`;
+        }
+
+        return `
+          <div class="p-2.5 rounded-lg border border-emerald-500/25 bg-black/45">
+            <div class="flex items-center justify-between gap-2 text-xs">
+              <span class="font-semibold text-emerald-200 truncate">${escapeHtml(file.name)} (${Math.max(1, Math.round(file.size / 1024))} KB)</span>
+              <div class="flex items-center gap-2 shrink-0">
+                <a href="${url}" download="${escapeAttr(file.name)}" class="px-2 py-0.5 rounded border border-emerald-400/40 hover:bg-emerald-800/60 text-emerald-200">DESCARGAR</a>
+                <button type="button" onclick="removeAttachedFile('${escapeAttr(file.id)}')" class="px-2 py-0.5 rounded border border-red-400/40 hover:bg-red-950/60 text-red-300">QUITAR</button>
+              </div>
+            </div>
+            ${previewHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function handleFilesUpload(event, nodeId) {
+      const fileList = Array.from(event.target.files || []);
+      if (fileList.length === 0) return;
+
+      for (const file of fileList) {
+        await saveMediaFile(nodeId, file);
+      }
+      showToast(`${fileList.length} archivo(s) guardado(s) en IndexedDB.`);
+      await refreshProjectMediaWall();
+      const node = findNodeRecursive(portfolioTree, nodeId) || (getNodeByPath(currentPath) || portfolioTree);
+      await openNodeModal(node);
+      renderCurrentLevel('');
+    }
+
+    async function removeAttachedFile(fileId) {
+      await deleteMediaFile(fileId);
+      showToast('Archivo eliminado de IndexedDB.');
+      await refreshProjectMediaWall();
+      const activeNode = getNodeByPath(currentPath) || portfolioTree;
+      await openNodeModal(activeNode);
+      renderCurrentLevel('');
+    }
+
+    async function saveNodeEdits(nodeId) {
+      const target = findNodeRecursive(portfolioTree, nodeId);
+      if (!target) return;
+      const newName = document.getElementById('editNodeName')?.value.trim();
+      const newSummary = document.getElementById('editNodeSummary')?.value.trim();
+      const newDetailsRaw = document.getElementById('editNodeDetails')?.value || '';
+
+      if (newName) target.name = newName;
+      target.summary = newSummary ?? target.summary;
+      target.details = newDetailsRaw
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      await saveTreeState(portfolioTree);
+      showToast('Cambios guardados en IndexedDB.');
+      closeModal();
+      renderCurrentLevel('');
+    }
+
+    function findNodeRecursive(node, targetId) {
+      if (!node) return null;
+      if (node.id === targetId) return node;
+      if (Array.isArray(node.children)) {
+        for (const child of node.children) {
+          const found = findNodeRecursive(child, targetId);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function closeModal() {
+      const overlay = document.getElementById('modalOverlay');
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, '&#39;');
+    }
+
+    /* =========================================================================
+       6. INICIALIZACIÓN, ATAJOS DE TECLADO Y REDIBUJADO RESPONSIVO
+       ========================================================================= */
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('modalOverlay');
+        if (!overlay.classList.contains('hidden')) {
+          closeModal();
+        } else if (currentPath.length > 0) {
+          ascendLevel();
+        }
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      const currentNode = getNodeByPath(currentPath) || portfolioTree;
+      drawConnectorLines(currentNode.children || []);
+    });
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await openPortfolioDB();
+        const savedTree = await loadTreeState();
+        if (savedTree && savedTree.id === 'root') {
+          portfolioTree = savedTree;
+        }
+        document.getElementById('dbStatus').textContent = 'CRT-FS v2.6 · IndexedDB: conectado';
+      } catch (err) {
+        document.getElementById('dbStatus').textContent = 'CRT-FS v2.6 · Modo memoria';
+      }
+      await refreshProjectMediaWall();
+      renderCurrentLevel('entering-level');
+    });
+  </script>
+</body>
+</html>

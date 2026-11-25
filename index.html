@@ -32,94 +32,100 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Mosaico multimedia de fondo: desenfoque suave + tinte verde laboratorio */
+  /* Escenario de fondo desordenado, superpuesto y en movimiento continuo */
   #bgWallStage {
     position: fixed;
     inset: 0;
     z-index: 1;
     overflow: hidden;
     pointer-events: none;
-    background: #030c06;
+    background: #020a05;
   }
 
   #projectMediaWall {
     position: absolute;
-    inset: -4%;
-    width: 108%;
-    height: 108%;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    padding: 12px;
-    filter: blur(7px) saturate(1.45) contrast(1.18) brightness(0.92);
-    transform: scale(1.03);
-    opacity: 0.88;
+    inset: -12%;
+    width: 124%;
+    height: 124%;
+    filter: blur(8px) saturate(1.55) contrast(1.2) brightness(0.92);
+    opacity: 0.9;
     transition: opacity 0.35s ease, filter 0.35s ease;
   }
 
   body.bg-dim #projectMediaWall {
-    opacity: 0.34;
-    filter: blur(11px) saturate(1.2) brightness(0.62);
+    opacity: 0.32;
+    filter: blur(12px) saturate(1.2) brightness(0.6);
   }
 
-  .wall-tile {
-    position: relative;
+  .float-media-layer {
+    position: absolute;
     overflow: hidden;
-    border: 1px solid rgba(57, 255, 122, 0.38);
-    border-radius: 10px;
-    background: #05160c;
+    border-radius: 14px;
+    border: 1px solid rgba(57, 255, 122, 0.28);
+    box-shadow: 0 0 40px rgba(25, 180, 82, 0.22);
+    background: rgba(5, 24, 12, 0.45);
+    will-change: transform;
   }
 
-  .wall-tile video,
-  .wall-tile img {
+  .float-media-layer video,
+  .float-media-layer img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    filter: grayscale(100%) sepia(100%) hue-rotate(88deg) saturate(360%) brightness(0.84) contrast(1.25);
+    filter: grayscale(100%) sepia(100%) hue-rotate(88deg) saturate(380%) brightness(0.86) contrast(1.28);
   }
 
-  .wall-art {
+  .float-media-art {
     width: 100%;
     height: 100%;
-    padding: 18px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     background:
-      radial-gradient(circle at 22% 25%, rgba(57, 255, 122, 0.34), transparent 55%),
-      radial-gradient(circle at 80% 75%, rgba(25, 180, 82, 0.36), transparent 60%),
-      repeating-linear-gradient(
-        0deg,
-        rgba(57, 255, 122, 0.11) 0px,
-        rgba(57, 255, 122, 0.11) 2px,
-        transparent 2px,
-        transparent 10px
-      ),
-      #05170c;
-    animation: wallPulse 7s ease-in-out infinite alternate;
+      radial-gradient(circle at 25% 30%, rgba(57, 255, 122, 0.36), transparent 58%),
+      radial-gradient(circle at 80% 75%, rgba(25, 195, 90, 0.32), transparent 62%),
+      linear-gradient(135deg, rgba(57, 255, 122, 0.12), rgba(2, 16, 8, 0.72));
   }
 
-  .wall-tile:nth-child(2n) .wall-art {
-    animation-duration: 9.5s;
-    animation-direction: alternate-reverse;
+  .drift-a {
+    animation: driftAnimA 19s ease-in-out infinite alternate;
+  }
+  .drift-b {
+    animation: driftAnimB 24s ease-in-out infinite alternate;
+  }
+  .drift-c {
+    animation: driftAnimC 16s ease-in-out infinite alternate;
   }
 
-  @keyframes wallPulse {
-    0% { transform: scale(1) translate3d(0, 0, 0); }
-    100% { transform: scale(1.06) translate3d(-1.2%, -0.8%, 0); }
+  @keyframes driftAnimA {
+    0%   { transform: translate3d(-3%, -2%, 0) rotate(-3deg) scale(1); }
+    50%  { transform: translate3d(3.5%, 2%, 0) rotate(1.5deg) scale(1.07); }
+    100% { transform: translate3d(-1.5%, 3.5%, 0) rotate(-1deg) scale(1.03); }
   }
 
-  /* Capa verde fosforica + vineteo CRT ligero */
+  @keyframes driftAnimB {
+    0%   { transform: translate3d(3%, -2.5%, 0) rotate(3.5deg) scale(1.05); }
+    50%  { transform: translate3d(-3.5%, 1.5%, 0) rotate(-2deg) scale(0.98); }
+    100% { transform: translate3d(2%, 3%, 0) rotate(2deg) scale(1.08); }
+  }
+
+  @keyframes driftAnimC {
+    0%   { transform: translate3d(0%, 3%, 0) rotate(-2.5deg) scale(1.02); }
+    50%  { transform: translate3d(-3%, -2.5%, 0) rotate(3deg) scale(1.1); }
+    100% { transform: translate3d(3%, -1%, 0) rotate(-1.5deg) scale(1); }
+  }
+
+  /* Capa verde fosforica + vineteo CRT */
   #greenTintOverlay {
     position: fixed;
     inset: 0;
     z-index: 2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.12) 0%, rgba(3, 15, 8, 0.58) 100%),
-      linear-gradient(180deg, rgba(57, 255, 122, 0.09) 0%, rgba(4, 24, 12, 0.22) 50%, rgba(2, 12, 6, 0.36) 100%);
+      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.1) 0%, rgba(3, 15, 8, 0.54) 100%),
+      linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.2) 50%, rgba(2, 12, 6, 0.34) 100%);
     mix-blend-mode: screen;
   }
 
@@ -128,7 +134,7 @@
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    background: rgba(16, 120, 52, 0.16);
+    background: rgba(16, 120, 52, 0.15);
     mix-blend-mode: multiply;
   }
 
@@ -142,10 +148,10 @@
       to bottom,
       rgba(0, 0, 0, 0) 0px,
       rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.28) 3px,
-      rgba(0, 0, 0, 0.28) 4px
+      rgba(0, 0, 0, 0.26) 3px,
+      rgba(0, 0, 0, 0.26) 4px
     );
-    box-shadow: inset 0 0 95px rgba(0, 0, 0, 0.75);
+    box-shadow: inset 0 0 95px rgba(0, 0, 0, 0.72);
   }
 
   /* Escena principal 100vh con animacion de inmersion/zoom */
@@ -222,7 +228,7 @@
 </head>
 <body>
 
-  <!-- 1. Mosaico multimedia desenfocado + filtro verde -->
+  <!-- 1. Fondo multimedia flotante, superpuesto y desenfocado + filtro verde -->
   <div id="bgWallStage" aria-hidden="true">
     <div id="projectMediaWall"></div>
   </div>
@@ -232,7 +238,6 @@
 
   <!-- 2. Escena principal 100vh -->
   <div id="viewportRoot">
-    <!-- Barra superior compacta -->
     <header class="fixed top-0 left-0 right-0 z-30 h-12 px-4 md:px-6 flex items-center justify-between border-b border-emerald-400/30 bg-black/75 backdrop-blur-md text-xs">
       <div class="flex items-center gap-2 min-w-0">
         <span class="inline-block w-2 h-2 rounded-full bg-[#39ff7a] animate-pulse shrink-0"></span>
@@ -252,17 +257,15 @@
       </div>
     </header>
 
-    <!-- Lienzo disperso donde se renderizan los nodos en cada nivel -->
     <main id="scatteredStage" class="relative w-full h-full pt-12"></main>
 
-    <!-- Pie de estado discreto -->
     <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-4 md:px-6 flex items-center justify-between border-t border-emerald-400/20 bg-black/70 backdrop-blur-sm text-[11px] text-emerald-300/80">
       <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · [ESC] PARA ASCENDER</span>
       <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
     </footer>
   </div>
 
-  <!-- 3. Modal de Bóveda Local (IndexedDB) para añadir vídeos, imágenes o PDFs -->
+  <!-- 3. Modal de Bóveda Local (IndexedDB) -->
   <div id="vaultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-[#39ff7a]/60 bg-[#041209]/95 shadow-[0_0_50px_rgba(57,255,122,0.2)]">
       <div class="px-5 py-3.5 border-b border-emerald-400/30 flex items-center justify-between">
@@ -299,7 +302,7 @@
 
 <script>
 /* ============================================================================
-   1. ESTRUCTURA DE RAMAS Y NODOS (DISPERSOS + INMERSIÓN CON ZOOM + ESC)
+   1. ESTRUCTURA DE RAMAS Y NODOS
    ============================================================================ */
 const PORTFOLIO_TREE = {
   root: {
@@ -313,8 +316,6 @@ const PORTFOLIO_TREE = {
     tags: ['Python', 'Flutter', 'Dart', 'C / C++', 'ESP32 / Arduino', 'Linux / SQL'],
     children: ['proyectos', 'formacion', 'perfil', 'contacto']
   },
-
-  /* --- RAMA 1: PROYECTOS --- */
   proyectos: {
     id: 'proyectos',
     parent: 'root',
@@ -370,8 +371,6 @@ const PORTFOLIO_TREE = {
     tags: ['C / C++', 'Arduino', 'Robótica', 'Sensores'],
     children: []
   },
-
-  /* --- RAMA 2: FORMACIÓN --- */
   formacion: {
     id: 'formacion',
     parent: 'root',
@@ -405,8 +404,6 @@ const PORTFOLIO_TREE = {
     tags: ['BIG school', 'Software', 'Desarrollo'],
     children: []
   },
-
-  /* --- RAMA 3: PERFIL --- */
   perfil: {
     id: 'perfil',
     parent: 'root',
@@ -418,8 +415,6 @@ const PORTFOLIO_TREE = {
     tags: ['Python', 'Flutter', 'Dart', 'C / C++'],
     children: []
   },
-
-  /* --- RAMA 4: CONTACTO --- */
   contacto: {
     id: 'contacto',
     parent: 'root',
@@ -434,7 +429,7 @@ const PORTFOLIO_TREE = {
 };
 
 /* ============================================================================
-   2. ESTADO DE NAVEGACIÓN + INDEXEDDB PARA VÍDEOS E IMÁGENES DEL USUARIO
+   2. ESTADO DE NAVEGACIÓN + INDEXEDDB
    ============================================================================ */
 let currentNodeId = 'root';
 let navStack = ['root'];
@@ -505,63 +500,72 @@ async function deleteVaultItem(id) {
 }
 
 /* ============================================================================
-   3. FONDO MULTIMEDIA DESENFOCADO + FILTRO VERDE
+   3. FONDO MULTIMEDIA DESORDENADO, SUPERPUESTO Y EN MOVIMIENTO CONTINUO
    ============================================================================ */
-const DEFAULT_WALL_CARDS = [
-  { label: 'FREESTYLE PICA', sub: 'FLUTTER · DART · RHYME ENGINE', meta: 'MODE // FMS & WORD FLOW' },
-  { label: 'PROVER9 - MACE4', sub: 'PYTHON · FIRST-ORDER LOGIC', meta: 'THEOREM & MODEL SEARCH' },
-  { label: 'GESTUREGLOVE', sub: 'C / C++ · ESP32 TELEMETRY', meta: 'INERTIAL GESTURE STREAM' },
-  { label: 'ROTOMBOT', sub: 'C / C++ · ARDUINO AUTONOMOUS', meta: 'SENSOR FUSION & DRIVE' },
-  { label: 'ETSIIT // UGR', sub: 'ING. DE COMPUTADORES', meta: 'SYSTEMS · LINUX · SQL' },
-  { label: 'BIG SCHOOL', sub: 'SOFTWARE ARCHITECTURE', meta: 'BUILD · TEST · SHIP' }
+// Archivos en /assets del repo + fallback visual si no se han subido aún
+const REPO_ASSETS_SEED = [
+  { src: 'assets/rotom-largo.mp4', kind: 'video', label: 'ROTOMBOT_FEED' },
+  { src: 'assets/7.png', kind: 'image', label: 'PROJECT_SNAP_07' }
+];
+
+const FLOATING_SLOTS = [
+  { left: '4%',  top: '6%',  w: '44%', h: '42%', anim: 'drift-a', z: 1, title: 'FREESTYLE PICA // DART ENGINE' },
+  { left: '42%', top: '3%',  w: '52%', h: '38%', anim: 'drift-b', z: 2, title: 'PROVER9-MACE4 // LOGIC SOLVER' },
+  { left: '14%', top: '34%', w: '48%', h: '44%', anim: 'drift-c', z: 3, title: 'GESTUREGLOVE // ESP32 IMU' },
+  { left: '52%', top: '38%', w: '45%', h: '46%', anim: 'drift-a', z: 2, title: 'ROTOMBOT // ARENA DRIVE' },
+  { left: '3%',  top: '62%', w: '43%', h: '34%', anim: 'drift-b', z: 1, title: 'ETSIIT UGR // COMPUTADORES' },
+  { left: '46%', top: '66%', w: '49%', h: '31%', anim: 'drift-c', z: 3, title: 'BIG SCHOOL // SOFTWARE LAB' }
 ];
 
 function renderBackgroundMediaWall() {
   const wall = document.getElementById('projectMediaWall');
   if (!wall) return;
 
-  const userVisuals = vaultItems.filter(
-    (m) => m.type.startsWith('video/') || m.type.startsWith('image/')
-  );
+  const userVisuals = vaultItems
+    .filter((m) => m.type.startsWith('video/') || m.type.startsWith('image/'))
+    .map((m) => ({
+      src: m.dataUrl,
+      kind: m.type.startsWith('video/') ? 'video' : 'image',
+      label: m.name
+    }));
 
-  const tiles = [];
-  for (let i = 0; i < 6; i++) {
-    const media = userVisuals[i];
-    if (media && media.type.startsWith('video/')) {
-      tiles.push(`
-        <div class="wall-tile">
-          <video src="${media.dataUrl}" autoplay loop muted playsinline></video>
-        </div>
-      `);
-    } else if (media && media.type.startsWith('image/')) {
-      tiles.push(`
-        <div class="wall-tile">
-          <img src="${media.dataUrl}" alt="${escapeHtml(media.name)}" />
-        </div>
-      `);
+  const pool = [...userVisuals, ...REPO_ASSETS_SEED];
+
+  wall.innerHTML = FLOATING_SLOTS.map((slot, idx) => {
+    const asset = pool[idx % pool.length];
+    let mediaMarkup = '';
+
+    if (asset && asset.kind === 'video') {
+      mediaMarkup = `
+        <video src="${asset.src}" autoplay loop muted playsinline
+               onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(slot.title)}', ${idx})"></video>
+      `;
+    } else if (asset && asset.kind === 'image') {
+      mediaMarkup = `
+        <img src="${asset.src}" alt="${escapeHtml(asset.label)}"
+             onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(slot.title)}', ${idx})" />
+      `;
     } else {
-      const card = DEFAULT_WALL_CARDS[i % DEFAULT_WALL_CARDS.length];
-      tiles.push(`
-        <div class="wall-tile">
-          <div class="wall-art">
-            <div class="flex items-center justify-between text-[11px] tracking-widest text-[#39ff7a]/80">
-              <span>0${i + 1} // MEDIA_FEED</span>
-              <span>CRT_LOOP</span>
-            </div>
-            <div>
-              <div class="text-xl md:text-2xl font-extrabold tracking-wider text-[#39ff7a]">${card.label}</div>
-              <div class="text-xs text-emerald-200/80 mt-1">${card.sub}</div>
-            </div>
-            <div class="text-[11px] font-mono text-emerald-300/70 border-t border-emerald-400/25 pt-2">
-              ${card.meta}
-            </div>
-          </div>
-        </div>
-      `);
+      mediaMarkup = renderFallbackTile(slot.title, idx);
     }
-  }
 
-  wall.innerHTML = tiles.join('');
+    return `
+      <div class="float-media-layer ${slot.anim}"
+           style="left:${slot.left}; top:${slot.top}; width:${slot.w}; height:${slot.h}; z-index:${slot.z};">
+        ${mediaMarkup}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderFallbackTile(title, idx) {
+  return `
+    <div class="float-media-art">
+      <div class="text-[11px] tracking-widest text-[#39ff7a]/85">STREAM_0${idx + 1} // OVERLAP_NODE</div>
+      <div class="text-2xl md:text-3xl font-extrabold tracking-wider text-[#39ff7a]">${title}</div>
+      <div class="text-xs text-emerald-200/75">CRT_PHOSPHOR_FEED · DRIFT_ACTIVE</div>
+    </div>
+  `;
 }
 
 function toggleBgIntensity() {
@@ -572,7 +576,7 @@ function toggleBgIntensity() {
 }
 
 /* ============================================================================
-   4. RENDERIZADO DE NODOS DISPERSOS, ZOOM DE INMERSIÓN Y NAVEGACIÓN [ESC]
+   4. NAVEGACIÓN DISPERSA, ZOOM DE INMERSIÓN Y [ESC]
    ============================================================================ */
 function renderScene(nodeId) {
   const node = PORTFOLIO_TREE[nodeId] || PORTFOLIO_TREE.root;

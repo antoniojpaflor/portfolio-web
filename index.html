@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antonio José Parras Flores | Ingeniero Informático</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            slate: {
+              850: '#151e32',
+              950: '#090d16',
+            },
+            brand: {
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(56, 189, 248, 0.6);
+    }
+    .glass-card {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased transition-colors duration-300 selection:bg-sky-500 selection:text-white">
+
+  <!-- Barra de navegación fija -->
+  <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/85 dark:bg-slate-950/85 glass-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <!-- Marca / Identidad -->
+      <a href="#inicio" class="flex items-center gap-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-slate-950 font-mono font-bold text-sm shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform">
+          AJP
+        </div>
+        <div class="hidden sm:block">
+          <span class="font-bold tracking-tight text-slate-900 dark:text-white block leading-none">Antonio J. Parras</span>
+          <span class="text-[11px] font-mono text-sky-600 dark:text-sky-400">Computer Engineer</span>
+        </div>
+      </a>
+
+      <!-- Enlaces de sección -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+        <a href="#proyectos" data-i18n="navProjects" class="hover:text-sky-500 dark:hover:text-sky-400 transition-colors">Proyectos</a>
+        <a href="#experiencia" data-i18n="navExperience" class="hover:text-sky-500 dark:hover:text-sky-400 transition-colors">Experiencia</a>
+        <a href="#formacion" data-i18n="navEducation" class="hover:text-sky-500 dark:hover:text-sky-400 transition-colors">Títulos y Certificados</a>
+        <a href="#stack" data-i18n="navStack" class="hover:text-sky-500 dark:hover:text-sky-400 transition-colors">Stack</a>
+        <a href="#contacto" data-i18n="navContact" class="hover:text-sky-500 dark:hover:text-sky-400 transition-colors">Contacto</a>
+      </nav>
+
+      <!-- Controles de Modo Edición, Idioma y Tema -->
+      <div class="flex items-center gap-2">
+        <!-- Conmutador Vista Pública / Modo Edición -->
+        <button id="toggleEditModeBtn" type="button" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-200 dark:border-slate-700">
+          <span id="editModeDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="editModeLabel">Vista Pública</span>
+        </button>
+
+        <!-- Selector Idioma ES / EN -->
+        <button id="toggleLangBtn" type="button" title="Cambiar idioma / Switch language" class="px-2.5 py-1.5 rounded-xl text-xs font-mono font-semibold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 transition-colors">
+          ES
+        </button>
+
+        <!-- Conmutador Tema Oscuro / Claro -->
+        <button id="toggleThemeBtn" type="button" aria-label="Cambiar tema" class="p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 transition-colors">
+          <svg id="sunIcon" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+          <svg id="moonIcon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra de Herramientas del Modo Edición (visible solo cuando editMode = true) -->
+  <div id="editorToolbar" class="hidden border-b border-sky-500/30 bg-sky-500/10 dark:bg-sky-950/60 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-xs sm:text-sm text-sky-900 dark:text-sky-200">
+        <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+        <span data-i18n="editorBannerText"><strong>Modo Edición Activo:</strong> Adjunta imágenes, vídeos o PDFs locales (guardados en tu navegador) y gestiona tus proyectos.</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="openNewProjectModalBtn" type="button" class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs shadow-sm transition-colors flex items-center gap-1.5">
+          <span>+</span>
+          <span data-i18n="btnNewProject">Nuevo Proyecto</span>
+        </button>
+        <label class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-medium cursor-pointer transition-colors flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          <span data-i18n="btnUploadCV">Adjuntar CV (PDF)</span>
+          <input id="cvFileInput" type="file" accept="application/pdf" class="hidden" />
+        </label>
+        <button id="exportJsonBtn" type="button" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-medium transition-colors">
+          <span data-i18n="btnExportJson">Exportar JSON</span>
+        </button>
+        <label class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-medium cursor-pointer transition-colors">
+          <span data-i18n="btnImportJson">Importar JSON</span>
+          <input id="importJsonInput" type="file" accept="application/json" class="hidden" />
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-24">
+
+    <!-- 1. HERO / PERFIL PROFESIONAL -->
+    <section id="inicio" class="relative pt-4 pb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-8 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-mono font-medium">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+            <span data-i18n="heroBadge">Graduado en Ingeniería Informática · ETSIIT (UGR) · Granada</span>
+          </div>
+
+          <div class="space-y-3">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.1]">
+              Antonio José <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300">Parras Flores</span>
+            </h1>
+            <p data-i18n="heroHeadline" class="text-lg sm:text-xl font-semibold text-slate-700 dark:text-slate-300">
+              Graduado en Ingeniería Informática | Especialidad en Ingeniería de Computadores
+            </p>
+          </div>
+
+          <p data-i18n="heroSummary" class="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
+            Soy Graduado en Ingeniería Informática por la Universidad de Granada (ETSIIT), con mención en Ingeniería de Computadores. Me especializo en el desarrollo de software, scripting y tratamiento de datos con Python, sistemas embebidos en C/C++ y desarrollo móvil multiplataforma con Flutter y Dart. Me apasiona diseñar soluciones eficientes que conectan el hardware y el software.
+          </p>
+
+          <!-- Botones de acción principales -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="#proyectos" class="px-5 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-sm shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2">
+              <span data-i18n="ctaProjects">Explorar Proyectos</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+
+            <button id="downloadCvBtn" type="button" class="px-5 py-3 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white border border-slate-700 font-semibold text-sm transition-all flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              <span id="cvBtnLabel" data-i18n="ctaDownloadCV">Descargar / Ver CV</span>
+            </button>
+
+            <a href="https://github.com/antoniojpaflor" target="_blank" rel="noopener noreferrer" class="p-3 rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-sky-500 text-slate-700 dark:text-slate-300 transition-colors" aria-label="GitHub">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            </a>
+
+            <a href="https://www.linkedin.com/in/ajparras" target="_blank" rel="noopener noreferrer" class="p-3 rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-sky-500 text-slate-700 dark:text-slate-300 transition-colors" aria-label="LinkedIn">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Tarjeta lateral de perfil / foto y métricas rápidas -->
+        <div class="lg:col-span-4">
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 shadow-xl space-y-5 relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="flex items-center gap-4">
+              <div class="relative group">
+                <img id="profilePhotoImg" src="https://placehold.co/160x160/0f172a/38bdf8?text=AJP" alt="Antonio José Parras Flores" class="w-20 h-20 rounded-2xl object-cover border-2 border-sky-500/40 shadow-md" />
+                <label class="edit-only hidden absolute inset-0 bg-slate-950/75 rounded-2xl flex items-center justify-center text-[11px] font-semibold text-white cursor-pointer text-center p-1">
+                  <span data-i18n="changePhoto">Cambiar foto</span>
+                  <input id="profilePhotoInput" type="file" accept="image/*" class="hidden" />
+                </label>
+              </div>
+              <div>
+                <h2 class="font-bold text-slate-900 dark:text-white text-base">Antonio José Parras</h2>
+                <p class="text-xs font-mono text-sky-600 dark:text-sky-400">ETSIIT · Univ. de Granada</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+                  <span>📍</span> Granada, España
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800/70">
+                <div class="text-xs text-slate-500 dark:text-slate-400" data-i18n="statSpecLabel">Especialidad</div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white mt-0.5">Ing. de Computadores</div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800/70">
+                <div class="text-xs text-slate-500 dark:text-slate-400" data-i18n="statLangLabel">Inglés</div>
+                <div class="text-xs font-bold text-sky-600 dark:text-sky-400 mt-0.5">C1 Advanced (Cambridge)</div>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 font-mono bg-slate-100/80 dark:bg-slate-950/80 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-800/60">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">email:</span>
+                <button type="button" onclick="copyText('antoniojpaflor@gmail.com')" class="text-slate-800 dark:text-slate-200 hover:text-sky-400 transition-colors">antoniojpaflor@gmail.com</button>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">tel:</span>
+                <span class="text-slate-800 dark:text-slate-200">(+34) 609 10 92 76</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">github:</span>
+                <a href="https://github.com/antoniojpaflor" target="_blank" rel="noopener noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline">@antoniojpaflor</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PROYECTOS DESTACADOS -->
+    <section id="proyectos" class="space-y-8 scroll-mt-24">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-sky-500 font-semibold" data-i18n="secProjectsTag">Ingeniería Aplicada</span>
+          <h2 class="text-3xl font-bold text-slate-900 dark:text-white mt-1" data-i18n="secProjectsTitle">Proyectos Destacados</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1" data-i18n="secProjectsSubtitle">
+            Desarrollo de aplicaciones móviles, software de escritorio multiplataforma, sistemas embebidos IoT y robótica autónoma.
+          </p>
+        </div>
+
+        <!-- Filtros por categoría -->
+        <div id="projectFilters" class="flex flex-wrap gap-2">
+          <button type="button" data-filter="all" class="filter-btn active px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-500 text-slate-950 transition-all">
+            <span data-i18n="filterAll">Todos</span>
+          </button>
+          <button type="button" data-filter="desktop" class="filter-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-sky-500 transition-all">
+            <span data-i18n="filterDesktop">Software / Desktop</span>
+          </button>
+          <button type="button" data-filter="mobile" class="filter-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-sky-500 transition-all">
+            <span data-i18n="filterMobile">Móvil</span>
+          </button>
+          <button type="button" data-filter="embedded" class="filter-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-sky-500 transition-all">
+            <span data-i18n="filterEmbedded">Embebidos / Robótica</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid de tarjetas de proyectos -->
+      <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Renderizado dinámico por JS -->
+      </div>
+    </section>
+
+    <!-- 3. EXPERIENCIA PROFESIONAL -->
+    <section id="experiencia" class="space-y-8 scroll-mt-24">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-sky-500 font-semibold" data-i18n="secExpTag">Trayectoria</span>
+        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mt-1" data-i18n="secExpTitle">Experiencia Profesional</h2>
+      </div>
+
+      <div class="relative border-l-2 border-sky-500/30 ml-3 pl-8 space-y-8">
+        <div class="relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 shadow-sm">
+          <span class="absolute -left-[41px] top-7 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-slate-50 dark:ring-slate-950"></span>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="expRole">Desarrollador de Software y Automatización (Prácticas)</h3>
+              <p class="text-sm font-medium text-sky-600 dark:text-sky-400">Gabinete Psicopedagógico — Universidad de Granada (UGR)</p>
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 w-fit">
+              Mayo 2026 – Diciembre 2026
+            </span>
+          </div>
+          <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-300 list-disc list-inside leading-relaxed">
+            <li data-i18n="expBullet1">Desarrollé e implementé programas y scripts en Python para el tratamiento masivo, limpieza y estructuración automatizada de datos institucionales.</li>
+            <li data-i18n="expBullet2">Diseñé y modelé bases de datos relacionales para optimizar los flujos de información y consulta del departamento.</li>
+            <li data-i18n="expBullet3">Creé y administré técnicamente formularios y encuestas en LimeSurvey, además de brindar soporte informático a los equipos del servicio.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FORMACIÓN, TÍTULOS Y CERTIFICACIONES (CON VISOR/GESTOR DE DOCUMENTOS) -->
+    <section id="formacion" class="space-y-8 scroll-mt-24">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-sky-500 font-semibold" data-i18n="secEduTag">Acreditaciones Oficiales</span>
+          <h2 class="text-3xl font-bold text-slate-900 dark:text-white mt-1" data-i18n="secEduTitle">Formación, Títulos y Certificaciones</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1" data-i18n="secEduSubtitle">
+            Adjunta y previsualiza tus resguardos de título, certificados de idiomas y diplomas directamente en formato PDF o imagen.
+          </p>
+        </div>
+      </div>
+
+      <div id="credentialsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Renderizado dinámico por JS -->
+      </div>
+    </section>
+
+    <!-- 5. STACK TECNOLÓGICO -->
+    <section id="stack" class="space-y-8 scroll-mt-24">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-sky-500 font-semibold" data-i18n="secStackTag">Herramientas y Lenguajes</span>
+        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mt-1" data-i18n="secStackTitle">Stack Tecnológico</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Lenguajes -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-500 flex items-center justify-center font-mono font-bold text-sm">&lt;/&gt;</div>
+            <h3 class="font-bold text-slate-900 dark:text-white" data-i18n="stackCatLangs">Lenguajes de Programación</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Python</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">C / C++</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Dart</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Java</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">SQL</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Bash</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">PowerShell</span>
+          </div>
+        </div>
+
+        <!-- Frameworks y Plataformas -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-mono font-bold text-sm">⚙️</div>
+            <h3 class="font-bold text-slate-900 dark:text-white" data-i18n="stackCatFrameworks">Frameworks y Herramientas</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Flutter</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">PyQt6</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Git / GitHub Actions</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Linux / Unix</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Bases de Datos Relacionales</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">LimeSurvey</span>
+          </div>
+        </div>
+
+        <!-- Hardware y Sistemas Embebidos -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-mono font-bold text-sm">🔌</div>
+            <h3 class="font-bold text-slate-900 dark:text-white" data-i18n="stackCatHardware">Sistemas Embebidos e IoT</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">ESP32-WROOM-32</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Arduino UNO</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Bluetooth Low Energy (BLE HID)</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Bus I2C / IMU MPU-6050</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-mono font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Arquitectura de Computadores</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CONTACTO -->
+    <section id="contacto" class="scroll-mt-24">
+      <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-white to-slate-100 dark:from-slate-900 dark:to-slate-950 p-8 sm:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+        <div class="space-y-3 max-w-2xl">
+          <span class="text-xs font-mono uppercase tracking-wider text-sky-500 font-semibold" data-i18n="secContactTag">Disponibilidad</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white" data-i18n="secContactTitle">¿Hablamos sobre un proyecto o oportunidad?</h2>
+          <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400" data-i18n="secContactSubtitle">
+            Estoy disponible para oportunidades en desarrollo de software, ingeniería de sistemas, automatización de datos y desarrollo multiplataforma.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href="mailto:antoniojpaflor@gmail.com" class="px-5 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-sm shadow-lg shadow-sky-500/20 transition-all">
+            antoniojpaflor@gmail.com
+          </a>
+          <button type="button" onclick="copyText('antoniojpaflor@gmail.com')" class="px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-sky-500 text-sm font-medium transition-colors" data-i18n="btnCopyEmail">
+            Copiar Correo
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 dark:border-slate-800/80 py-8 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+      <p>© 2026 Antonio José Parras Flores · Graduado en Ingeniería Informática (UGR).</p>
+      <p class="font-mono">Almacenamiento local seguro (IndexedDB) · Sin rastreadores externos</p>
+    </div>
+  </footer>
+
+  <!-- MODAL 1: DETALLE DE PROYECTO + GALERÍA MULTIMEDIA (IMÁGENES, VÍDEOS Y PDF) -->
+  <div id="projectModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur">
+        <div>
+          <span id="modalProjBadge" class="text-[11px] font-mono uppercase tracking-wider text-sky-500 font-semibold"></span>
+          <h3 id="modalProjTitle" class="text-xl font-bold text-slate-900 dark:text-white"></h3>
+        </div>
+        <button id="closeProjectModalBtn" type="button" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">✕</button>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <!-- Zona de carga multimedia Drag & Drop / Input File -->
+        <div id="modalDropZone" class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-2xl p-5 text-center transition-colors bg-slate-50/70 dark:bg-slate-950/50">
+          <p class="text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="dropZoneTitle">
+            Arrastra aquí imágenes, vídeos demo (MP4/WebM) o memoria en PDF de este proyecto
+          </p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-i18n="dropZoneSub">
+            Los archivos se guardan localmente en tu navegador (IndexedDB) para que puedas previsualizarlos cuando quieras.
+          </p>
+          <div class="mt-3 flex flex-wrap justify-center gap-2">
+            <label class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold cursor-pointer transition-colors">
+              <span data-i18n="btnSelectMedia">+ Seleccionar Imágenes o Vídeos</span>
+              <input id="modalMediaInput" type="file" accept="image/*,video/*" multiple class="hidden" />
+            </label>
+            <label class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold cursor-pointer transition-colors">
+              <span data-i18n="btnSelectPdf">+ Adjuntar Memoria / Documento PDF</span>
+              <input id="modalPdfInput" type="file" accept="application/pdf" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Galería multimedia del proyecto -->
+        <div id="modalMediaGallery" class="space-y-4">
+          <!-- Renderizado dinámico de vídeos e imágenes -->
+        </div>
+
+        <!-- Descripción detallada y características -->
+        <div class="space-y-3">
+          <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400" data-i18n="modalAboutProject">Descripción Técnica</h4>
+          <p id="modalProjDescription" class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed"></p>
+          <ul id="modalProjHighlights" class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400 list-disc list-inside pt-1"></ul>
+        </div>
+
+        <!-- Stack del proyecto -->
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2" data-i18n="modalTechUsed">Tecnologías Utilizadas</h4>
+          <div id="modalProjTech" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Enlaces y PDF adjunto -->
+        <div id="modalProjLinks" class="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-200 dark:border-slate-800"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: VISOR LIMPIO DE DOCUMENTOS PDF / IMÁGENES DE TÍTULOS -->
+  <div id="docViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-5xl w-full h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <span class="text-[11px] font-mono uppercase text-sky-500 font-semibold" data-i18n="docViewerTag">Visor Documental</span>
+          <h3 id="docViewerTitle" class="text-lg font-bold text-slate-900 dark:text-white truncate">Documento</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <a id="docDownloadLink" href="#" download class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition-colors" data-i18n="btnDownloadDoc">
+            Descargar
+          </a>
+          <button id="closeDocViewerBtn" type="button" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">✕</button>
+        </div>
+      </div>
+      <div id="docViewerContent" class="flex-1 bg-slate-100 dark:bg-slate-950 flex items-center justify-center overflow-auto p-2">
+        <!-- iframe PDF o img -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: AÑADIR NUEVO PROYECTO -->
+  <div id="newProjectModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="newProjModalTitle">Añadir Nuevo Proyecto</h3>
+        <button id="closeNewProjectModalBtn" type="button" class="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">✕</button>
+      </div>
+
+      <form id="newProjectForm" class="space-y-4 text-sm">
+        <div>
+          <label class="block font-medium mb-1">Título del Proyecto *</label>
+          <input name="title" required placeholder="Ej. Sistema de Monitorización IoT" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-sky-500" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium mb-1">Categoría *</label>
+            <select name="category" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-sky-500">
+              <option value="desktop">Software / Desktop</option>
+              <option value="mobile">Móvil</option>
+              <option value="embedded">Embebidos / Robótica</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Estado / Subtítulo</label>
+            <input name="badge" placeholder="Ej. Proyecto Personal · 2026" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-sky-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Descripción (en 1ª persona) *</label>
+          <textarea name="description" rows="3" required placeholder="He desarrollado este sistema para..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Tecnologías (separadas por comas)</label>
+          <input name="tech" placeholder="Python, FastAPI, Docker, PostgreSQL" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-sky-500" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Enlace a Repositorio / Demo (opcional)</label>
+          <input name="repoUrl" type="url" placeholder="https://github.com/antoniojpaflor/..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-sky-500" />
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" id="cancelNewProjectBtn" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold">Guardar Proyecto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast de notificaciones (en lugar de alert) -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    /**
+     * ============================================================================
+     * CONFIGURACIÓN DE DATOS INICIALES Y TRADUCCIONES (ES / EN)
+     * ============================================================================
+     */
+    const I18N = {
+      es: {
+        navProjects: 'Proyectos',
+        navExperience: 'Experiencia',
+        navEducation: 'Títulos y Certificados',
+        navStack: 'Stack',
+        navContact: 'Contacto',
+        viewPublic: 'Vista Pública',
+        viewEdit: 'Modo Edición',
+        editorBannerText: 'Modo Edición Activo: Adjunta imágenes, vídeos o PDFs locales (guardados en tu navegador) y gestiona tus proyectos.',
+        btnNewProject: 'Nuevo Proyecto',
+        btnUploadCV: 'Adjuntar CV (PDF)',
+        btnExportJson: 'Exportar JSON',
+        btnImportJson: 'Importar JSON',
+        heroBadge: 'Graduado en Ingeniería Informática · ETSIIT (UGR) · Granada',
+        heroHeadline: 'Graduado en Ingeniería Informática | Especialidad en Ingeniería de Computadores',
+        heroSummary: 'Soy Graduado en Ingeniería Informática por la Universidad de Granada (ETSIIT), con mención en Ingeniería de Computadores. Me especializo en el desarrollo de software, scripting y tratamiento de datos con Python, sistemas embebidos en C/C++ y desarrollo móvil multiplataforma con Flutter y Dart. Me apasiona diseñar soluciones eficientes que conectan el hardware y el software.',
+        ctaProjects: 'Explorar Proyectos',
+        ctaDownloadCV: 'Descargar / Ver CV',
+        changePhoto: 'Cambiar foto',
+        statSpecLabel: 'Especialidad',
+        statLangLabel: 'Inglés',
+        secProjectsTag: 'Ingeniería Aplicada',
+        secProjectsTitle: 'Proyectos Destacados',
+        secProjectsSubtitle: 'Desarrollo de aplicaciones móviles, software de escritorio multiplataforma, sistemas embebidos IoT y robótica autónoma.',
+        filterAll: 'Todos',
+        filterDesktop: 'Software / Desktop',
+        filterMobile: 'Móvil',
+        filterEmbedded: 'Embebidos / Robótica',
+        secExpTag: 'Trayectoria',
+        secExpTitle: 'Experiencia Profesional',
+        expRole: 'Desarrollador de Software y Automatización (Prácticas)',
+        expBullet1: 'Desarrollé e implementé programas y scripts en Python para el tratamiento masivo, limpieza y estructuración automatizada de datos institucionales.',
+        expBullet2: 'Diseñé y modelé bases de datos relacionales para optimizar los flujos de información y consulta del departamento.',
+        expBullet3: 'Creé y administré técnicamente formularios y encuestas en LimeSurvey, además de brindar soporte informático a los equipos del servicio.',
+        secEduTag: 'Acreditaciones Oficiales',
+        secEduTitle: 'Formación, Títulos y Certificaciones',
+        secEduSubtitle: 'Adjunta y previsualiza tus resguardos de título, certificados de idiomas y diplomas directamente en formato PDF o imagen.',
+        secStackTag: 'Herramientas y Lenguajes',
+        secStackTitle: 'Stack Tecnológico',
+        stackCatLangs: 'Lenguajes de Programación',
+        stackCatFrameworks: 'Frameworks y Herramientas',
+        stackCatHardware: 'Sistemas Embebidos e IoT',
+        secContactTag: 'Disponibilidad',
+        secContactTitle: '¿Hablamos sobre un proyecto o oportunidad?',
+        secContactSubtitle: 'Estoy disponible para oportunidades en desarrollo de software, ingeniería de sistemas, automatización de datos y desarrollo multiplataforma.',
+        btnCopyEmail: 'Copiar Correo',
+        dropZoneTitle: 'Arrastra aquí imágenes, vídeos demo (MP4/WebM) o memoria en PDF de este proyecto',
+        dropZoneSub: 'Los archivos se guardan localmente en tu navegador (IndexedDB) para que puedas previsualizarlos cuando quieras.',
+        btnSelectMedia: '+ Seleccionar Imágenes o Vídeos',
+        btnSelectPdf: '+ Adjuntar Memoria / Documento PDF',
+        modalAboutProject: 'Descripción Técnica',
+        modalTechUsed: 'Tecnologías Utilizadas',
+        docViewerTag: 'Visor Documental',
+        btnDownloadDoc: 'Descargar',
+        newProjModalTitle: 'Añadir Nuevo Proyecto',
+        btnViewDetails: 'Ver ficha y galería',
+        btnAttachMedia: '+ Imagen / Vídeo',
+        btnAttachDoc: 'Adjuntar PDF / Imagen',
+        btnViewDoc: 'Ver Documento',
+        noDocAttached: 'Sin documento adjunto'
+      },
+      en: {
+        navProjects: 'Projects',
+        navExperience: 'Experience',
+        navEducation: 'Degrees & Certificates',
+        navStack: 'Stack',
+        navContact: 'Contact',
+        viewPublic: 'Public View',
+        viewEdit: 'Edit Mode',
+        editorBannerText: 'Edit Mode Active: Attach local images, videos, or PDFs (persisted in your browser) and manage your projects.',
+        btnNewProject: 'New Project',
+        btnUploadCV: 'Upload CV (PDF)',
+        btnExportJson: 'Export JSON',
+        btnImportJson: 'Import JSON',
+        heroBadge: 'B.S. in Computer Engineering · ETSIIT (UGR) · Granada',
+        heroHeadline: 'B.S. in Computer Engineering | Computer Systems & Architecture',
+        heroSummary: 'I am a Computer Engineer graduated from the University of Granada (ETSIIT), specializing in Computer Systems and Architecture. I focus on software development, data processing with Python, C/C++ embedded systems, and cross-platform mobile apps with Flutter and Dart.',
+        ctaProjects: 'Explore Projects',
+        ctaDownloadCV: 'View / Download CV',
+        changePhoto: 'Change photo',
+        statSpecLabel: 'Specialization',
+        statLangLabel: 'English',
+        secProjectsTag: 'Applied Engineering',
+        secProjectsTitle: 'Featured Projects',
+        secProjectsSubtitle: 'Cross-platform mobile apps, desktop software, IoT embedded systems, and autonomous robotics.',
+        filterAll: 'All',
+        filterDesktop: 'Software / Desktop',
+        filterMobile: 'Mobile',
+        filterEmbedded: 'Embedded / Robotics',
+        secExpTag: 'Career',
+        secExpTitle: 'Professional Experience',
+        expRole: 'Software & Data Automation Intern',
+        expBullet1: 'Developed and deployed Python programs and scripts for large-scale data processing and structuring.',
+        expBullet2: 'Designed and modeled relational databases to optimize departmental information workflows.',
+        expBullet3: 'Built and maintained online survey forms via LimeSurvey and provided IT technical support to workstations.',
+        secEduTag: 'Official Credentials',
+        secEduTitle: 'Education, Degrees & Certifications',
+        secEduSubtitle: 'Attach and preview your degree certificates, language credentials, and diplomas directly in PDF or image format.',
+        secStackTag: 'Tools & Languages',
+        secStackTitle: 'Tech Stack',
+        stackCatLangs: 'Programming Languages',
+        stackCatFrameworks: 'Frameworks & Tools',
+        stackCatHardware: 'Embedded Systems & IoT',
+        secContactTag: 'Availability',
+        secContactTitle: 'Let’s talk about a project or opportunity',
+        secContactSubtitle: 'Open to opportunities in software engineering, systems architecture, data automation, and cross-platform development.',
+        btnCopyEmail: 'Copy Email',
+        dropZoneTitle: 'Drag & drop images, demo videos (MP4/WebM), or project PDF thesis here',
+        dropZoneSub: 'Files are stored locally in your browser (IndexedDB) for instant preview.',
+        btnSelectMedia: '+ Select Images or Videos',
+        btnSelectPdf: '+ Attach PDF Report',
+        modalAboutProject: 'Technical Overview',
+        modalTechUsed: 'Technologies Used',
+        docViewerTag: 'Document Viewer',
+        btnDownloadDoc: 'Download',
+        newProjModalTitle: 'Add New Project',
+        btnViewDetails: 'Details & Gallery',
+        btnAttachMedia: '+ Image / Video',
+        btnAttachDoc: 'Attach PDF / Image',
+        btnViewDoc: 'View Document',
+        noDocAttached: 'No document attached'
+      }
+    };
+
+    const DEFAULT_PROJECTS = [
+      {
+        id: 'freestyle-pica',
+        title: 'Freestyle Pica',
+        badge: 'App Móvil Multiplataforma · En desarrollo',
+        category: 'mobile',
+        featured: true,
+        shortDesc: 'Aplicación móvil para entrenamiento de freestyle rap desarrollada con Flutter y Dart, con modos de entrenamiento, detección de rimas y sincronización de beats.',
+        description: 'He diseñado y desarrollado Freestyle Pica, una aplicación móvil multiplataforma orientada al entrenamiento de improvisación y freestyle rap. Construida sobre Flutter y Dart, la arquitectura gestiona el estado de sesiones en tiempo real, persistencia local de métricas y sincronización precisa de pistas instrumentales.',
+        highlights: [
+          'Tres modos de entrenamiento integrados: "100% libre", "Libre con palabras" y "Formato FMS" con temporizadores dinámicos.',
+          'Motor de análisis fonético en español para detección automática de rimas asonantes y consonantes.',
+          'Reproductor y sincronizador de pistas instrumentales de audio con control de compases y BPM.',
+          'Espacio preparado para adjuntar capturas de interfaz y vídeos demostrativos directamente desde tu dispositivo.'
+        ],
+        tech: ['Flutter', 'Dart', 'State Management', 'Audio Sync', 'Local Persistence'],
+        links: [],
+        placeholderText: 'Freestyle Pica · Flutter App (Adjunta capturas o vídeo demo)'
+      },
+      {
+        id: 'prover9-mace4-gui',
+        title: 'Interfaz Gráfica para Prover9-Mace4',
+        badge: 'Trabajo Fin de Grado · ETSIIT UGR (Sept. 2026)',
+        category: 'desktop',
+        featured: true,
+        shortDesc: 'Entorno gráfico de escritorio multiplataforma en Python y PyQt6 para demostración automática de teoremas (Prover9) y búsqueda de modelos finitos (Mace4).',
+        description: 'Como Trabajo Fin de Grado en la ETSIIT (Universidad de Granada), he desarrollado un IDE gráfico moderno y multiplataforma (Windows, macOS y GNU/Linux) que encapsula los motores lógicos de consola Prover9 y Mace4, eliminando su barrera de entrada en entornos docentes y de investigación.',
+        highlights: [
+          'Arquitectura modular y asíncrona basada en QThread y QProcess con control de timeout dinámico y cancelación segura sin bloqueos.',
+          'Entorno dual: Modo Guiado (separación visual de premisas y conclusión) y Modo Avanzado con sintaxis nativa .in.',
+          'Historial interactivo con restauración instantánea del estado de sesión e internacionalización dinámica en caliente (ES/EN).',
+          'Empaquetado autónomo multiplataforma con PyInstaller y flujos de Integración Continua (CI/CD) en GitHub Actions.'
+        ],
+        tech: ['Python', 'PyQt6', 'QThread / QProcess', 'PyInstaller', 'GitHub Actions CI/CD', 'First-Order Logic'],
+        links: [
+          { label: 'Repositorio GitHub', url: 'https://github.com/antoniojpaflor/tfg-prover9mace4-gui', type: 'github' }
+        ],
+        placeholderText: 'Prover9-Mace4 GUI · Python & PyQt6 (Adjunta capturas o memoria PDF)'
+      },
+      {
+        id: 'gesture-glove',
+        title: 'GestureGlove',
+        badge: 'IoT & Sistemas Embebidos · ESP32 BLE',
+        category: 'embedded',
+        featured: false,
+        shortDesc: 'Guante inalámbrico de control gestual HID basado en ESP32 y C++ sobre Bluetooth Low Energy, combinando sensor IMU de 6 ejes y joystick analógico de precisión.',
+        description: 'He diseñado y programado GestureGlove, un dispositivo vestible inalámbrico que actúa como ratón Bluetooth HID estándar sin requerir drivers. Integra control gestual mediante acelerómetro/giroscopio MPU-6050 junto a un joystick analógico para el pulgar gobernado por una lógica de prioridades.',
+        highlights: [
+          'Rutina de autocalibración de deriva al arranque, filtro de suavizado de movimiento y detección de clics por giro de muñeca con corrección de postura.',
+          'Sistema de prioridad inteligente: al accionar el joystick KY-023 se bloquea el sensor inercial para lograr precisión milimétrica.',
+          'Discriminación temporal en un único pulsador para diferenciar clic izquierdo (pulsación corta) y clic derecho (pulsación larga).'
+        ],
+        tech: ['ESP32-WROOM-32', 'C++', 'Bluetooth Low Energy (HID)', 'MPU-6050 (I2C)', 'Embedded Systems'],
+        links: [
+          { label: 'Vídeo Demo (Google Drive)', url: 'https://drive.google.com/file/d/1Tkt0ocYqkgzutr5bN2oF8S1ESjuR6J1V/view?usp=sharing', type: 'video' },
+          { label: 'Simulación Wokwi', url: 'https://wokwi.com/projects/452427055436952577', type: 'external' }
+        ],
+        placeholderText: 'GestureGlove · ESP32 + MPU-6050 (Adjunta fotos del prototipo o vídeo)'
+      },
+      {
+        id: 'rotombot',
+        title: 'Rotombot',
+        badge: 'Robótica Autónoma & Arduino',
+        category: 'embedded',
+        featured: false,
+        shortDesc: 'Robot autónomo de combate/sumo construido sobre Arduino UNO, puente H L293D y arquitectura de máquina de estados con prioridades.',
+        description: 'He desarrollado en equipo Rotombot, un robot autónomo de combate y sumo con carcasa protectora personalizada, doble tracción trasera y rueda loca delantera. Su firmware implementa una máquina de estados jerárquica para tomar decisiones reactivas en tiempo real.',
+        highlights: [
+          'Prioridad 1: Sensor infrarrojo frontal para detección y evasión inmediata del borde de pista (línea negra).',
+          'Prioridad 2: Bumpers delantero y trasero para detección física y respuesta de empuje ante colisiones.',
+          'Prioridad 3 y 4: Sensor ultrasónico HC-SR04 para ataque directo (< 50 cm) y búsqueda activa mediante giro pivotante.'
+        ],
+        tech: ['Arduino UNO', 'C / C++', 'Puente H L293D', 'Sensor HC-SR04', 'Máquina de Estados'],
+        links: [],
+        placeholderText: 'Rotombot · Arduino Autonomous Robot (Adjunta fotos o vídeo de combate)'
+      }
+    ];
+
+    const DEFAULT_CREDENTIALS = [
+      {
+        id: 'deg-ugr',
+        title: 'Grado en Ingeniería Informática',
+        subtitle: 'Mención en Ingeniería de Computadores · ETSIIT, Universidad de Granada',
+        date: '2020 – Septiembre 2026',
+        status: 'Finalizado · Resguardo oficial (28/09/2026)',
+        icon: '🎓'
+      },
+      {
+        id: 'cert-cambridge',
+        title: 'Cambridge English: Advanced (CAE)',
+        subtitle: 'Level 2 Certificate in ESOL International · Nivel C1 Acreditado',
+        date: 'Cambridge Assessment English',
+        status: 'Nivel C1 Oficial',
+        icon: '🌐'
+      },
+      {
+        id: 'cert-hacking',
+        title: 'Hacking Ético: de 0 a Hackear Aplicaciones',
+        subtitle: 'Certificado de Asistencia · BIG school (6 horas lectivas)',
+        date: '23 de Octubre de 2026',
+        status: 'Certificado Acreditado',
+        icon: '🛡️'
+      }
+    ];
+
+    /**
+     * ============================================================================
+     * PERSISTENCIA LOCAL CON INDEXEDDB (SOPORTA VÍDEOS, IMÁGENES Y PDF PESADOS)
+     * ============================================================================
+     */
+    const DB_NAME = 'PortfolioAntonioParrasDB';
+    const DB_VERSION = 1;
+    let db = null;
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains('state')) {
+            database.createObjectStore('state', { keyPath: 'key' });
+          }
+          if (!database.objectStoreNames.contains('files')) {
+            database.createObjectStore('files', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve(db);
+        };
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function dbPut(storeName, value) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const req = store.put(value);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbGet(storeName, key) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbGetAll(storeName) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbDelete(storeName, key) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const req = store.delete(key);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    /**
+     * ============================================================================
+     * ESTADO GLOBAL DE LA APLICACIÓN
+     * ============================================================================
+     */
+    const appState = {
+      lang: 'es',
+      editMode: false,
+      activeFilter: 'all',
+      projects: [...DEFAULT_PROJECTS],
+      credentials: [...DEFAULT_CREDENTIALS],
+      activeProjectId: null,
+      objectUrls: [] // Para limpiar URLs creadas con createObjectURL
+    };
+
+    function createManagedObjectURL(blob) {
+      const url = URL.createObjectURL(blob);
+      appState.objectUrls.push(url);
+      return url;
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = type === 'success'
+        ? 'bg-emerald-600 text-white border-emerald-400'
+        : type === 'error'
+        ? 'bg-rose-600 text-white border-rose-400'
+        : 'bg-slate-900 text-white border-sky-500/50';
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border shadow-xl text-xs sm:text-sm font-medium transition-all duration-300 ${colors}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function copyText(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(appState.lang === 'es' ? `Copiado: ${text}` : `Copied: ${text}`, 'success');
+      } catch (err) {
+        showToast('No se pudo copiar', 'error');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    /**
+     * ============================================================================
+     * RENDERIZADO DE PROYECTOS Y GALERÍA MULTIMEDIA
+     * ============================================================================
+     */
+    async function getProjectFiles(projectId) {
+      const allFiles = await dbGetAll('files');
+      return allFiles.filter(f => f.ownerType === 'project' && f.ownerId === projectId);
+    }
+
+    async function renderProjects() {
+      const grid = document.getElementById('projectsGrid');
+      grid.innerHTML = '';
+
+      const filtered = appState.activeFilter === 'all'
+        ? appState.projects
+        : appState.projects.filter(p => p.category === appState.activeFilter);
+
+      for (const proj of filtered) {
+        const files = await getProjectFiles(proj.id);
+        const mediaFiles = files.filter(f => f.kind === 'image' || f.kind === 'video');
+        const pdfFile = files.find(f => f.kind === 'pdf');
+        const coverMedia = mediaFiles[0];
+
+        const card = document.createElement('article');
+        card.className = 'group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/75 overflow-hidden shadow-sm hover:shadow-xl hover:border-sky-500/50 transition-all flex flex-col justify-between';
+
+        // Cabecera multimedia de la tarjeta
+        let mediaPreviewHtml = '';
+        if (coverMedia) {
+          const url = createManagedObjectURL(coverMedia.blob);
+          if (coverMedia.kind === 'video') {
+            mediaPreviewHtml = `
+              <div class="relative h-52 bg-slate-950 overflow-hidden">
+                <video src="${url}" class="w-full h-full object-cover" muted loop playsinline onmouseover="this.play()" onmouseout="this.pause()"></video>
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/80 text-sky-400 text-[11px] font-mono">▶ Vídeo Demo (${mediaFiles.length})</span>
+              </div>
+            `;
+          } else {
+            mediaPreviewHtml = `
+              <div class="relative h-52 bg-slate-950 overflow-hidden">
+                <img src="${url}" alt="${proj.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ${mediaFiles.length > 1 ? `<span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/80 text-white text-[11px] font-mono">+${mediaFiles.length - 1} archivos</span>` : ''}
+              </div>
+            `;
+          }
+        } else {
+          mediaPreviewHtml = `
+            <div class="relative h-44 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950 border-b border-slate-200/70 dark:border-slate-800/70 flex flex-col items-center justify-center p-6 text-center">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center mb-2 font-mono text-sm">
+                ${proj.category === 'mobile' ? '📱' : proj.category === 'embedded' ? '🔌' : '💻'}
+              </div>
+              <p class="text-xs font-mono text-slate-500 dark:text-slate-400 max-w-xs">${proj.placeholderText || proj.title}</p>
+            </div>
+          `;
+        }
+
+        const techBadges = proj.tech.slice(0, 5).map(t =>
+          `<span class="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${t}</span>`
+        ).join('');
+
+        card.innerHTML = `
+          <div>
+            ${mediaPreviewHtml}
+            <div class="p-6 space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-[11px] font-mono font-semibold text-sky-600 dark:text-sky-400">${proj.badge}</span>
+                ${pdfFile ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-mono font-semibold">PDF Adjunto</span>` : ''}
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">${proj.title}</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">${proj.shortDesc}</p>
+              <div class="flex flex-wrap gap-1.5 pt-2">${techBadges}</div>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 bg-slate-50/70 dark:bg-slate-950/40 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onclick="openProjectModal('${proj.id}')" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition-colors">
+              ${I18N[appState.lang].btnViewDetails}
+            </button>
+
+            <div class="flex items-center gap-2">
+              <label class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-sky-500 text-xs font-medium cursor-pointer transition-colors" title="Adjuntar imagen o vídeo desde tu equipo">
+                <span>${I18N[appState.lang].btnAttachMedia}</span>
+                <input type="file" accept="image/*,video/*" multiple class="hidden" onchange="handleQuickProjectUpload(event, '${proj.id}')" />
+              </label>
+              ${proj.links && proj.links[0] ? `
+                <a href="${proj.links[0].url}" target="_blank" rel="noopener noreferrer" class="p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-sky-500 text-slate-700 dark:text-slate-300 text-xs" title="${proj.links[0].label}">
+                  ↗
+                </a>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    async function handleQuickProjectUpload(event, projectId) {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
+      for (const file of files) {
+        const kind = file.type.startsWith('video/') ? 'video' : 'image';
+        await dbPut('files', {
+          id: `${projectId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          ownerType: 'project',
+          ownerId: projectId,
+          kind,
+          name: file.name,
+          mimeType: file.type,
+          blob: file
+        });
+      }
+      showToast(`${files.length} archivo(s) adjuntado(s) correctamente`, 'success');
+      await renderProjects();
+      if (appState.activeProjectId === projectId) {
+        await openProjectModal(projectId);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * MODAL DE DETALLE DE PROYECTO Y REPRODUCTOR / CARRUSEL
+     * ============================================================================
+     */
+    async function openProjectModal(projectId) {
+      const proj = appState.projects.find(p => p.id === projectId);
+      if (!proj) return;
+      appState.activeProjectId = projectId;
+
+      document.getElementById('modalProjBadge').textContent = proj.badge;
+      document.getElementById('modalProjTitle').textContent = proj.title;
+      document.getElementById('modalProjDescription').textContent = proj.description;
+
+      const highlightsEl = document.getElementById('modalProjHighlights');
+      highlightsEl.innerHTML = (proj.highlights || []).map(h => `<li>${h}</li>`).join('');
+
+      const techEl = document.getElementById('modalProjTech');
+      techEl.innerHTML = proj.tech.map(t =>
+        `<span class="px-3 py-1 rounded-xl text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">${t}</span>`
+      ).join('');
+
+      // Renderizar galería multimedia adjunta
+      const files = await getProjectFiles(projectId);
+      const mediaFiles = files.filter(f => f.kind === 'image' || f.kind === 'video');
+      const pdfFile = files.find(f => f.kind === 'pdf');
+
+      const galleryEl = document.getElementById('modalMediaGallery');
+      if (mediaFiles.length === 0) {
+        galleryEl.innerHTML = '';
+      } else {
+        galleryEl.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            ${mediaFiles.map(m => {
+              const url = createManagedObjectURL(m.blob);
+              return `
+                <div class="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950 group">
+                  ${m.kind === 'video'
+                    ? `<video src="${url}" controls class="w-full h-56 object-contain bg-black"></video>`
+                    : `<img src="${url}" alt="${m.name}" class="w-full h-56 object-cover cursor-pointer" onclick="openDocViewer('${m.id}')" />`
+                  }
+                  <div class="px-3 py-2 bg-slate-900/90 text-xs text-slate-300 flex items-center justify-between">
+                    <span class="truncate max-w-[200px] font-mono">${m.name}</span>
+                    <button type="button" onclick="deleteAttachedFile('${m.id}', '${projectId}')" class="text-rose-400 hover:text-rose-300 text-xs font-semibold">Eliminar</button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // Enlaces y botón de ver memoria PDF si existe
+      const linksEl = document.getElementById('modalProjLinks');
+      let linksHtml = (proj.links || []).map(l => `
+        <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700 transition-colors">
+          ${l.label} ↗
+        </a>
+      `).join('');
+
+      if (pdfFile) {
+        linksHtml += `
+          <button type="button" onclick="openDocViewer('${pdfFile.id}')" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold transition-colors">
+            📄 Ver Memoria PDF (${pdfFile.name})
+          </button>
+        `;
+      }
+
+      linksEl.innerHTML = linksHtml;
+
+      const modal = document.getElementById('projectModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    async function deleteAttachedFile(fileId, projectId) {
+      await dbDelete('files', fileId);
+      showToast('Archivo eliminado', 'info');
+      await renderProjects();
+      if (projectId) await openProjectModal(projectId);
+      await renderCredentials();
+    }
+
+    /**
+     * ============================================================================
+     * RENDERIZADO DE TÍTULOS, CERTIFICACIONES Y VISOR DOCUMENTAL
+     * ============================================================================
+     */
+    async function renderCredentials() {
+      const grid = document.getElementById('credentialsGrid');
+      grid.innerHTML = '';
+      const allFiles = await dbGetAll('files');
+
+      for (const cred of appState.credentials) {
+        const attachedDoc = allFiles.find(f => f.ownerType === 'credential' && f.ownerId === cred.id);
+
+        const card = document.createElement('div');
+        card.className = 'rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 flex flex-col justify-between gap-5 shadow-sm hover:border-sky-500/40 transition-all';
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-2xl">${cred.icon}</span>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-mono bg-sky-500/10 text-sky-600 dark:text-sky-400 font-medium">${cred.status}</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white leading-snug">${cred.title}</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">${cred.subtitle}</p>
+            <p class="text-xs font-mono text-slate-500">${cred.date}</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-2">
+            ${attachedDoc ? `
+              <button type="button" onclick="openDocViewer('${attachedDoc.id}')" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold transition-colors">
+                📄 ${I18N[appState.lang].btnViewDoc}
+              </button>
+            ` : `
+              <span class="text-[11px] font-mono text-slate-400">${I18N[appState.lang].noDocAttached}</span>
+            `}
+
+            <label class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:border-sky-500 text-xs font-medium cursor-pointer transition-colors">
+              <span>${I18N[appState.lang].btnAttachDoc}</span>
+              <input type="file" accept="application/pdf,image/*" class="hidden" onchange="handleCredentialUpload(event, '${cred.id}')" />
+            </label>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    async function handleCredentialUpload(event, credId) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const kind = file.type === 'application/pdf' ? 'pdf' : 'image';
+      await dbPut('files', {
+        id: `cred-${credId}`,
+        ownerType: 'credential',
+        ownerId: credId,
+        kind,
+        name: file.name,
+        mimeType: file.type,
+        blob: file
+      });
+      showToast(`Documento "${file.name}" vinculado`, 'success');
+      await renderCredentials();
+    }
+
+    async function openDocViewer(fileId) {
+      const fileRecord = await dbGet('files', fileId);
+      if (!fileRecord) {
+        showToast('No se encontró el archivo adjunto', 'error');
+        return;
+      }
+      const url = createManagedObjectURL(fileRecord.blob);
+      document.getElementById('docViewerTitle').textContent = fileRecord.name;
+      const dlLink = document.getElementById('docDownloadLink');
+      dlLink.href = url;
+      dlLink.download = fileRecord.name;
+
+      const contentEl = document.getElementById('docViewerContent');
+      if (fileRecord.mimeType === 'application/pdf' || fileRecord.kind === 'pdf') {
+        contentEl.innerHTML = `<iframe src="${url}" class="w-full h-full rounded-xl border-0" title="${fileRecord.name}"></iframe>`;
+      } else {
+        contentEl.innerHTML = `<img src="${url}" alt="${fileRecord.name}" class="max-w-full max-h-full object-contain rounded-xl shadow-lg" />`;
+      }
+
+      const modal = document.getElementById('docViewerModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    /**
+     * ============================================================================
+     * GESTIÓN DE CV, FOTO DE PERFIL Y EXPORTACIÓN/IMPORTACIÓN JSON
+     * ============================================================================
+     */
+    async function loadSavedProfileAssets() {
+      const photo = await dbGet('files', 'profile-photo');
+      if (photo && photo.blob) {
+        document.getElementById('profilePhotoImg').src = createManagedObjectURL(photo.blob);
+      }
+      const cv = await dbGet('files', 'profile-cv');
+      const cvLabel = document.getElementById('cvBtnLabel');
+      if (cv) {
+        cvLabel.textContent = appState.lang === 'es' ? `Ver / Descargar CV (${cv.name})` : `View / Download CV (${cv.name})`;
+      }
+    }
+
+    async function saveProjectsState() {
+      await dbPut('state', { key: 'projects', value: appState.projects });
+    }
+
+    async function loadProjectsState() {
+      const saved = await dbGet('state', 'projects');
+      if (saved && Array.isArray(saved.value) && saved.value.length > 0) {
+        appState.projects = saved.value;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * ACTUALIZACIÓN DE IDIOMA Y MODO EDICIÓN
+     * ============================================================================
+     */
+    function applyLanguage() {
+      const dict = I18N[appState.lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+      document.getElementById('toggleLangBtn').textContent = appState.lang.toUpperCase();
+      document.getElementById('editModeLabel').textContent = appState.editMode ? dict.viewEdit : dict.viewPublic;
+      renderProjects();
+      renderCredentials();
+      loadSavedProfileAssets();
+    }
+
+    function setEditMode(enabled) {
+      appState.editMode = enabled;
+      const toolbar = document.getElementById('editorToolbar');
+      const dot = document.getElementById('editModeDot');
+      const label = document.getElementById('editModeLabel');
+
+      if (enabled) {
+        toolbar.classList.remove('hidden');
+        dot.classList.remove('bg-emerald-500');
+        dot.classList.add('bg-sky-400', 'animate-pulse');
+        label.textContent = I18N[appState.lang].viewEdit;
+        document.querySelectorAll('.edit-only').forEach(el => el.classList.remove('hidden'));
+      } else {
+        toolbar.classList.add('hidden');
+        dot.classList.remove('bg-sky-400', 'animate-pulse');
+        dot.classList.add('bg-emerald-500');
+        label.textContent = I18N[appState.lang].viewPublic;
+        document.querySelectorAll('.edit-only').forEach(el => el.classList.add('hidden'));
+      }
+    }
+
+    /**
+     * ============================================================================
+     * INICIALIZACIÓN Y EVENT LISTENERS
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await initDB();
+        await loadProjectsState();
+        await loadSavedProfileAssets();
+        await renderProjects();
+        await renderCredentials();
+      } catch (err) {
+        console.error('Error inicializando IndexedDB:', err);
+      }
+
+      // Conmutador Tema Oscuro/Claro
+      document.getElementById('toggleThemeBtn').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // Conmutador Idioma ES/EN
+      document.getElementById('toggleLangBtn').addEventListener('click', () => {
+        appState.lang = appState.lang === 'es' ? 'en' : 'es';
+        applyLanguage();
+      });
+
+      // Conmutador Modo Vista Pública / Modo Edición
+      document.getElementById('toggleEditModeBtn').addEventListener('click', () => {
+        setEditMode(!appState.editMode);
+      });
+
+      // Filtros de Proyectos
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('bg-sky-500', 'text-slate-950');
+            b.classList.add('bg-white', 'dark:bg-slate-900', 'text-slate-700', 'dark:text-slate-300');
+          });
+          btn.classList.remove('bg-white', 'dark:bg-slate-900', 'text-slate-700', 'dark:text-slate-300');
+          btn.classList.add('bg-sky-500', 'text-slate-950');
+          appState.activeFilter = btn.getAttribute('data-filter');
+          renderProjects();
+        });
+      });
+
+      // Subir foto de perfil
+      document.getElementById('profilePhotoInput').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        await dbPut('files', {
+          id: 'profile-photo',
+          ownerType: 'profile',
+          kind: 'image',
+          name: file.name,
+          mimeType: file.type,
+          blob: file
+        });
+        await loadSavedProfileAssets();
+        showToast('Foto de perfil actualizada', 'success');
+      });
+
+      // Subir CV PDF
+      document.getElementById('cvFileInput').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        await dbPut('files', {
+          id: 'profile-cv',
+          ownerType: 'profile',
+          kind: 'pdf',
+          name: file.name,
+          mimeType: file.type,
+          blob: file
+        });
+        await loadSavedProfileAssets();
+        showToast('CV en PDF guardado localmente', 'success');
+      });
+
+      // Ver / Descargar CV
+      document.getElementById('downloadCvBtn').addEventListener('click', async () => {
+        const cv = await dbGet('files', 'profile-cv');
+        if (cv) {
+          openDocViewer('profile-cv');
+        } else {
+          setEditMode(true);
+          showToast('Activa "Adjuntar CV (PDF)" en la barra superior para vincular tu archivo PDF.', 'info');
+        }
+      });
+
+      // Modal Proyecto: Carga de medios y Drag & Drop
+      const dropZone = document.getElementById('modalDropZone');
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-sky-500', 'bg-sky-500/10');
+      });
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-sky-500', 'bg-sky-500/10');
+      });
+      dropZone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-sky-500', 'bg-sky-500/10');
+        if (!appState.activeProjectId) return;
+        const files = Array.from(e.dataTransfer.files || []);
+        for (const file of files) {
+          const kind = file.type === 'application/pdf' ? 'pdf' : file.type.startsWith('video/') ? 'video' : 'image';
+          await dbPut('files', {
+            id: `${appState.activeProjectId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            ownerType: 'project',
+            ownerId: appState.activeProjectId,
+            kind,
+            name: file.name,
+            mimeType: file.type,
+            blob: file
+          });
+        }
+        showToast(`${files.length} archivo(s) añadidos al proyecto`, 'success');
+        await renderProjects();
+        await openProjectModal(appState.activeProjectId);
+      });
+
+      document.getElementById('modalMediaInput').addEventListener('change', (e) => {
+        if (appState.activeProjectId) {
+          handleQuickProjectUpload(e, appState.activeProjectId);
+        }
+      });
+
+      document.getElementById('modalPdfInput').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file || !appState.activeProjectId) return;
+        await dbPut('files', {
+          id: `${appState.activeProjectId}-pdf`,
+          ownerType: 'project',
+          ownerId: appState.activeProjectId,
+          kind: 'pdf',
+          name: file.name,
+          mimeType: file.type,
+          blob: file
+        });
+        showToast(`Memoria PDF "${file.name}" vinculada al proyecto`, 'success');
+        await renderProjects();
+        await openProjectModal(appState.activeProjectId);
+      });
+
+      // Cerrar Modales
+      document.getElementById('closeProjectModalBtn').addEventListener('click', () => {
+        const modal = document.getElementById('projectModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        appState.activeProjectId = null;
+      });
+
+      document.getElementById('closeDocViewerBtn').addEventListener('click', () => {
+        const modal = document.getElementById('docViewerModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.getElementById('docViewerContent').innerHTML = '';
+      });
+
+      // Modal Nuevo Proyecto
+      const newProjModal = document.getElementById('newProjectModal');
+      document.getElementById('openNewProjectModalBtn').addEventListener('click', () => {
+        newProjModal.classList.remove('hidden');
+        newProjModal.classList.add('flex');
+      });
+      const closeNewProj = () => {
+        newProjModal.classList.add('hidden');
+        newProjModal.classList.remove('flex');
+      };
+      document.getElementById('closeNewProjectModalBtn').addEventListener('click', closeNewProj);
+      document.getElementById('cancelNewProjectBtn').addEventListener('click', closeNewProj);
+
+      document.getElementById('newProjectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const techList = (fd.get('tech') || '').toString().split(',').map(s => s.trim()).filter(Boolean);
+        const repoUrl = (fd.get('repoUrl') || '').toString().trim();
+        const newProj = {
+          id: `proj-${Date.now()}`,
+          title: fd.get('title').toString().trim(),
+          badge: (fd.get('badge') || 'Proyecto Destacado').toString().trim(),
+          category: fd.get('category').toString(),
+          featured: false,
+          shortDesc: fd.get('description').toString().trim(),
+          description: fd.get('description').toString().trim(),
+          highlights: [],
+          tech: techList.length ? techList : ['Software Engineering'],
+          links: repoUrl ? [{ label: 'Enlace / Repositorio', url: repoUrl, type: 'external' }] : [],
+          placeholderText: fd.get('title').toString().trim()
+        };
+        appState.projects.unshift(newProj);
+        await saveProjectsState();
+        await renderProjects();
+        e.target.reset();
+        closeNewProj();
+        showToast('Nuevo proyecto añadido al porfolio', 'success');
+      });
+
+      // Exportar JSON
+      document.getElementById('exportJsonBtn').addEventListener('click', () => {
+        const payload = {
+          exportedAt: new Date().toISOString(),
+          profile: 'Antonio José Parras Flores',
+          projects: appState.projects,
+          credentials: appState.credentials
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = createManagedObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'portfolio-antonio-parras-config.json';
+        a.click();
+        showToast('Configuración exportada en JSON', 'success');
+      });
+
+      // Importar JSON
+      document.getElementById('importJsonInput').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (Array.isArray(data.projects)) {
+            appState.projects = data.projects;
+            await saveProjectsState();
+          }
+          if (Array.isArray(data.credentials)) {
+            appState.credentials = data.credentials;
+          }
+          await renderProjects();
+          await renderCredentials();
+          showToast('Configuración importada correctamente', 'success');
+        } catch (err) {
+          showToast('El archivo JSON no es válido', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -14,7 +14,6 @@
     --phosphor-dim: #199b49;
     --phosphor-dark: #06180d;
     --crt-bg: #030a06;
-    /* Márgenes de seguridad: el contenido (cabecera/pie) queda DENTRO del marco negro */
     --safe-top: clamp(34px, 5.4vh, 58px);
     --safe-bottom: clamp(34px, 5.4vh, 58px);
     --safe-x: clamp(28px, 5.2vw, 76px);
@@ -50,7 +49,6 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Área de pantalla recortada con silueta de tubo CRT antiguo */
   #crtTubeShell {
     position: fixed;
     inset: 0;
@@ -66,13 +64,10 @@
     width: 100%;
     height: 100%;
     background: var(--crt-bg);
-    -webkit-mask-image: url("#crtTubeMask");
-    mask-image: url("#crtTubeMask");
-    transform: perspective(900px) scale(1.015);
-    transform-origin: center center;
+    overflow: hidden;
   }
 
-  /* Fondo multimedia flotante, superpuesto y desenfocado */
+  /* Fondo multimedia renderizado en un único canvas de baja resolución (ultra ligero) */
   #bgWallStage {
     position: absolute;
     inset: 0;
@@ -82,94 +77,20 @@
     background: #020a05;
   }
 
-  #projectMediaWall {
-    position: absolute;
-    inset: -12%;
-    width: 124%;
-    height: 124%;
-    filter: blur(8px) saturate(1.55) contrast(1.2) brightness(0.92);
-    opacity: 0.9;
-    transition: opacity 0.35s ease, filter 0.35s ease;
-  }
-
-  body.bg-dim #projectMediaWall {
-    opacity: 0.32;
-    filter: blur(12px) saturate(1.2) brightness(0.6);
-  }
-
-  .float-media-layer {
-    position: absolute;
-    overflow: hidden;
-    border-radius: 14px;
-    border: 1px solid rgba(57, 255, 122, 0.28);
-    box-shadow: 0 0 40px rgba(25, 180, 82, 0.22);
-    background: rgba(5, 24, 12, 0.45);
-    will-change: transform;
-  }
-
-  .float-media-layer video,
-  .float-media-layer img {
+  #bgWallCanvas {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     display: block;
-    filter: grayscale(100%) sepia(100%) hue-rotate(88deg) saturate(380%) brightness(0.86) contrast(1.28);
+    image-rendering: auto;
+    opacity: 0.88;
+    transition: opacity 0.3s ease;
   }
 
-  .float-media-art {
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background:
-      radial-gradient(circle at 25% 30%, rgba(57, 255, 122, 0.36), transparent 58%),
-      radial-gradient(circle at 80% 75%, rgba(25, 195, 90, 0.32), transparent 62%),
-      linear-gradient(135deg, rgba(57, 255, 122, 0.12), rgba(2, 16, 8, 0.72));
+  body.bg-dim #bgWallCanvas {
+    opacity: 0.28;
   }
 
-  .drift-a { animation: driftAnimA 19s ease-in-out infinite alternate; }
-  .drift-b { animation: driftAnimB 24s ease-in-out infinite alternate; }
-  .drift-c { animation: driftAnimC 16s ease-in-out infinite alternate; }
-
-  @keyframes driftAnimA {
-    0%   { transform: translate3d(-3%, -2%, 0) rotate(-3deg) scale(1); }
-    50%  { transform: translate3d(3.5%, 2%, 0) rotate(1.5deg) scale(1.07); }
-    100% { transform: translate3d(-1.5%, 3.5%, 0) rotate(-1deg) scale(1.03); }
-  }
-  @keyframes driftAnimB {
-    0%   { transform: translate3d(3%, -2.5%, 0) rotate(3.5deg) scale(1.05); }
-    50%  { transform: translate3d(-3.5%, 1.5%, 0) rotate(-2deg) scale(0.98); }
-    100% { transform: translate3d(2%, 3%, 0) rotate(2deg) scale(1.08); }
-  }
-  @keyframes driftAnimC {
-    0%   { transform: translate3d(0%, 3%, 0) rotate(-2.5deg) scale(1.02); }
-    50%  { transform: translate3d(-3%, -2.5%, 0) rotate(3deg) scale(1.1); }
-    100% { transform: translate3d(3%, -1%, 0) rotate(-1.5deg) scale(1); }
-  }
-
-  /* Capas de tinte verde y scanlines */
-  #greenTintOverlay {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.08) 0%, rgba(3, 15, 8, 0.48) 100%),
-      linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.18) 50%, rgba(2, 12, 6, 0.34) 100%);
-    mix-blend-mode: screen;
-  }
-
-  #greenMultiplyLayer {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    background: rgba(16, 120, 52, 0.14);
-    mix-blend-mode: multiply;
-  }
-
+  /* Scanlines ligeras sin blend modes costosos */
   #crtScanlines {
     position: absolute;
     inset: 0;
@@ -179,12 +100,12 @@
       to bottom,
       rgba(0, 0, 0, 0) 0px,
       rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.34) 3px,
-      rgba(0, 0, 0, 0.34) 4px
+      rgba(0, 0, 0, 0.32) 3px,
+      rgba(0, 0, 0, 0.32) 4px
     );
   }
 
-  /* Bordes negros de monitor antiguo curvado (sin borde verde) */
+  /* Marco negro de monitor antiguo curvado (sin filtro SVG costoso) */
   #crtMonitorBezel {
     position: fixed;
     inset: 0;
@@ -192,7 +113,7 @@
     height: 100vh;
     z-index: 25;
     pointer-events: none;
-    box-shadow: inset 0 0 90px 18px rgba(0, 0, 0, 0.85);
+    box-shadow: inset 0 0 84px 16px rgba(0, 0, 0, 0.88);
   }
 
   #crtMonitorBezel svg {
@@ -201,7 +122,7 @@
     display: block;
   }
 
-  /* Escena principal 100vh con zoom de inmersión fuerte */
+  /* Escena principal 100vh con zoom de inmersión */
   #viewportRoot {
     position: relative;
     z-index: 10;
@@ -209,60 +130,52 @@
     height: 100%;
     overflow: hidden;
     transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
-    transition: transform 0.36s cubic-bezier(0.12, 0.92, 0.24, 1), opacity 0.26s ease, filter 0.26s ease;
+    transition: transform 0.32s cubic-bezier(0.12, 0.92, 0.24, 1), opacity 0.22s ease;
   }
 
   #viewportRoot.zoom-diving {
-    transform: scale(1.68);
+    transform: scale(1.62);
     opacity: 0.06;
-    filter: blur(3px);
   }
 
   #viewportRoot.zoom-ascending {
-    transform: scale(0.68);
+    transform: scale(0.72);
     opacity: 0.12;
-    filter: blur(2px);
   }
 
-  /* Nodos dispersos */
+  /* Nodos dispersos sin backdrop-filter para mantener 60fps constantes */
   .scattered-node {
     position: absolute;
     transform: translate(-50%, -50%);
     cursor: pointer;
     z-index: 15;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    background: rgba(5, 22, 12, 0.84);
-    backdrop-filter: blur(6px);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    background: rgba(4, 20, 11, 0.91);
     border: 1px solid rgba(57, 255, 122, 0.45);
-    box-shadow: 0 0 20px rgba(57, 255, 122, 0.12), inset 0 0 14px rgba(57, 255, 122, 0.06);
+    box-shadow: 0 0 18px rgba(57, 255, 122, 0.12), inset 0 0 12px rgba(57, 255, 122, 0.06);
+    touch-action: none;
   }
 
   .scattered-node:hover {
-    transform: translate(-50%, -50%) scale(1.06);
+    transform: translate(-50%, -50%) scale(1.05);
     border-color: var(--phosphor);
-    background: rgba(8, 36, 19, 0.94);
-    box-shadow: 0 0 30px rgba(57, 255, 122, 0.34), inset 0 0 18px rgba(57, 255, 122, 0.15);
+    background: rgba(7, 32, 17, 0.96);
+    box-shadow: 0 0 26px rgba(57, 255, 122, 0.3), inset 0 0 16px rgba(57, 255, 122, 0.14);
   }
 
   .scattered-node.hub-node {
     border-width: 1.5px;
     border-color: rgba(57, 255, 122, 0.78);
-    box-shadow: 0 0 38px rgba(57, 255, 122, 0.24), inset 0 0 22px rgba(57, 255, 122, 0.1);
+    box-shadow: 0 0 32px rgba(57, 255, 122, 0.22), inset 0 0 18px rgba(57, 255, 122, 0.09);
   }
 
   .crt-glow {
     text-shadow: 0 0 10px rgba(57, 255, 122, 0.45);
   }
 
-  /* Escenario con su propio contexto de apilado: los cuadros arrastrados nunca tapan cabecera/pie */
   #scatteredStage {
     position: relative;
     z-index: 10;
-  }
-
-  /* Cuadros arrastrables */
-  .scattered-node {
-    touch-action: none;
   }
 
   .scattered-node.free-card {
@@ -274,10 +187,9 @@
     transition: none;
     cursor: grabbing;
     transform: translate(-50%, -50%) scale(1.02);
-    box-shadow: 0 0 44px rgba(57, 255, 122, 0.42), inset 0 0 18px rgba(57, 255, 122, 0.15);
+    box-shadow: 0 0 38px rgba(57, 255, 122, 0.38), inset 0 0 16px rgba(57, 255, 122, 0.14);
   }
 
-  /* Durante el arrastre, vídeos y PDFs no deben robar los eventos del ratón */
   body.drag-active,
   body.drag-active * {
     cursor: grabbing !important;
@@ -286,6 +198,43 @@
   body.drag-active iframe,
   body.drag-active video {
     pointer-events: none;
+  }
+
+  /* Modo restringido visual estilo Scribd / paywall de prensa */
+  .restricted-preview-shell {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    background: #030e08;
+    min-height: 190px;
+  }
+
+  .restricted-blur-layer {
+    width: 100%;
+    height: 100%;
+    filter: blur(11px) saturate(0.75) brightness(0.58);
+    transform: scale(1.08);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .restricted-paywall-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(
+      180deg,
+      rgba(2, 10, 6, 0.42) 0%,
+      rgba(2, 12, 7, 0.84) 48%,
+      rgba(2, 10, 6, 0.94) 100%
+    );
   }
 
   /* Pad numérico estilo control de acceso de puerta */
@@ -327,39 +276,17 @@
 </head>
 <body>
 
-  <!-- Máscara SVG con curvatura de tubo CRT antiguo -->
-  <svg width="0" height="0" style="position:fixed;pointer-events:none;" aria-hidden="true">
-    <defs>
-      <mask id="crtTubeMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-        <rect x="0" y="0" width="1" height="1" fill="black" />
-        <path d="
-          M 0.045 0.032
-          Q 0.5 0.008 0.955 0.032
-          Q 0.985 0.032 0.988 0.066
-          Q 1.004 0.5 0.988 0.934
-          Q 0.985 0.968 0.955 0.968
-          Q 0.5 0.992 0.045 0.968
-          Q 0.015 0.968 0.012 0.934
-          Q -0.004 0.5 0.012 0.066
-          Q 0.015 0.032 0.045 0.032
-          Z" fill="white" />
-      </mask>
-    </defs>
-  </svg>
-
   <div id="crtTubeShell">
     <div id="crtScreenClip">
-      <!-- 1. Fondo + CRT -->
+      <!-- 1. Fondo optimizado en canvas de baja resolución + scanlines -->
       <div id="bgWallStage" aria-hidden="true">
-        <div id="projectMediaWall"></div>
+        <canvas id="bgWallCanvas" width="192" height="108"></canvas>
       </div>
-      <div id="greenMultiplyLayer" aria-hidden="true"></div>
-      <div id="greenTintOverlay" aria-hidden="true"></div>
       <div id="crtScanlines" aria-hidden="true"></div>
 
-      <!-- 2. Escena principal 100vh con márgenes interiores seguros dentro de la curva -->
+      <!-- 2. Escena principal 100vh con márgenes interiores seguros -->
       <div id="viewportRoot">
-        <header class="hud-header z-30 h-11 px-4 flex items-center justify-between border-b border-emerald-400/30 bg-black/80 backdrop-blur-md text-xs rounded-lg">
+        <header class="hud-header z-30 h-11 px-4 flex items-center justify-between border-b border-emerald-400/30 bg-[#020a05]/92 text-xs rounded-lg">
           <div class="flex items-center gap-2 min-w-0">
             <span id="modeIndicatorDot" class="inline-block w-2 h-2 rounded-full bg-emerald-400/60 shrink-0"></span>
             <span id="sessionRoleTag" class="px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0">VISITOR_MODE</span>
@@ -387,22 +314,17 @@
 
         <main id="scatteredStage" class="relative w-full h-full pt-12 pb-10"></main>
 
-        <footer class="hud-footer z-20 h-8 px-4 flex items-center justify-between border-t border-emerald-400/20 bg-black/75 backdrop-blur-sm text-[11px] text-emerald-300/80 rounded-lg">
+        <footer class="hud-footer z-20 h-8 px-4 flex items-center justify-between border-t border-emerald-400/20 bg-[#020a05]/90 text-[11px] text-emerald-300/80 rounded-lg">
           <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · ARRASTRA LOS CUADROS · [ESC] PARA ASCENDER</span>
-          <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
+          <span class="hidden sm:inline font-semibold tracking-wider text-emerald-200/90">SOFTWARE &amp; COMPUTER ENGINEER · PYTHON · FLUTTER · C/C++ · EMBEDDED</span>
         </footer>
       </div>
     </div>
   </div>
 
-  <!-- Marco negro de monitor antiguo curvado (sin borde verde) -->
+  <!-- Marco negro de monitor antiguo curvado -->
   <div id="crtMonitorBezel" aria-hidden="true">
     <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
-      <defs>
-        <filter id="bezelSoftBlur" x="-10%" y="-10%" width="120%" height="120%">
-          <feGaussianBlur stdDeviation="7" />
-        </filter>
-      </defs>
       <path d="
         M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z
         M 45 32
@@ -425,12 +347,12 @@
         Q 15 968 12 934
         Q -4 500 12 66
         Q 15 32 45 32
-        Z" fill="none" stroke="rgba(0,0,0,0.82)" stroke-width="20" filter="url(#bezelSoftBlur)" />
+        Z" fill="none" stroke="rgba(0,0,0,0.65)" stroke-width="16" />
     </svg>
   </div>
 
   <!-- 3. Pad de acceso estilo teclado de puerta -->
-  <div id="doorPadModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div id="doorPadModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
     <div class="door-keypad-housing w-full max-w-[270px] rounded-2xl p-5 text-center">
       <div class="flex items-center justify-between text-[10px] tracking-widest text-emerald-300/75 mb-2">
         <span>ACCESS_CTRL // 01</span>
@@ -463,8 +385,8 @@
   </div>
 
   <!-- 4. Visor directo en pantalla (imágenes, vídeos, PDFs) sin descargar -->
-  <div id="viewerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="w-full max-w-4xl h-[84vh] flex flex-col rounded-xl border border-[#39ff7a]/65 bg-[#041209]/95 shadow-[0_0_50px_rgba(57,255,122,0.22)]">
+  <div id="viewerModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl h-[84vh] flex flex-col rounded-xl border border-[#39ff7a]/65 bg-[#041209] shadow-[0_0_50px_rgba(57,255,122,0.22)]">
       <div class="px-5 py-3 border-b border-emerald-400/30 flex items-center justify-between gap-3">
         <div class="min-w-0">
           <div class="text-[10px] text-emerald-300/75">SCREEN_VIEWER // DIRECT_RENDER</div>
@@ -477,8 +399,8 @@
   </div>
 
   <!-- 5. Modal de Bóveda Local (solo modo desarrollador) -->
-  <div id="vaultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-[#39ff7a]/60 bg-[#041209]/95 shadow-[0_0_50px_rgba(57,255,122,0.2)]">
+  <div id="vaultModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-[#39ff7a]/60 bg-[#041209] shadow-[0_0_50px_rgba(57,255,122,0.2)]">
       <div class="px-5 py-3.5 border-b border-emerald-400/30 flex items-center justify-between">
         <div>
           <h2 class="text-sm font-bold tracking-widest text-[#39ff7a]">BÓVEDA LOCAL // DEV_EDIT</h2>
@@ -496,11 +418,11 @@
               <option value="prover9-mace4">Prover9-Mace4 GUI (Python)</option>
               <option value="gesture-glove">GestureGlove (ESP32 / C++)</option>
               <option value="rotombot">Rotombot (Arduino / C++)</option>
-              <option value="etsiit-ugr">ETSIIT UGR & TFG</option>
+              <option value="etsiit-ugr">ETSIIT UGR &amp; TFG</option>
               <option value="big-school">BIG school</option>
               <option value="practicas-ugr">Prácticas UGR (Experiencia)</option>
               <option value="curriculum">Currículum (restringido)</option>
-              <option value="contacto">Canales & Ubicación</option>
+              <option value="contacto">Canales &amp; Ubicación</option>
             </select>
           </div>
           <div>
@@ -540,7 +462,7 @@
 
 <script>
 /* ============================================================================
-   1. ESTRUCTURA DE RAMAS Y NODOS (COORDENADAS AJUSTADAS AL ÁREA INTERIOR)
+   1. ESTRUCTURA DE RAMAS Y NODOS
    ============================================================================ */
 const DEV_PIN = '6451';
 const CONTACT_EMAIL = 'antoniojpaflor@gmail.com';
@@ -559,7 +481,6 @@ const PORTFOLIO_TREE = {
     children: ['formacion', 'experiencia', 'proyectos', 'contacto']
   },
 
-  /* ---- Apartado exclusivo y restringido: se abre al pulsar el nodo central ---- */
   curriculum: {
     id: 'curriculum',
     parent: 'root',
@@ -573,7 +494,6 @@ const PORTFOLIO_TREE = {
     children: []
   },
 
-  /* ---- Formación ---- */
   formacion: {
     id: 'formacion',
     parent: 'root',
@@ -611,7 +531,6 @@ const PORTFOLIO_TREE = {
     children: []
   },
 
-  /* ---- Experiencia ---- */
   experiencia: {
     id: 'experiencia',
     parent: 'root',
@@ -637,7 +556,6 @@ const PORTFOLIO_TREE = {
     children: []
   },
 
-  /* ---- Proyectos ---- */
   proyectos: {
     id: 'proyectos',
     parent: 'root',
@@ -699,7 +617,6 @@ const PORTFOLIO_TREE = {
     children: []
   },
 
-  /* ---- Contacto ---- */
   contacto: {
     id: 'contacto',
     parent: 'root',
@@ -723,6 +640,7 @@ let isTransitioning = false;
 let isDevMode = false;
 let padBuffer = '';
 let vaultItems = [];
+let repoAssetsList = [];
 let dbInstance = null;
 
 function openVaultDB() {
@@ -758,7 +676,7 @@ async function loadVaultFromDB() {
         }));
         document.getElementById('vaultCountBadge').textContent = vaultItems.length;
         renderVaultList();
-        renderBackgroundMediaWall();
+        syncBackgroundPool();
         resolve();
       };
       req.onerror = () => resolve();
@@ -780,7 +698,7 @@ async function loadVaultFromDB() {
       req.onerror = () => resolve();
     });
   } catch (_) {
-    renderBackgroundMediaWall();
+    syncBackgroundPool();
   }
 }
 
@@ -834,6 +752,7 @@ function handleDevButton() {
   if (isDevMode) {
     isDevMode = false;
     updateModeUI();
+    syncBackgroundPool();
     renderScene(currentNodeId);
   } else {
     openDoorPad();
@@ -872,8 +791,9 @@ function submitPadCode() {
     updatePadDisplay('ACCESO CONCEDIDO // DEV_MODE');
     setTimeout(() => {
       closeDoorPad();
+      syncBackgroundPool();
       renderScene(currentNodeId);
-    }, 350);
+    }, 320);
   } else {
     updatePadDisplay('CÓDIGO DENEGADO');
     padBuffer = '';
@@ -908,25 +828,352 @@ function updateModeUI() {
 }
 
 /* ============================================================================
-   4. FONDO MULTIMEDIA DESORDENADO, SUPERPUESTO Y EN MOVIMIENTO CONTINUO
+   4. MOTOR DE FONDO ULTRA-LIGERO (CANVAS 192x108 + ROTACIÓN DE TODOS LOS MEDIOS)
+   - Decodifica como máximo 2 vídeos simultáneos (1 si hay un vídeo principal activo)
+   - Recorre el 100% de las imágenes y vídeos disponibles (manifest + bóveda)
+   - Baja automáticamente a 3 FPS mientras se reproduce un vídeo principal
    ============================================================================ */
-const FLOATING_SLOTS = [
-  { left: '4%',  top: '6%',  w: '44%', h: '42%', anim: 'drift-a', z: 1, title: 'FREESTYLE PICA // DART ENGINE' },
-  { left: '42%', top: '3%',  w: '52%', h: '38%', anim: 'drift-b', z: 2, title: 'PROVER9-MACE4 // LOGIC SOLVER' },
-  { left: '14%', top: '34%', w: '48%', h: '44%', anim: 'drift-c', z: 3, title: 'GESTUREGLOVE // ESP32 IMU' },
-  { left: '52%', top: '38%', w: '45%', h: '46%', anim: 'drift-a', z: 2, title: 'ROTOMBOT // ARENA DRIVE' },
-  { left: '3%',  top: '62%', w: '43%', h: '34%', anim: 'drift-b', z: 1, title: 'ETSIIT UGR // COMPUTADORES' },
-  { left: '46%', top: '66%', w: '49%', h: '31%', anim: 'drift-c', z: 3, title: 'BIG SCHOOL // SOFTWARE LAB' }
+const BG_SLOTS_LAYOUT = [
+  { x: 0.04, y: 0.06, w: 0.50, h: 0.48, freqX: 0.21, freqY: 0.17, phase: 0.0 },
+  { x: 0.44, y: 0.04, w: 0.52, h: 0.44, freqX: 0.16, freqY: 0.23, phase: 1.7 },
+  { x: 0.10, y: 0.46, w: 0.50, h: 0.48, freqX: 0.19, freqY: 0.15, phase: 3.1 },
+  { x: 0.46, y: 0.48, w: 0.50, h: 0.46, freqX: 0.24, freqY: 0.18, phase: 4.6 }
 ];
 
-let repoAssetsList = [];
+const bgEngine = {
+  canvas: null,
+  ctx: null,
+  pool: [],
+  poolCursor: 0,
+  slots: [],
+  rotateCursor: 0,
+  lastDrawTs: 0,
+  lastRotateTs: 0,
+  rafId: null,
+  mainVideoPlayingCount: 0,
+  poolSignature: ''
+};
+
+function releaseMediaHandle(handle) {
+  if (!handle) return;
+  if (handle.kind === 'video' && handle.el) {
+    try {
+      handle.el.pause();
+      handle.el.removeAttribute('src');
+      handle.el.load();
+    } catch (_) {}
+  }
+  handle.el = null;
+}
+
+function createMediaHandle(asset) {
+  const handle = {
+    src: asset.src,
+    kind: asset.kind,
+    label: asset.label,
+    el: null,
+    ready: false
+  };
+
+  if (asset.kind === 'video') {
+    const v = document.createElement('video');
+    v.src = asset.src;
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.preload = 'auto';
+    v.setAttribute('playsinline', '');
+    v.setAttribute('muted', '');
+    v.addEventListener('loadeddata', () => {
+      handle.ready = true;
+    }, { once: true });
+    v.addEventListener('error', () => {
+      handle.ready = false;
+    }, { once: true });
+    v.play().catch(() => {});
+    handle.el = v;
+  } else {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => {
+      handle.ready = true;
+    };
+    img.onerror = () => {
+      handle.ready = false;
+    };
+    img.src = asset.src;
+    handle.el = img;
+  }
+
+  return handle;
+}
+
+function countActiveSlotVideos(excludeSlotIdx = -1) {
+  let count = 0;
+  bgEngine.slots.forEach((slot, idx) => {
+    if (idx === excludeSlotIdx) return;
+    if (slot.current && slot.current.kind === 'video') count++;
+  });
+  return count;
+}
+
+function pickNextAssetForSlot(slotIdx) {
+  const pool = bgEngine.pool;
+  if (pool.length === 0) return null;
+
+  const maxVideos = bgEngine.mainVideoPlayingCount > 0 ? 1 : 2;
+  const activeVideos = countActiveSlotVideos(slotIdx);
+
+  // Intentar elegir el siguiente asset del pool respetando el límite de vídeos simultáneos
+  for (let attempt = 0; attempt < pool.length; attempt++) {
+    const candidate = pool[bgEngine.poolCursor % pool.length];
+    bgEngine.poolCursor = (bgEngine.poolCursor + 1) % pool.length;
+    if (candidate.kind === 'video' && activeVideos >= maxVideos) {
+      // Si el pool entero son vídeos, permitimos el primero para no dejar vacío
+      const hasImages = pool.some((item) => item.kind === 'image');
+      if (hasImages) continue;
+    }
+    return candidate;
+  }
+  return pool[0];
+}
+
+function syncBackgroundVideoPlayback() {
+  const maxPlaying = document.hidden ? 0 : (bgEngine.mainVideoPlayingCount > 0 ? 1 : 2);
+  let playing = 0;
+  bgEngine.slots.forEach((slot) => {
+    [slot.current, slot.prev].forEach((h) => {
+      if (!h || h.kind !== 'video' || !h.el) return;
+      if (playing < maxPlaying) {
+        playing++;
+        h.el.playbackRate = bgEngine.mainVideoPlayingCount > 0 ? 0.65 : 1.0;
+        if (h.el.paused) h.el.play().catch(() => {});
+      } else {
+        if (!h.el.paused) h.el.pause();
+      }
+    });
+  });
+}
+
+function buildBackgroundPool() {
+  const seen = new Set();
+  const combined = [];
+
+  // 1. Todos los archivos de imagen o vídeo del manifest (se usen o no en nodos de la web)
+  repoAssetsList.forEach((item) => {
+    if (!item || !item.path) return;
+    const kind = item.kind === 'video' ? 'video' : (item.kind === 'image' ? 'image' : null);
+    if (!kind) return;
+    if (item.confidential && !isDevMode) return;
+    const src = encodeURI(item.path);
+    if (seen.has(src)) return;
+    seen.add(src);
+    combined.push({ src, kind, label: item.name || item.path });
+  });
+
+  // 2. Todas las imágenes y vídeos públicos de la bóveda local
+  vaultItems.forEach((m) => {
+    if (m.confidential && !isDevMode) return;
+    const parentNode = PORTFOLIO_TREE[m.nodeId];
+    if (parentNode && parentNode.confidential && !isDevMode) return;
+    const kind = m.type.startsWith('video/') ? 'video' : (m.type.startsWith('image/') ? 'image' : null);
+    if (!kind) return;
+    if (seen.has(m.dataUrl)) return;
+    seen.add(m.dataUrl);
+    combined.push({ src: m.dataUrl, kind, label: m.name });
+  });
+
+  return combined;
+}
+
+function syncBackgroundPool() {
+  const newPool = buildBackgroundPool();
+  const sig = newPool.map((x) => `${x.kind}:${x.src.slice(0, 80)}`).join('|');
+  if (sig === bgEngine.poolSignature && bgEngine.slots.length > 0) return;
+
+  bgEngine.poolSignature = sig;
+  bgEngine.pool = newPool;
+  bgEngine.poolCursor = 0;
+  bgEngine.rotateCursor = 0;
+
+  // Liberar recursos anteriores
+  bgEngine.slots.forEach((s) => {
+    releaseMediaHandle(s.current);
+    releaseMediaHandle(s.prev);
+  });
+
+  bgEngine.slots = BG_SLOTS_LAYOUT.map((layout, idx) => {
+    const asset = pickNextAssetForSlot(idx);
+    return {
+      layout,
+      current: asset ? createMediaHandle(asset) : null,
+      prev: null,
+      fadeStart: 0
+    };
+  });
+
+  syncBackgroundVideoPlayback();
+}
+
+function rotateOneBackgroundSlot(now) {
+  if (bgEngine.pool.length <= BG_SLOTS_LAYOUT.length) return;
+  const idx = bgEngine.rotateCursor % bgEngine.slots.length;
+  bgEngine.rotateCursor = (bgEngine.rotateCursor + 1) % bgEngine.slots.length;
+
+  const slot = bgEngine.slots[idx];
+  const nextAsset = pickNextAssetForSlot(idx);
+  if (!nextAsset) return;
+
+  releaseMediaHandle(slot.prev);
+  slot.prev = slot.current;
+  slot.current = createMediaHandle(nextAsset);
+  slot.fadeStart = now;
+  syncBackgroundVideoPlayback();
+}
+
+function drawCover(ctx, el, dx, dy, dw, dh) {
+  const sw = el.videoWidth || el.naturalWidth || 0;
+  const sh = el.videoHeight || el.naturalHeight || 0;
+  if (!sw || !sh) return false;
+
+  const scale = Math.max(dw / sw, dh / sh);
+  const cw = dw / scale;
+  const ch = dh / scale;
+  const sx = (sw - cw) * 0.5;
+  const sy = (sh - ch) * 0.5;
+  ctx.drawImage(el, sx, sy, cw, ch, dx, dy, dw, dh);
+  return true;
+}
+
+function drawFallbackGlow(ctx, dx, dy, dw, dh, t, idx) {
+  const g = ctx.createLinearGradient(dx, dy, dx + dw, dy + dh);
+  const pulse = 0.16 + 0.08 * Math.sin(t * 0.8 + idx);
+  g.addColorStop(0, `rgba(57, 255, 122, ${pulse.toFixed(3)})`);
+  g.addColorStop(1, 'rgba(3, 18, 9, 0.55)');
+  ctx.fillStyle = g;
+  ctx.fillRect(dx, dy, dw, dh);
+}
+
+function renderBgFrame(now) {
+  bgEngine.rafId = requestAnimationFrame(renderBgFrame);
+  if (document.hidden) return;
+
+  // 12 FPS normales (~83ms), 3 FPS (~330ms) cuando hay un vídeo principal reproduciéndose
+  const targetInterval = bgEngine.mainVideoPlayingCount > 0 ? 330 : 83;
+  if (now - bgEngine.lastDrawTs < targetInterval) return;
+  bgEngine.lastDrawTs = now;
+
+  // Rotar un slot cada 6.5s para garantizar que se muestran TODOS los archivos disponibles
+  if (bgEngine.pool.length > BG_SLOTS_LAYOUT.length && now - bgEngine.lastRotateTs > 6500) {
+    bgEngine.lastRotateTs = now;
+    rotateOneBackgroundSlot(now);
+  }
+
+  const canvas = bgEngine.canvas;
+  const ctx = bgEngine.ctx;
+  if (!canvas || !ctx) return;
+
+  const cw = canvas.width;
+  const ch = canvas.height;
+  const t = now * 0.001;
+
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#020a05';
+  ctx.fillRect(0, 0, cw, ch);
+
+  bgEngine.slots.forEach((slot, idx) => {
+    const L = slot.layout;
+    const ox = Math.sin(t * L.freqX + L.phase) * cw * 0.045;
+    const oy = Math.cos(t * L.freqY + L.phase) * ch * 0.045;
+    const dx = L.x * cw + ox;
+    const dy = L.y * ch + oy;
+    const dw = L.w * cw;
+    const dh = L.h * ch;
+
+    const fadeProgress = slot.prev ? Math.min(1, (now - slot.fadeStart) / 1100) : 1;
+    if (slot.prev && fadeProgress >= 1) {
+      releaseMediaHandle(slot.prev);
+      slot.prev = null;
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(dx, dy, dw, dh);
+    ctx.clip();
+
+    let drewSomething = false;
+
+    if (slot.prev && slot.prev.ready && slot.prev.el) {
+      ctx.globalAlpha = 0.85 * (1 - fadeProgress);
+      drewSomething = drawCover(ctx, slot.prev.el, dx, dy, dw, dh) || drewSomething;
+    }
+
+    if (slot.current && slot.current.ready && slot.current.el) {
+      ctx.globalAlpha = 0.85 * fadeProgress;
+      drewSomething = drawCover(ctx, slot.current.el, dx, dy, dw, dh) || drewSomething;
+    }
+
+    if (!drewSomething) {
+      ctx.globalAlpha = 0.7;
+      drawFallbackGlow(ctx, dx, dy, dw, dh, t, idx);
+    }
+
+    ctx.restore();
+  });
+
+  // Tinte fósforo verde CRT sobre el canvas minúsculo (192x108 => coste casi cero)
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'saturation';
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, cw, ch);
+
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = '#36e874';
+  ctx.fillRect(0, 0, cw, ch);
+
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = 'rgba(2, 14, 7, 0.24)';
+  ctx.fillRect(0, 0, cw, ch);
+}
+
+function initBackgroundEngine() {
+  bgEngine.canvas = document.getElementById('bgWallCanvas');
+  bgEngine.ctx = bgEngine.canvas ? bgEngine.canvas.getContext('2d', { alpha: false }) : null;
+
+  // Detectar reproducción de vídeos principales para priorizar su fluidez
+  const recountMainVideos = () => {
+    const videos = document.querySelectorAll('#scatteredStage video, #viewerBody video');
+    let playing = 0;
+    videos.forEach((v) => {
+      if (!v.paused && !v.ended) playing++;
+    });
+    bgEngine.mainVideoPlayingCount = playing;
+    syncBackgroundVideoPlayback();
+  };
+
+  document.addEventListener('play', (e) => {
+    if (e.target && e.target.tagName === 'VIDEO') recountMainVideos();
+  }, true);
+  document.addEventListener('pause', (e) => {
+    if (e.target && e.target.tagName === 'VIDEO') recountMainVideos();
+  }, true);
+  document.addEventListener('ended', (e) => {
+    if (e.target && e.target.tagName === 'VIDEO') recountMainVideos();
+  }, true);
+  document.addEventListener('visibilitychange', () => {
+    syncBackgroundVideoPlayback();
+  });
+
+  bgEngine.rafId = requestAnimationFrame(renderBgFrame);
+}
 
 async function loadRepoManifest() {
   try {
     const res = await fetch('assets/manifest.json', { cache: 'no-store' });
     if (!res.ok) {
       repoAssetsList = [];
-      renderBackgroundMediaWall();
+      syncBackgroundPool();
       return;
     }
     const data = await res.json();
@@ -934,82 +1181,8 @@ async function loadRepoManifest() {
   } catch (_) {
     repoAssetsList = [];
   }
-  renderBackgroundMediaWall();
-}
-
-function renderBackgroundMediaWall() {
-  const wall = document.getElementById('projectMediaWall');
-  if (!wall) return;
-
-  const vaultVisuals = vaultItems
-    .filter((m) => {
-      if (m.confidential && !isDevMode) return false;
-      const parentNode = PORTFOLIO_TREE[m.nodeId];
-      if (parentNode && parentNode.confidential && !isDevMode) return false;
-      return m.type.startsWith('video/') || m.type.startsWith('image/');
-    })
-    .map((m) => ({
-      src: m.dataUrl,
-      kind: m.type.startsWith('video/') ? 'video' : 'image',
-      label: m.name
-    }));
-
-  const manifestVisuals = repoAssetsList.map((item) => ({
-    src: encodeURI(item.path),
-    kind: item.kind,
-    label: item.name
-  }));
-
-  const pool = [...manifestVisuals, ...vaultVisuals];
-
-  if (pool.length === 0) {
-    wall.innerHTML = FLOATING_SLOTS.map((slot, idx) => `
-      <div class="float-media-layer ${slot.anim}"
-           style="left:${slot.left}; top:${slot.top}; width:${slot.w}; height:${slot.h}; z-index:${slot.z};">
-        ${renderFallbackTile(slot.title, idx)}
-      </div>
-    `).join('');
-    return;
-  }
-
-  const totalSlots = Math.max(FLOATING_SLOTS.length, pool.length);
-
-  wall.innerHTML = Array.from({ length: totalSlots }, (_, idx) => {
-    const baseSlot = FLOATING_SLOTS[idx % FLOATING_SLOTS.length];
-    const asset = pool[idx % pool.length];
-
-    const extraOffset = idx >= FLOATING_SLOTS.length ? ((idx * 17) % 28) : 0;
-    const leftVal = idx >= FLOATING_SLOTS.length
-      ? `calc(${baseSlot.left} + ${(extraOffset % 14) - 7}%)`
-      : baseSlot.left;
-    const topVal = idx >= FLOATING_SLOTS.length
-      ? `calc(${baseSlot.top} + ${((extraOffset * 3) % 14) - 7}%)`
-      : baseSlot.top;
-    const animClass = ['drift-a', 'drift-b', 'drift-c'][idx % 3];
-
-    const mediaMarkup = asset.kind === 'video'
-      ? `<video src="${asset.src}" autoplay loop muted playsinline
-                onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(asset.label)}', ${idx})"></video>`
-      : `<img src="${asset.src}" alt="${escapeHtml(asset.label)}"
-              onerror="this.parentElement.innerHTML = renderFallbackTile('${escapeHtml(asset.label)}', ${idx})" />`;
-
-    return `
-      <div class="float-media-layer ${animClass}"
-           style="left:${leftVal}; top:${topVal}; width:${baseSlot.w}; height:${baseSlot.h}; z-index:${(idx % 3) + 1};">
-        ${mediaMarkup}
-      </div>
-    `;
-  }).join('');
-}
-
-function renderFallbackTile(title, idx) {
-  return `
-    <div class="float-media-art">
-      <div class="text-[11px] tracking-widest text-[#39ff7a]/85">STREAM_0${idx + 1} // OVERLAP_NODE</div>
-      <div class="text-2xl md:text-3xl font-extrabold tracking-wider text-[#39ff7a]">${title}</div>
-      <div class="text-xs text-emerald-200/75">CRT_PHOSPHOR_FEED · DRIFT_ACTIVE</div>
-    </div>
-  `;
+  syncBackgroundPool();
+  renderScene(currentNodeId);
 }
 
 function toggleBgIntensity() {
@@ -1022,20 +1195,72 @@ function toggleBgIntensity() {
 /* ============================================================================
    5. VISOR DIRECTO EN PANTALLA (SIN DESCARGAR)
    ============================================================================ */
+function getNodeMediaItems(nodeId) {
+  const fromVault = vaultItems
+    .filter((m) => m.nodeId === nodeId)
+    .map((m) => ({
+      id: m.id,
+      name: m.name,
+      type: m.type,
+      src: m.dataUrl,
+      confidential: Boolean(m.confidential),
+      source: 'vault'
+    }));
+
+  const fromManifest = repoAssetsList
+    .filter((item) => item && item.nodeId === nodeId && item.path)
+    .map((item, idx) => {
+      const mime = item.kind === 'video'
+        ? 'video/mp4'
+        : (item.kind === 'pdf' ? 'application/pdf' : 'image/jpeg');
+      return {
+        id: `manifest_${nodeId}_${idx}`,
+        name: item.name || item.path.split('/').pop(),
+        type: mime,
+        src: encodeURI(item.path),
+        confidential: Boolean(item.confidential),
+        source: 'manifest'
+      };
+    });
+
+  return [...fromManifest, ...fromVault];
+}
+
+function findMediaItemById(itemId) {
+  const v = vaultItems.find((m) => m.id === itemId);
+  if (v) {
+    return {
+      id: v.id,
+      nodeId: v.nodeId,
+      name: v.name,
+      type: v.type,
+      src: v.dataUrl,
+      confidential: Boolean(v.confidential)
+    };
+  }
+  for (const nodeId of Object.keys(PORTFOLIO_TREE)) {
+    const found = getNodeMediaItems(nodeId).find((x) => x.id === itemId);
+    if (found) return { ...found, nodeId };
+  }
+  return null;
+}
+
 function openInlineViewerById(itemId) {
-  const item = vaultItems.find((m) => m.id === itemId);
+  const item = findMediaItemById(itemId);
   if (!item) return;
-  if (item.confidential && !isDevMode) return;
+  const parentNode = PORTFOLIO_TREE[item.nodeId];
+  const isRestricted = Boolean((item.confidential || (parentNode && parentNode.confidential)) && !isDevMode);
+  if (isRestricted) return;
 
   document.getElementById('viewerTitle').textContent = item.name;
   const body = document.getElementById('viewerBody');
 
   if (item.type.startsWith('image/')) {
-    body.innerHTML = `<img src="${item.dataUrl}" alt="${escapeHtml(item.name)}" class="max-w-full max-h-full object-contain rounded border border-emerald-400/35" />`;
+    body.innerHTML = `<img src="${item.src}" alt="${escapeHtml(item.name)}" class="max-w-full max-h-full object-contain rounded border border-emerald-400/35" />`;
   } else if (item.type.startsWith('video/')) {
-    body.innerHTML = `<video src="${item.dataUrl}" controls autoplay playsinline class="max-w-full max-h-full rounded border border-emerald-400/35 bg-black"></video>`;
+    body.innerHTML = `<video src="${item.src}" controls autoplay playsinline class="max-w-full max-h-full rounded border border-emerald-400/35 bg-black"></video>`;
   } else if (item.type === 'application/pdf') {
-    body.innerHTML = `<iframe src="${item.dataUrl}" title="${escapeHtml(item.name)}" class="w-full h-full rounded border border-emerald-400/35 bg-white"></iframe>`;
+    body.innerHTML = `<iframe src="${item.src}" title="${escapeHtml(item.name)}" class="w-full h-full rounded border border-emerald-400/35 bg-white"></iframe>`;
   } else {
     body.innerHTML = `<div class="text-xs text-emerald-200">Vista previa directa no disponible para este formato (${escapeHtml(item.type)}).</div>`;
   }
@@ -1046,25 +1271,88 @@ function openInlineViewerById(itemId) {
 function closeViewerModal() {
   document.getElementById('viewerModal').classList.add('hidden');
   document.getElementById('viewerBody').innerHTML = '';
+  bgEngine.mainVideoPlayingCount = 0;
+  syncBackgroundVideoPlayback();
 }
 
 /* ============================================================================
-   6. RENDERIZADO DE NODOS, CENSURA INDEPENDIENTE Y ZOOM FUERTE
+   6. MODO RESTRINGIDO VISUAL (PREVISUALIZACIÓN BLURREADA ESTILO SCRIBD / PRENSA)
    ============================================================================ */
-function renderConfidentialNotice(scopeLabel) {
+function renderPaywallOverlay(titleText, subtitleText) {
+  const subject = encodeURIComponent(`Solicitud de acceso: ${titleText}`);
   return `
-    <div class="mt-2 p-3 rounded-lg border border-amber-400/50 bg-black/85 text-amber-200 space-y-1">
-      <div class="text-[10px] font-extrabold tracking-widest text-amber-300">
-        [CENSURADO // ${scopeLabel} CONFIDENCIAL]
+    <div class="restricted-paywall-overlay">
+      <div class="px-2.5 py-0.5 rounded-full border border-amber-400/60 bg-amber-500/15 text-amber-300 text-[10px] font-extrabold tracking-widest mb-2">
+        LOCKED // ACCESO RESTRINGIDO
       </div>
-      <p class="text-[11px] leading-relaxed text-emerald-100/85">
-        Contenido confidencial. Si te interesa consultarlo, solicítalo por correo a
-        <span class="font-bold text-[#39ff7a] underline">${CONTACT_EMAIL}</span>.
+      <div class="text-xs font-bold text-[#39ff7a] mb-1 max-w-[92%] truncate">${escapeHtml(titleText)}</div>
+      <p class="text-[11px] leading-snug text-emerald-100/85 max-w-[260px]">
+        ${subtitleText || 'Este archivo está protegido. Solicita acceso directo por correo electrónico.'}
       </p>
+      <a href="mailto:${CONTACT_EMAIL}?subject=${subject}"
+         class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded border border-[#39ff7a]/70 bg-[#051a0d] text-[#39ff7a] hover:bg-emerald-400/20 text-[10px] font-bold tracking-wider transition">
+        SOLICITAR A ${CONTACT_EMAIL}
+      </a>
     </div>
   `;
 }
 
+function renderBlurredDocumentSkeleton() {
+  return `
+    <div class="restricted-blur-layer p-4 space-y-3 bg-[#0a2214]">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-emerald-300/35 shrink-0"></div>
+        <div class="space-y-1.5 flex-1">
+          <div class="h-3 w-3/4 rounded bg-emerald-300/45"></div>
+          <div class="h-2 w-1/2 rounded bg-emerald-200/30"></div>
+        </div>
+      </div>
+      <div class="h-px bg-emerald-400/25"></div>
+      <div class="space-y-2">
+        <div class="h-2.5 w-full rounded bg-emerald-200/30"></div>
+        <div class="h-2.5 w-11/12 rounded bg-emerald-200/25"></div>
+        <div class="h-2.5 w-5/6 rounded bg-emerald-200/25"></div>
+        <div class="h-2.5 w-full rounded bg-emerald-200/20"></div>
+        <div class="h-2.5 w-2/3 rounded bg-emerald-200/25"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <div class="h-12 rounded bg-emerald-300/20"></div>
+        <div class="h-12 rounded bg-emerald-300/15"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderRestrictedMediaCard(m, key, style) {
+  let blurredMedia = '';
+  if (m.type.startsWith('image/')) {
+    blurredMedia = `<img src="${m.src}" alt="" draggable="false" class="restricted-blur-layer w-full h-52 object-cover" />`;
+  } else if (m.type.startsWith('video/')) {
+    blurredMedia = `<video src="${m.src}" muted playsinline preload="metadata" class="restricted-blur-layer w-full h-52 object-cover bg-black"></video>`;
+  } else if (m.type === 'application/pdf') {
+    blurredMedia = `<iframe src="${m.src}#toolbar=0&navpanes=0&scrollbar=0" title="" tabindex="-1" class="restricted-blur-layer w-full h-56 bg-white"></iframe>`;
+  } else {
+    blurredMedia = renderBlurredDocumentSkeleton();
+  }
+
+  return `
+    <div class="scattered-node free-card rounded-xl p-2.5 w-[min(82vw,330px)] space-y-2"
+         data-drag-key="${key}" style="${style}">
+      <div class="flex items-center justify-between gap-2 text-[11px]">
+        <span class="font-bold text-amber-300 truncate">${escapeHtml(m.name)}</span>
+        <span class="px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-300 text-[10px] shrink-0">RESTRINGIDO</span>
+      </div>
+      <div class="restricted-preview-shell">
+        ${blurredMedia}
+        ${renderPaywallOverlay(m.name, 'Vista previa bloqueada. Escribe para solicitar el archivo completo.')}
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   7. RENDERIZADO DE NODOS Y ZOOM DE INMERSIÓN
+   ============================================================================ */
 function renderScene(nodeId) {
   const node = PORTFOLIO_TREE[nodeId] || PORTFOLIO_TREE.root;
   currentNodeId = node.id;
@@ -1093,22 +1381,25 @@ function renderScene(nodeId) {
   let html = '';
 
   const centerX = 50;
-  const centerY = childNodes.length > 0 ? 49 : 31;
+  const centerY = childNodes.length > 0 ? 49 : 29;
 
   html += `
-    <div class="scattered-node hub-node ${node.id === 'root' ? '' : 'free-card'} rounded-xl p-4 md:p-5 w-[min(82vw,420px)]"
+    <div class="scattered-node hub-node ${node.id === 'root' ? '' : 'free-card'} rounded-xl p-4 md:p-5 w-[min(84vw,430px)]"
          data-drag-key="hub"
          style="${nodeStyle(node.id, 'hub', centerX, centerY)}"
          onclick="handleCenterClick('${node.id}', event)">
-      <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-1">
+      <div class="flex items-center justify-between gap-2 text-[11px] text-emerald-300/80 mb-1">
         <span>${node.code}</span>
-        <span>${node.confidential ? 'NODO CONFIDENCIAL' : (childNodes.length > 0 ? childNodes.length + ' RAMAS' : 'HOJA_ACTIVA')}</span>
+        <div class="flex items-center gap-2 shrink-0">
+          ${isDevMode && childNodes.length === 0 ? `<button type="button" onclick="event.stopPropagation(); openVaultModal('${node.id}')" class="underline text-[#39ff7a] font-bold cursor-pointer">+ GESTIONAR</button>` : ''}
+          <span>${node.confidential ? 'NODO RESTRINGIDO' : (childNodes.length > 0 ? childNodes.length + ' RAMAS' : 'HOJA_ACTIVA')}</span>
+        </div>
       </div>
       <h1 class="text-base md:text-lg font-extrabold tracking-wide text-[#39ff7a] crt-glow">${node.title}</h1>
       <p class="text-xs text-emerald-100/85 mt-1">${node.subtitle}</p>
       ${
         isNodeCensored
-          ? renderConfidentialNotice('NODO')
+          ? `<p class="text-xs text-amber-200/85 mt-2 leading-relaxed">Contenido bajo acceso restringido. Solicita la versión completa en <span class="font-bold text-[#39ff7a]">${CONTACT_EMAIL}</span>.</p>`
           : `
             <p class="text-xs text-emerald-200/75 mt-2.5 leading-relaxed">${escapeHtml(node.summary)}</p>
             <div class="flex flex-wrap gap-1.5 mt-3">
@@ -1133,12 +1424,12 @@ function renderScene(nodeId) {
               onclick="diveIntoNode('${child.id}', event)">
         <div class="flex items-center justify-between text-[10px] text-emerald-300/75 mb-1">
           <span>${child.code}</span>
-          <span>${childCensored ? 'CONFIDENCIAL' : (grandCount > 0 ? '▸ ' + grandCount + ' SUB' : '▸ ABRIR')}</span>
+          <span>${childCensored ? 'RESTRINGIDO' : (grandCount > 0 ? '▸ ' + grandCount + ' SUB' : '▸ ABRIR')}</span>
         </div>
         <div class="text-sm font-bold text-[#39ff7a] crt-glow">${child.title}</div>
         ${
           childCensored
-            ? `<div class="text-[11px] text-amber-300 mt-1">[CENSURADO · PEDIR A ${CONTACT_EMAIL}]</div>`
+            ? `<div class="text-[11px] text-amber-300 mt-1">[ACCESO RESTRINGIDO · VER VISTA PREVIA]</div>`
             : `
               <div class="text-[11px] text-emerald-100/75 mt-1 line-clamp-2">${child.subtitle}</div>
               <div class="flex flex-wrap gap-1 mt-2">
@@ -1151,59 +1442,45 @@ function renderScene(nodeId) {
   });
 
   if (childNodes.length === 0) {
-    const attached = vaultItems.filter((m) => m.nodeId === node.id);
+    const attached = getNodeMediaItems(node.id);
     const vw = window.innerWidth;
-    const wide = vw >= 1000;
+    const cols = vw < 700 ? 1 : (vw < 1100 ? 2 : 3);
 
-    const statusText = isNodeCensored
-      ? 'NODO CONFIDENCIAL · ARCHIVOS OCULTOS'
-      : attached.length === 0
-        ? 'Sin archivos adjuntos en este nodo todavía.'
-        : `${attached.length} ${attached.length === 1 ? 'ARCHIVO' : 'ARCHIVOS'} · ARRASTRA PARA MOVER`;
-
-    // Tarjeta de estado del nodo (arrastrable)
-    html += `
-      <div class="scattered-node free-card rounded-xl p-3 w-[min(80vw,250px)]"
-           data-drag-key="status"
-           style="${nodeStyle(node.id, 'status', wide ? 14 : 50, wide ? 31 : 53)}">
-        <div class="flex items-center justify-between gap-2 text-[11px] text-emerald-300/80">
-          <span class="truncate">CONTENIDO // ${node.id.toUpperCase()}</span>
-          ${isDevMode ? `<button type="button" onclick="openVaultModal('${node.id}')" class="underline text-[#39ff7a] cursor-pointer shrink-0">+ GESTIONAR</button>` : `<span class="shrink-0">VISOR_DIRECTO</span>`}
+    if (attached.length === 0 && isNodeCensored) {
+      // Si el nodo restringido (ej. CV) aún no tiene archivo subido, mostramos documento blurreado estilo Scribd
+      html += `
+        <div class="scattered-node free-card rounded-xl p-2.5 w-[min(84vw,360px)]"
+             data-drag-key="restricted-doc"
+             style="${nodeStyle(node.id, 'restricted-doc', 50, 67)}">
+          <div class="restricted-preview-shell">
+            ${renderBlurredDocumentSkeleton()}
+            ${renderPaywallOverlay(node.title, 'Documento confidencial. Solicita una copia por correo para verlo sin censura.')}
+          </div>
         </div>
-        <p class="text-[11px] text-emerald-200/70 mt-1.5">${statusText}</p>
-      </div>
-    `;
-
-    // Un cuadro independiente (y arrastrable) por cada archivo
-    if (!isNodeCensored) {
-      const cols = vw < 700 ? 1 : (vw < 1100 ? 2 : 3);
-
+      `;
+    } else {
       attached.forEach((m, i) => {
         const row = Math.floor(i / cols);
         const col = i % cols;
         const inRow = Math.min(cols, attached.length - row * cols);
         const defX = ((col + 1) * 100) / (inRow + 1);
-        const defY = Math.min(86, (wide ? 68 : 72) + row * 14 + (col % 2) * 4);
+        const defY = Math.min(84, 67 + row * 14 + (col % 2) * 3);
         const key = `file:${m.id}`;
         const style = nodeStyle(node.id, key, defX, defY);
 
-        if (m.confidential && !isDevMode) {
-          html += `
-            <div class="scattered-node free-card rounded-xl p-3 w-[min(80vw,300px)]"
-                 data-drag-key="${key}" style="${style}">
-              ${renderConfidentialNotice('ARCHIVO')}
-            </div>
-          `;
+        const isItemRestricted = Boolean((m.confidential || isNodeCensored) && !isDevMode);
+        if (isItemRestricted) {
+          html += renderRestrictedMediaCard(m, key, style);
           return;
         }
 
         let inlinePreview = '';
         if (m.type.startsWith('image/')) {
-          inlinePreview = `<img src="${m.dataUrl}" alt="${escapeHtml(m.name)}" draggable="false" onclick="openInlineViewerById('${m.id}')" class="w-full max-h-52 object-contain rounded border border-emerald-400/25 bg-black/60" />`;
+          inlinePreview = `<img src="${m.src}" alt="${escapeHtml(m.name)}" draggable="false" onclick="openInlineViewerById('${m.id}')" class="w-full max-h-52 object-contain rounded border border-emerald-400/25 bg-black/60 cursor-pointer" />`;
         } else if (m.type.startsWith('video/')) {
-          inlinePreview = `<video src="${m.dataUrl}" controls muted playsinline class="w-full max-h-52 rounded border border-emerald-400/25 bg-black"></video>`;
+          inlinePreview = `<video src="${m.src}" controls playsinline preload="metadata" class="w-full max-h-52 rounded border border-emerald-400/25 bg-black"></video>`;
         } else if (m.type === 'application/pdf') {
-          inlinePreview = `<iframe src="${m.dataUrl}" title="${escapeHtml(m.name)}" class="w-full h-56 rounded border border-emerald-400/25 bg-white"></iframe>`;
+          inlinePreview = `<iframe src="${m.src}" title="${escapeHtml(m.name)}" class="w-full h-56 rounded border border-emerald-400/25 bg-white"></iframe>`;
         }
 
         html += `
@@ -1229,7 +1506,7 @@ function renderScene(nodeId) {
 }
 
 /* ============================================================================
-   CUADROS ARRASTRABLES (posición por pantalla, en memoria hasta recargar)
+   CUADROS ARRASTRABLES
    ============================================================================ */
 const layoutState = {};
 let zTop = 20;
@@ -1257,8 +1534,6 @@ function setupDragging() {
     const el = e.target.closest('.scattered-node');
     if (!el || !stage.contains(el)) return;
 
-    // Controles internos (botones, vídeo, PDF) conservan su comportamiento;
-    // el propio cuadro puede ser un botón (nodos hijos) y sí se arrastra.
     const interactive = e.target.closest('button, a, input, textarea, select, video, iframe');
     if (interactive && interactive !== el) return;
 
@@ -1279,7 +1554,6 @@ function setupDragging() {
   window.addEventListener('pointerup', endDrag);
   window.addEventListener('pointercancel', endDrag);
 
-  // Tras arrastrar no se debe disparar el clic del nodo (inmersión / abrir visor)
   stage.addEventListener('click', (e) => {
     if (Date.now() < suppressClickUntil) {
       e.stopPropagation();
@@ -1343,7 +1617,6 @@ function resetLayout() {
 
 function handleCenterClick(nodeId, event) {
   event.stopPropagation();
-  // Solo el nodo central de la raíz abre el apartado exclusivo del currículum
   if (nodeId === 'root') {
     diveIntoNode('curriculum', event);
   }
@@ -1374,7 +1647,7 @@ function diveIntoNode(targetId, event) {
         isTransitioning = false;
       });
     });
-  }, 240);
+  }, 220);
 }
 
 function ascendLevel() {
@@ -1392,7 +1665,7 @@ function ascendLevel() {
     renderScene(prevId);
     root.classList.remove('zoom-ascending');
     isTransitioning = false;
-  }, 200);
+  }, 190);
 }
 
 function jumpToBreadcrumb(index) {
@@ -1421,7 +1694,7 @@ function updateBreadcrumb() {
 }
 
 /* ============================================================================
-   7. BÓVEDA MODAL (CONFIDENCIALIDAD POR ARCHIVO Y POR NODO) & TECLADO FÍSICO
+   8. BÓVEDA MODAL & TECLADO FÍSICO
    ============================================================================ */
 function openVaultModal(preselectNodeId) {
   if (!isDevMode) {
@@ -1558,10 +1831,11 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ============================================================================
-   8. ARRANQUE
+   9. ARRANQUE
    ============================================================================ */
 updateModeUI();
 setupDragging();
+initBackgroundEngine();
 renderScene('root');
 loadRepoManifest();
 loadVaultFromDB();

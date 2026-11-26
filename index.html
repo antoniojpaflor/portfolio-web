@@ -27,14 +27,24 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: var(--crt-bg);
+    background: #020503;
     color: var(--phosphor);
     font-family: 'JetBrains Mono', monospace;
   }
 
+  /* Tubo CRT curvo con caída suave en bordes y esquinas */
+  #crtTubeShell {
+    position: fixed;
+    inset: 6px;
+    border-radius: 34px;
+    overflow: hidden;
+    background: var(--crt-bg);
+    box-shadow: 0 0 0 6px #020503, 0 0 40px rgba(0, 0, 0, 0.9);
+  }
+
   /* Fondo multimedia flotante, superpuesto y desenfocado */
   #bgWallStage {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 1;
     overflow: hidden;
@@ -111,27 +121,27 @@
 
   /* Capas de tinte verde y scanlines */
   #greenTintOverlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.1) 0%, rgba(3, 15, 8, 0.52) 100%),
-      linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.2) 50%, rgba(2, 12, 6, 0.34) 100%);
+      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.08) 0%, rgba(3, 15, 8, 0.45) 100%),
+      linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.18) 50%, rgba(2, 12, 6, 0.32) 100%);
     mix-blend-mode: screen;
   }
 
   #greenMultiplyLayer {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    background: rgba(16, 120, 52, 0.15);
+    background: rgba(16, 120, 52, 0.14);
     mix-blend-mode: multiply;
   }
 
   #crtScanlines {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 4;
     pointer-events: none;
@@ -139,36 +149,36 @@
       to bottom,
       rgba(0, 0, 0, 0) 0px,
       rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.36) 3px,
-      rgba(0, 0, 0, 0.36) 4px
+      rgba(0, 0, 0, 0.32) 3px,
+      rgba(0, 0, 0, 0.32) 4px
     );
   }
 
-  /* Bordes, bisel y curvatura de monitor CRT antiguo bien marcados */
-  #crtBezelFrame {
-    position: fixed;
+  /* Caída suave curvada de monitor antiguo en bordes y esquinas (sin corte duro) */
+  #crtSoftCurvature {
+    position: absolute;
     inset: 0;
     z-index: 25;
     pointer-events: none;
-    border-style: solid;
-    border-color: #050d08;
-    border-top-width: 20px;
-    border-bottom-width: 24px;
-    border-left-width: 22px;
-    border-right-width: 22px;
-    border-radius: 38px;
+    border-radius: 34px;
+    background: radial-gradient(
+      ellipse 88% 84% at 50% 50%,
+      rgba(0, 0, 0, 0) 56%,
+      rgba(2, 8, 4, 0.34) 78%,
+      rgba(1, 5, 2, 0.76) 93%,
+      rgba(0, 0, 0, 0.95) 100%
+    );
     box-shadow:
-      inset 0 0 155px 24px rgba(0, 0, 0, 0.94),
-      inset 0 0 42px rgba(57, 255, 122, 0.16),
-      0 0 0 10px #020503;
+      inset 0 0 95px 18px rgba(0, 0, 0, 0.78),
+      inset 0 0 28px rgba(57, 255, 122, 0.09);
   }
 
   /* Escena principal 100vh con zoom de inmersión fuerte */
   #viewportRoot {
     position: relative;
     z-index: 10;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
     transition: transform 0.36s cubic-bezier(0.12, 0.92, 0.24, 1), opacity 0.26s ease, filter 0.26s ease;
@@ -255,46 +265,48 @@
 </head>
 <body>
 
-  <!-- 1. Fondo + CRT + Bisel de monitor antiguo -->
-  <div id="bgWallStage" aria-hidden="true">
-    <div id="projectMediaWall"></div>
-  </div>
-  <div id="greenMultiplyLayer" aria-hidden="true"></div>
-  <div id="greenTintOverlay" aria-hidden="true"></div>
-  <div id="crtScanlines" aria-hidden="true"></div>
-  <div id="crtBezelFrame" aria-hidden="true"></div>
+  <div id="crtTubeShell">
+    <!-- 1. Fondo + CRT + Caída suave curvada en bordes -->
+    <div id="bgWallStage" aria-hidden="true">
+      <div id="projectMediaWall"></div>
+    </div>
+    <div id="greenMultiplyLayer" aria-hidden="true"></div>
+    <div id="greenTintOverlay" aria-hidden="true"></div>
+    <div id="crtScanlines" aria-hidden="true"></div>
+    <div id="crtSoftCurvature" aria-hidden="true"></div>
 
-  <!-- 2. Escena principal 100vh -->
-  <div id="viewportRoot">
-    <header class="fixed top-0 left-0 right-0 z-30 h-12 px-4 md:px-6 flex items-center justify-between border-b border-emerald-400/30 bg-black/80 backdrop-blur-md text-xs">
-      <div class="flex items-center gap-2 min-w-0">
-        <span id="modeIndicatorDot" class="inline-block w-2 h-2 rounded-full bg-emerald-400/60 shrink-0"></span>
-        <span id="sessionRoleTag" class="px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0">VISITOR_MODE</span>
-        <nav id="breadcrumbBar" class="flex items-center gap-1.5 truncate font-bold tracking-wider"></nav>
-      </div>
+    <!-- 2. Escena principal 100vh -->
+    <div id="viewportRoot">
+      <header class="fixed top-0 left-0 right-0 z-30 h-12 px-4 md:px-6 flex items-center justify-between border-b border-emerald-400/30 bg-black/80 backdrop-blur-md text-xs">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="modeIndicatorDot" class="inline-block w-2 h-2 rounded-full bg-emerald-400/60 shrink-0"></span>
+          <span id="sessionRoleTag" class="px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0">VISITOR_MODE</span>
+          <nav id="breadcrumbBar" class="flex items-center gap-1.5 truncate font-bold tracking-wider"></nav>
+        </div>
 
-      <div class="flex items-center gap-2 shrink-0">
-        <button id="btnAscend" onclick="ascendLevel()" class="hidden px-2.5 py-1 rounded border border-emerald-400/50 text-[#39ff7a] hover:bg-emerald-400/15 transition cursor-pointer">
-          [ESC] SUBIR
-        </button>
-        <button id="btnBgToggle" onclick="toggleBgIntensity()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
-          BG_FEED: ON
-        </button>
-        <button id="btnVaultHeader" onclick="openVaultModal()" class="hidden px-2.5 py-1 rounded border border-[#39ff7a] bg-emerald-400/15 text-[#39ff7a] font-bold hover:bg-emerald-400/25 transition cursor-pointer">
-          + MEDIA_VAULT (<span id="vaultCountBadge">0</span>)
-        </button>
-        <button id="btnDevPadToggle" onclick="handleDevButton()" class="px-2.5 py-1 rounded border border-emerald-400/50 bg-emerald-950/70 text-[#39ff7a] font-bold hover:border-[#39ff7a] transition cursor-pointer">
-          KEYPAD [LOCKED]
-        </button>
-      </div>
-    </header>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btnAscend" onclick="ascendLevel()" class="hidden px-2.5 py-1 rounded border border-emerald-400/50 text-[#39ff7a] hover:bg-emerald-400/15 transition cursor-pointer">
+            [ESC] SUBIR
+          </button>
+          <button id="btnBgToggle" onclick="toggleBgIntensity()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
+            BG_FEED: ON
+          </button>
+          <button id="btnVaultHeader" onclick="openVaultModal()" class="hidden px-2.5 py-1 rounded border border-[#39ff7a] bg-emerald-400/15 text-[#39ff7a] font-bold hover:bg-emerald-400/25 transition cursor-pointer">
+            + MEDIA_VAULT (<span id="vaultCountBadge">0</span>)
+          </button>
+          <button id="btnDevPadToggle" onclick="handleDevButton()" class="px-2.5 py-1 rounded border border-emerald-400/50 bg-emerald-950/70 text-[#39ff7a] font-bold hover:border-[#39ff7a] transition cursor-pointer">
+            KEYPAD [LOCKED]
+          </button>
+        </div>
+      </header>
 
-    <main id="scatteredStage" class="relative w-full h-full pt-12"></main>
+      <main id="scatteredStage" class="relative w-full h-full pt-12"></main>
 
-    <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-4 md:px-6 flex items-center justify-between border-t border-emerald-400/20 bg-black/75 backdrop-blur-sm text-[11px] text-emerald-300/80">
-      <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · [ESC] PARA ASCENDER</span>
-      <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
-    </footer>
+      <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-4 md:px-6 flex items-center justify-between border-t border-emerald-400/20 bg-black/75 backdrop-blur-sm text-[11px] text-emerald-300/80">
+        <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · [ESC] PARA ASCENDER</span>
+        <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
+      </footer>
+    </div>
   </div>
 
   <!-- 3. Pad de acceso estilo teclado de puerta -->
@@ -356,7 +368,6 @@
       </div>
 
       <div class="p-5 inner-scroll space-y-5 text-xs">
-        <!-- Subida de archivos a una rama -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-[11px] text-emerald-300/80 mb-1">SECCIÓN / NODO DESTINO</label>
@@ -382,7 +393,6 @@
           <span>SUBIR LOS NUEVOS ARCHIVOS COMO CONFIDENCIALES</span>
         </label>
 
-        <!-- Editor de sección y confidencialidad de nodo -->
         <div class="p-3.5 rounded-lg border border-emerald-400/30 bg-black/45 space-y-3">
           <div class="flex items-center justify-between gap-2">
             <span class="font-bold text-[#39ff7a] tracking-wider">CONFIGURACIÓN DEL NODO</span>
@@ -402,7 +412,6 @@
           </button>
         </div>
 
-        <!-- Lista de archivos guardados con toggle confidencial por archivo -->
         <div id="vaultItemsList" class="space-y-2"></div>
       </div>
     </div>
@@ -558,7 +567,7 @@ let navStack = ['root'];
 let isTransitioning = false;
 let isDevMode = false;
 let padBuffer = '';
-let vaultItems = []; // { id, nodeId, name, type, dataUrl, confidential }
+let vaultItems = [];
 let dbInstance = null;
 
 function openVaultDB() {
@@ -983,7 +992,6 @@ function renderScene(nodeId) {
     `;
   });
 
-  // En nodos hoja: mostrar contenido directamente en pantalla sin descargar, respetando confidencialidad de nodo y archivo
   if (childNodes.length === 0) {
     const attached = vaultItems.filter((m) => m.nodeId === node.id);
     html += `

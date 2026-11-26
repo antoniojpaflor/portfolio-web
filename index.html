@@ -27,30 +27,20 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: #010302;
+    background: #020503;
     color: var(--phosphor);
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Área de pantalla recortada con silueta de tubo CRT antiguo */
+  /* Contenedor general con ligera curvatura de lente */
   #crtTubeShell {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: #010302;
-  }
-
-  #crtScreenClip {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
     background: var(--crt-bg);
-    -webkit-mask-image: url("#crtTubeMask");
-    mask-image: url("#crtTubeMask");
-    transform: perspective(900px) scale(1.018);
+    transform: perspective(1200px) scale(1.01);
     transform-origin: center center;
   }
 
@@ -138,8 +128,8 @@
     z-index: 2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.08) 0%, rgba(3, 15, 8, 0.48) 100%),
-      linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.18) 50%, rgba(2, 12, 6, 0.34) 100%);
+      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.08) 0%, rgba(3, 15, 8, 0.45) 100%),
+      linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.18) 50%, rgba(2, 12, 6, 0.32) 100%);
     mix-blend-mode: screen;
   }
 
@@ -161,13 +151,13 @@
       to bottom,
       rgba(0, 0, 0, 0) 0px,
       rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.34) 3px,
-      rgba(0, 0, 0, 0.34) 4px
+      rgba(0, 0, 0, 0.32) 3px,
+      rgba(0, 0, 0, 0.32) 4px
     );
   }
 
-  /* Bordes de monitor antiguo marcados + vineteo perimetral */
-  #crtMonitorBezel {
+  /* Vineteo oscuro suave de monitor CRT antiguo sin borde verde ni recorte de texto */
+  #crtScreenVignette {
     position: fixed;
     inset: 0;
     width: 100vw;
@@ -176,21 +166,14 @@
     pointer-events: none;
     background:
       radial-gradient(
-        ellipse 92% 88% at 50% 50%,
-        rgba(0, 0, 0, 0) 62%,
-        rgba(1, 5, 2, 0.42) 81%,
-        rgba(0, 0, 0, 0.85) 95%,
-        rgba(0, 0, 0, 0.98) 100%
+        ellipse 95% 91% at 50% 50%,
+        rgba(0, 0, 0, 0) 64%,
+        rgba(1, 5, 2, 0.32) 83%,
+        rgba(0, 0, 0, 0.72) 96%,
+        rgba(0, 0, 0, 0.92) 100%
       );
     box-shadow:
-      inset 0 0 115px 28px rgba(0, 0, 0, 0.88),
-      inset 0 0 26px rgba(57, 255, 122, 0.12);
-  }
-
-  #crtMonitorBezel svg {
-    width: 100%;
-    height: 100%;
-    display: block;
+      inset 0 0 85px 18px rgba(0, 0, 0, 0.72);
   }
 
   /* Escena principal 100vh con zoom de inmersión fuerte */
@@ -285,115 +268,51 @@
 </head>
 <body>
 
-  <!-- Máscara SVG con curvatura de tubo CRT antiguo (esquinas redondeadas + lados arqueados hacia dentro) -->
-  <svg width="0" height="0" style="position:fixed;pointer-events:none;" aria-hidden="true">
-    <defs>
-      <mask id="crtTubeMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-        <rect x="0" y="0" width="1" height="1" fill="black" />
-        <path d="
-          M 0.045 0.03
-          Q 0.5 0.008 0.955 0.03
-          Q 0.985 0.03 0.988 0.065
-          Q 1.004 0.5 0.988 0.935
-          Q 0.985 0.97 0.955 0.97
-          Q 0.5 0.992 0.045 0.97
-          Q 0.015 0.97 0.012 0.935
-          Q -0.004 0.5 0.012 0.065
-          Q 0.015 0.03 0.045 0.03
-          Z" fill="white" />
-      </mask>
-    </defs>
-  </svg>
-
   <div id="crtTubeShell">
-    <div id="crtScreenClip">
-      <!-- 1. Fondo + CRT -->
-      <div id="bgWallStage" aria-hidden="true">
-        <div id="projectMediaWall"></div>
-      </div>
-      <div id="greenMultiplyLayer" aria-hidden="true"></div>
-      <div id="greenTintOverlay" aria-hidden="true"></div>
-      <div id="crtScanlines" aria-hidden="true"></div>
+    <!-- 1. Fondo + CRT -->
+    <div id="bgWallStage" aria-hidden="true">
+      <div id="projectMediaWall"></div>
+    </div>
+    <div id="greenMultiplyLayer" aria-hidden="true"></div>
+    <div id="greenTintOverlay" aria-hidden="true"></div>
+    <div id="crtScanlines" aria-hidden="true"></div>
 
-      <!-- 2. Escena principal 100vh -->
-      <div id="viewportRoot">
-        <header class="fixed top-0 left-0 right-0 z-30 h-12 px-4 md:px-6 flex items-center justify-between border-b border-emerald-400/30 bg-black/80 backdrop-blur-md text-xs">
-          <div class="flex items-center gap-2 min-w-0">
-            <span id="modeIndicatorDot" class="inline-block w-2 h-2 rounded-full bg-emerald-400/60 shrink-0"></span>
-            <span id="sessionRoleTag" class="px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0">VISITOR_MODE</span>
-            <nav id="breadcrumbBar" class="flex items-center gap-1.5 truncate font-bold tracking-wider"></nav>
-          </div>
+    <!-- 2. Escena principal 100vh -->
+    <div id="viewportRoot">
+      <header class="fixed top-0 left-0 right-0 z-30 h-12 px-5 md:px-8 flex items-center justify-between border-b border-emerald-400/30 bg-black/80 backdrop-blur-md text-xs">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="modeIndicatorDot" class="inline-block w-2 h-2 rounded-full bg-emerald-400/60 shrink-0"></span>
+          <span id="sessionRoleTag" class="px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0">VISITOR_MODE</span>
+          <nav id="breadcrumbBar" class="flex items-center gap-1.5 truncate font-bold tracking-wider"></nav>
+        </div>
 
-          <div class="flex items-center gap-2 shrink-0">
-            <button id="btnAscend" onclick="ascendLevel()" class="hidden px-2.5 py-1 rounded border border-emerald-400/50 text-[#39ff7a] hover:bg-emerald-400/15 transition cursor-pointer">
-              [ESC] SUBIR
-            </button>
-            <button id="btnBgToggle" onclick="toggleBgIntensity()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
-              BG_FEED: ON
-            </button>
-            <button id="btnVaultHeader" onclick="openVaultModal()" class="hidden px-2.5 py-1 rounded border border-[#39ff7a] bg-emerald-400/15 text-[#39ff7a] font-bold hover:bg-emerald-400/25 transition cursor-pointer">
-              + MEDIA_VAULT (<span id="vaultCountBadge">0</span>)
-            </button>
-            <button id="btnDevPadToggle" onclick="handleDevButton()" class="px-2.5 py-1 rounded border border-emerald-400/50 bg-emerald-950/70 text-[#39ff7a] font-bold hover:border-[#39ff7a] transition cursor-pointer">
-              KEYPAD [LOCKED]
-            </button>
-          </div>
-        </header>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btnAscend" onclick="ascendLevel()" class="hidden px-2.5 py-1 rounded border border-emerald-400/50 text-[#39ff7a] hover:bg-emerald-400/15 transition cursor-pointer">
+            [ESC] SUBIR
+          </button>
+          <button id="btnBgToggle" onclick="toggleBgIntensity()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
+            BG_FEED: ON
+          </button>
+          <button id="btnVaultHeader" onclick="openVaultModal()" class="hidden px-2.5 py-1 rounded border border-[#39ff7a] bg-emerald-400/15 text-[#39ff7a] font-bold hover:bg-emerald-400/25 transition cursor-pointer">
+            + MEDIA_VAULT (<span id="vaultCountBadge">0</span>)
+          </button>
+          <button id="btnDevPadToggle" onclick="handleDevButton()" class="px-2.5 py-1 rounded border border-emerald-400/50 bg-emerald-950/70 text-[#39ff7a] font-bold hover:border-[#39ff7a] transition cursor-pointer">
+            KEYPAD [LOCKED]
+          </button>
+        </div>
+      </header>
 
-        <main id="scatteredStage" class="relative w-full h-full pt-12"></main>
+      <main id="scatteredStage" class="relative w-full h-full pt-12"></main>
 
-        <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-4 md:px-6 flex items-center justify-between border-t border-emerald-400/20 bg-black/75 backdrop-blur-sm text-[11px] text-emerald-300/80">
-          <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · [ESC] PARA ASCENDER</span>
-          <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
-        </footer>
-      </div>
+      <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-5 md:px-8 flex items-center justify-between border-t border-emerald-400/20 bg-black/75 backdrop-blur-sm text-[11px] text-emerald-300/80">
+        <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · [ESC] PARA ASCENDER</span>
+        <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
+      </footer>
     </div>
   </div>
 
-  <!-- Marco y borde de monitor antiguo marcado con la misma curvatura -->
-  <div id="crtMonitorBezel" aria-hidden="true">
-    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
-      <defs>
-        <filter id="bezelSoftBlur" x="-10%" y="-10%" width="120%" height="120%">
-          <feGaussianBlur stdDeviation="8" />
-        </filter>
-      </defs>
-      <path d="
-        M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z
-        M 45 30
-        Q 500 8 955 30
-        Q 985 30 988 65
-        Q 1004 500 988 935
-        Q 985 970 955 970
-        Q 500 992 45 970
-        Q 15 970 12 935
-        Q -4 500 12 65
-        Q 15 30 45 30
-        Z" fill="#010302" fill-rule="evenodd" />
-      <path d="
-        M 45 30
-        Q 500 8 955 30
-        Q 985 30 988 65
-        Q 1004 500 988 935
-        Q 985 970 955 970
-        Q 500 992 45 970
-        Q 15 970 12 935
-        Q -4 500 12 65
-        Q 15 30 45 30
-        Z" fill="none" stroke="rgba(0,0,0,0.78)" stroke-width="22" filter="url(#bezelSoftBlur)" />
-      <path d="
-        M 45 30
-        Q 500 8 955 30
-        Q 985 30 988 65
-        Q 1004 500 988 935
-        Q 985 970 955 970
-        Q 500 992 45 970
-        Q 15 970 12 935
-        Q -4 500 12 65
-        Q 15 30 45 30
-        Z" fill="none" stroke="rgba(57,255,122,0.16)" stroke-width="2" />
-    </svg>
-  </div>
+  <!-- Caída suave perimetral sin borde verde ni recorte -->
+  <div id="crtScreenVignette" aria-hidden="true"></div>
 
   <!-- 3. Pad de acceso estilo teclado de puerta -->
   <div id="doorPadModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
@@ -516,7 +435,7 @@ const PORTFOLIO_TREE = {
     code: 'ROOT://ANTONIO_PARRAS',
     title: 'ANTONIO JOSÉ PARRAS FLORES',
     subtitle: 'Graduado en Ingeniería Informática · Especialidad en Ingeniería de Computadores (UGR)',
-    coords: { x: 50, y: 47 },
+    coords: { x: 50, y: 49 },
     isHub: true,
     confidential: false,
     summary: 'Desarrollo de software, sistemas embebidos, lógica computacional y aplicaciones móviles. Base en Granada y Palma del Río (Córdoba).',
@@ -529,7 +448,7 @@ const PORTFOLIO_TREE = {
     code: 'BR://PROYECTOS',
     title: 'PROYECTOS & SISTEMAS',
     subtitle: 'Aplicaciones móviles, herramientas de lógica, hardware embebido y robótica',
-    coords: { x: 24, y: 28 },
+    coords: { x: 26, y: 31 },
     confidential: false,
     summary: 'Selección de proyectos técnicos desarrollados con enfoque práctico y arquitectura modular.',
     tags: ['FLUTTER', 'PYTHON', 'C++', 'ESP32'],
@@ -541,7 +460,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://FREESTYLE_PICA',
     title: 'FREESTYLE PICA',
     subtitle: 'App móvil de entrenamiento de freestyle rap en Flutter y Dart',
-    coords: { x: 22, y: 26 },
+    coords: { x: 26, y: 30 },
     confidential: false,
     summary: 'Aplicación móvil para entrenar improvisación con modos 100% libre, libre con palabras y formato FMS, detección de rimas asonantes y consonantes y gestión de sesiones.',
     tags: ['Flutter', 'Dart', 'Mobile', 'Rimas'],
@@ -553,7 +472,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://PROVER9_MACE4',
     title: 'PROVER9-MACE4 GUI',
     subtitle: 'Interfaz gráfica en Python para demostración automática de teoremas y modelos finitos',
-    coords: { x: 76, y: 26 },
+    coords: { x: 74, y: 30 },
     confidential: false,
     summary: 'Entorno visual en Python para redactar fórmulas de lógica de primer orden, ejecutar Prover9 y Mace4, inspeccionar demostraciones y contramodelos y gestionar archivos.',
     tags: ['Python', 'Lógica de Primer Orden', 'GUI', 'Automatización'],
@@ -565,7 +484,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://GESTURE_GLOVE',
     title: 'GESTUREGLOVE',
     subtitle: 'Controlador inalámbrico gestual e inercial sobre ESP32 en C/C++',
-    coords: { x: 24, y: 70 },
+    coords: { x: 26, y: 68 },
     confidential: false,
     summary: 'Prototipo de guante / mando híbrido basado en microcontrolador ESP32 con lectura inercial y gestual para interacción y control de dispositivos.',
     tags: ['C / C++', 'ESP32', 'Sensores IMU', 'Wireless'],
@@ -577,7 +496,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://ROTOMBOT',
     title: 'ROTOMBOT',
     subtitle: 'Robot autónomo de combate / sumo programado en C/C++ sobre Arduino',
-    coords: { x: 75, y: 70 },
+    coords: { x: 74, y: 68 },
     confidential: false,
     summary: 'Robot autónomo equipado con tracción por motores DC, detección de borde/línea, sensores de distancia y parachoques de contacto para maniobras reactivas en arena.',
     tags: ['C / C++', 'Arduino', 'Robótica', 'Sensores'],
@@ -589,7 +508,7 @@ const PORTFOLIO_TREE = {
     code: 'BR://FORMACION',
     title: 'FORMACIÓN & UGR',
     subtitle: 'Grado en Ingeniería Informática (Ingeniería de Computadores) y prácticas en UGR',
-    coords: { x: 76, y: 28 },
+    coords: { x: 74, y: 31 },
     confidential: false,
     summary: 'Graduado en Ingeniería Informática con especialidad en Ingeniería de Computadores en la ETSIIT (Universidad de Granada), con experiencia en mantenimiento de servidores/BD y scripts en Python.',
     tags: ['ETSIIT UGR', 'Ing. Computadores', 'Python', 'Linux / MariaDB'],
@@ -601,7 +520,7 @@ const PORTFOLIO_TREE = {
     code: 'EDU://ETSIIT_UGR',
     title: 'GRADO ING. INFORMÁTICA · UGR',
     subtitle: 'Especialidad en Ingeniería de Computadores · ETSIIT Granada',
-    coords: { x: 30, y: 42 },
+    coords: { x: 32, y: 42 },
     confidential: false,
     summary: 'Grado completado en la Escuela Técnica Superior de Ingenierías Informática y de Telecomunicación (UGR), con TFG defendido y prácticas extracurriculares trabajando con Linux, MariaDB, Apache y scripts en Python.',
     tags: ['Grado Completado', 'Ing. de Computadores', 'Python', 'MariaDB / Linux'],
@@ -613,7 +532,7 @@ const PORTFOLIO_TREE = {
     code: 'EDU://BIG_SCHOOL',
     title: 'BIG SCHOOL & ESPECIALIZACIÓN',
     subtitle: 'Formación complementaria en desarrollo y arquitectura de software',
-    coords: { x: 70, y: 56 },
+    coords: { x: 68, y: 56 },
     confidential: false,
     summary: 'Formación adicional orientada a desarrollo de aplicaciones, buenas prácticas de programación y resolución de problemas técnicos.',
     tags: ['BIG school', 'Software', 'Desarrollo'],
@@ -625,7 +544,7 @@ const PORTFOLIO_TREE = {
     code: 'BR://PERFIL',
     title: 'STACK & PERFIL TÉCNICO',
     subtitle: 'Lenguajes principales, sistemas y enfoque de ingeniería',
-    coords: { x: 26, y: 72 },
+    coords: { x: 27, y: 69 },
     confidential: false,
     summary: 'Perfil enfocado en puestos de Junior Software Engineer / Computer Engineering, combinando Python, Flutter/Dart y C/C++ con administración de entornos Linux y bases de datos.',
     tags: ['Python', 'Flutter', 'Dart', 'C / C++'],
@@ -637,7 +556,7 @@ const PORTFOLIO_TREE = {
     code: 'BR://CONTACTO',
     title: 'CANALES & UBICACIÓN',
     subtitle: 'Granada / Palma del Río (Córdoba) · GitHub & contacto directo',
-    coords: { x: 74, y: 72 },
+    coords: { x: 73, y: 69 },
     confidential: false,
     summary: `Disponible para oportunidades de desarrollo de software e ingeniería de computadores. Contacto directo: ${CONTACT_EMAIL}.`,
     tags: ['Granada', 'Palma del Río', 'GitHub'],
@@ -1011,12 +930,12 @@ function renderScene(nodeId) {
     .filter(Boolean);
 
   const spreadPresets = [
-    { x: 22, y: 27 },
-    { x: 78, y: 27 },
-    { x: 24, y: 71 },
-    { x: 76, y: 71 },
-    { x: 50, y: 22 },
-    { x: 50, y: 76 }
+    { x: 26, y: 31 },
+    { x: 74, y: 31 },
+    { x: 27, y: 69 },
+    { x: 73, y: 69 },
+    { x: 50, y: 25 },
+    { x: 50, y: 74 }
   ];
 
   const isNodeCensored = Boolean(node.confidential && !isDevMode);
@@ -1024,10 +943,10 @@ function renderScene(nodeId) {
   let html = '';
 
   const centerX = 50;
-  const centerY = childNodes.length > 0 ? 48 : 31;
+  const centerY = childNodes.length > 0 ? 49 : 31;
 
   html += `
-    <div class="scattered-node hub-node rounded-xl p-4 md:p-5 w-[min(90vw,440px)]"
+    <div class="scattered-node hub-node rounded-xl p-4 md:p-5 w-[min(86vw,430px)]"
          style="left:${centerX}%; top:${centerY}%;"
          onclick="handleCenterClick('${node.id}', event)">
       <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-1">
@@ -1056,7 +975,7 @@ function renderScene(nodeId) {
 
     html += `
       <button type="button"
-              class="scattered-node rounded-xl p-3.5 md:p-4 w-[min(44vw,275px)] text-left"
+              class="scattered-node rounded-xl p-3.5 md:p-4 w-[min(40vw,265px)] text-left"
               style="left:${pos.x}%; top:${pos.y}%;"
               onclick="diveIntoNode('${child.id}', event)">
         <div class="flex items-center justify-between text-[10px] text-emerald-300/75 mb-1">
@@ -1081,8 +1000,8 @@ function renderScene(nodeId) {
   if (childNodes.length === 0) {
     const attached = vaultItems.filter((m) => m.nodeId === node.id);
     html += `
-      <div class="scattered-node rounded-xl p-4 w-[min(92vw,620px)] max-h-[42vh] flex flex-col"
-           style="left:50%; top:69%;">
+      <div class="scattered-node rounded-xl p-4 w-[min(88vw,600px)] max-h-[40vh] flex flex-col"
+           style="left:50%; top:68%;">
         <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-2 shrink-0">
           <span>CONTENIDO_EN_PANTALLA // ${node.id.toUpperCase()}</span>
           ${isDevMode ? `<button type="button" onclick="openVaultModal('${node.id}')" class="underline text-[#39ff7a] cursor-pointer">+ GESTIONAR</button>` : `<span>VISOR_DIRECTO</span>`}

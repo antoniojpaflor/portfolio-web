@@ -498,7 +498,8 @@
               <option value="rotombot">Rotombot (Arduino / C++)</option>
               <option value="etsiit-ugr">ETSIIT UGR & TFG</option>
               <option value="big-school">BIG school</option>
-              <option value="perfil">Stack & Perfil Técnico</option>
+              <option value="practicas-ugr">Prácticas UGR (Experiencia)</option>
+              <option value="curriculum">Currículum (restringido)</option>
               <option value="contacto">Canales & Ubicación</option>
             </select>
           </div>
@@ -553,17 +554,97 @@ const PORTFOLIO_TREE = {
     coords: { x: 50, y: 49 },
     isHub: true,
     confidential: false,
-    summary: 'Desarrollo de software, sistemas embebidos, lógica computacional y aplicaciones móviles. Base en Granada y Palma del Río (Córdoba).',
+    summary: 'Desarrollo de software, sistemas embebidos, lógica computacional y aplicaciones móviles. Perfil orientado a Junior Software Engineer / Ingeniería de Computadores, con Python, Flutter/Dart y C/C++ y entornos Linux y bases de datos. Base en Granada y Palma del Río (Córdoba).',
     tags: ['Python', 'Flutter', 'Dart', 'C / C++', 'ESP32 / Arduino', 'Linux / SQL'],
-    children: ['proyectos', 'formacion', 'perfil', 'contacto']
+    children: ['formacion', 'experiencia', 'proyectos', 'contacto']
   },
+
+  /* ---- Apartado exclusivo y restringido: se abre al pulsar el nodo central ---- */
+  curriculum: {
+    id: 'curriculum',
+    parent: 'root',
+    code: 'CV://RESTRINGIDO',
+    title: 'CURRÍCULUM VITAE',
+    subtitle: 'Antonio José Parras Flores · documento completo',
+    coords: { x: 50, y: 49 },
+    confidential: true,
+    summary: 'Currículum completo de Antonio José Parras Flores: formación, experiencia y proyectos. Acceso restringido, disponible bajo solicitud.',
+    tags: ['CV', 'Acceso restringido'],
+    children: []
+  },
+
+  /* ---- Formación ---- */
+  formacion: {
+    id: 'formacion',
+    parent: 'root',
+    code: 'BR://FORMACION',
+    title: 'FORMACIÓN',
+    subtitle: 'Grado en Ingeniería Informática (Ingeniería de Computadores) y formación complementaria',
+    coords: { x: 23, y: 30 },
+    confidential: false,
+    summary: 'Graduado en Ingeniería Informática con especialidad en Ingeniería de Computadores en la ETSIIT (Universidad de Granada), complementado con formación adicional en desarrollo de software.',
+    tags: ['ETSIIT UGR', 'Ing. Computadores', 'BIG school'],
+    children: ['etsiit-ugr', 'big-school']
+  },
+  'etsiit-ugr': {
+    id: 'etsiit-ugr',
+    parent: 'formacion',
+    code: 'EDU://ETSIIT_UGR',
+    title: 'GRADO ING. INFORMÁTICA · UGR',
+    subtitle: 'Especialidad en Ingeniería de Computadores · ETSIIT Granada',
+    coords: { x: 22, y: 49 },
+    confidential: false,
+    summary: 'Grado completado en la Escuela Técnica Superior de Ingenierías Informática y de Telecomunicación (Universidad de Granada), con TFG defendido.',
+    tags: ['Grado Completado', 'Ing. de Computadores', 'TFG'],
+    children: []
+  },
+  'big-school': {
+    id: 'big-school',
+    parent: 'formacion',
+    code: 'EDU://BIG_SCHOOL',
+    title: 'BIG SCHOOL & ESPECIALIZACIÓN',
+    subtitle: 'Formación complementaria en desarrollo y arquitectura de software',
+    coords: { x: 78, y: 49 },
+    confidential: false,
+    summary: 'Formación adicional orientada a desarrollo de aplicaciones, buenas prácticas de programación y resolución de problemas técnicos.',
+    tags: ['BIG school', 'Software', 'Desarrollo'],
+    children: []
+  },
+
+  /* ---- Experiencia ---- */
+  experiencia: {
+    id: 'experiencia',
+    parent: 'root',
+    code: 'BR://EXPERIENCIA',
+    title: 'EXPERIENCIA',
+    subtitle: 'Prácticas y experiencia en entornos reales',
+    coords: { x: 77, y: 30 },
+    confidential: false,
+    summary: 'Experiencia en mantenimiento de servidores y bases de datos y en automatización con scripts en Python, sobre Linux, MariaDB y Apache.',
+    tags: ['Linux', 'MariaDB', 'Apache', 'Python'],
+    children: ['practicas-ugr']
+  },
+  'practicas-ugr': {
+    id: 'practicas-ugr',
+    parent: 'experiencia',
+    code: 'EXP://PRACTICAS_UGR',
+    title: 'PRÁCTICAS EXTRACURRICULARES · UGR',
+    subtitle: 'Mantenimiento de servidores y bases de datos, y scripting en Python',
+    coords: { x: 50, y: 78 },
+    confidential: false,
+    summary: 'Prácticas extracurriculares en la Universidad de Granada trabajando con Linux, MariaDB y Apache: mantenimiento de servidores y bases de datos y desarrollo de scripts en Python.',
+    tags: ['Linux', 'MariaDB', 'Apache', 'Python'],
+    children: []
+  },
+
+  /* ---- Proyectos ---- */
   proyectos: {
     id: 'proyectos',
     parent: 'root',
     code: 'BR://PROYECTOS',
-    title: 'PROYECTOS & SISTEMAS',
+    title: 'PROYECTOS',
     subtitle: 'Aplicaciones móviles, herramientas de lógica, hardware embebido y robótica',
-    coords: { x: 28, y: 33 },
+    coords: { x: 23, y: 70 },
     confidential: false,
     summary: 'Selección de proyectos técnicos desarrollados con enfoque práctico y arquitectura modular.',
     tags: ['FLUTTER', 'PYTHON', 'C++', 'ESP32'],
@@ -575,7 +656,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://FREESTYLE_PICA',
     title: 'FREESTYLE PICA',
     subtitle: 'App móvil de entrenamiento de freestyle rap en Flutter y Dart',
-    coords: { x: 29, y: 33 },
+    coords: { x: 23, y: 30 },
     confidential: false,
     summary: 'Aplicación móvil para entrenar improvisación con modos 100% libre, libre con palabras y formato FMS, detección de rimas asonantes y consonantes y gestión de sesiones.',
     tags: ['Flutter', 'Dart', 'Mobile', 'Rimas'],
@@ -587,7 +668,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://PROVER9_MACE4',
     title: 'PROVER9-MACE4 GUI',
     subtitle: 'Interfaz gráfica en Python para demostración automática de teoremas y modelos finitos',
-    coords: { x: 71, y: 33 },
+    coords: { x: 77, y: 30 },
     confidential: false,
     summary: 'Entorno visual en Python para redactar fórmulas de lógica de primer orden, ejecutar Prover9 y Mace4, inspeccionar demostraciones y contramodelos y gestionar archivos.',
     tags: ['Python', 'Lógica de Primer Orden', 'GUI', 'Automatización'],
@@ -599,7 +680,7 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://GESTURE_GLOVE',
     title: 'GESTUREGLOVE',
     subtitle: 'Controlador inalámbrico gestual e inercial sobre ESP32 en C/C++',
-    coords: { x: 29, y: 66 },
+    coords: { x: 23, y: 70 },
     confidential: false,
     summary: 'Prototipo de guante / mando híbrido basado en microcontrolador ESP32 con lectura inercial y gestual para interacción y control de dispositivos.',
     tags: ['C / C++', 'ESP32', 'Sensores IMU', 'Wireless'],
@@ -611,67 +692,21 @@ const PORTFOLIO_TREE = {
     code: 'PRJ://ROTOMBOT',
     title: 'ROTOMBOT',
     subtitle: 'Robot autónomo de combate / sumo programado en C/C++ sobre Arduino',
-    coords: { x: 71, y: 66 },
+    coords: { x: 77, y: 70 },
     confidential: false,
     summary: 'Robot autónomo equipado con tracción por motores DC, detección de borde/línea, sensores de distancia y parachoques de contacto para maniobras reactivas en arena.',
     tags: ['C / C++', 'Arduino', 'Robótica', 'Sensores'],
     children: []
   },
-  formacion: {
-    id: 'formacion',
-    parent: 'root',
-    code: 'BR://FORMACION',
-    title: 'FORMACIÓN & UGR',
-    subtitle: 'Grado en Ingeniería Informática (Ingeniería de Computadores) y prácticas en UGR',
-    coords: { x: 72, y: 33 },
-    confidential: false,
-    summary: 'Graduado en Ingeniería Informática con especialidad en Ingeniería de Computadores en la ETSIIT (Universidad de Granada), con experiencia en mantenimiento de servidores/BD y scripts en Python.',
-    tags: ['ETSIIT UGR', 'Ing. Computadores', 'Python', 'Linux / MariaDB'],
-    children: ['etsiit-ugr', 'big-school']
-  },
-  'etsiit-ugr': {
-    id: 'etsiit-ugr',
-    parent: 'formacion',
-    code: 'EDU://ETSIIT_UGR',
-    title: 'GRADO ING. INFORMÁTICA · UGR',
-    subtitle: 'Especialidad en Ingeniería de Computadores · ETSIIT Granada',
-    coords: { x: 34, y: 43 },
-    confidential: false,
-    summary: 'Grado completado en la Escuela Técnica Superior de Ingenierías Informática y de Telecomunicación (UGR), con TFG defendido y prácticas extracurriculares trabajando con Linux, MariaDB, Apache y scripts en Python.',
-    tags: ['Grado Completado', 'Ing. de Computadores', 'Python', 'MariaDB / Linux'],
-    children: []
-  },
-  'big-school': {
-    id: 'big-school',
-    parent: 'formacion',
-    code: 'EDU://BIG_SCHOOL',
-    title: 'BIG SCHOOL & ESPECIALIZACIÓN',
-    subtitle: 'Formación complementaria en desarrollo y arquitectura de software',
-    coords: { x: 66, y: 55 },
-    confidential: false,
-    summary: 'Formación adicional orientada a desarrollo de aplicaciones, buenas prácticas de programación y resolución de problemas técnicos.',
-    tags: ['BIG school', 'Software', 'Desarrollo'],
-    children: []
-  },
-  perfil: {
-    id: 'perfil',
-    parent: 'root',
-    code: 'BR://PERFIL',
-    title: 'STACK & PERFIL TÉCNICO',
-    subtitle: 'Lenguajes principales, sistemas y enfoque de ingeniería',
-    coords: { x: 29, y: 67 },
-    confidential: false,
-    summary: 'Perfil enfocado en puestos de Junior Software Engineer / Computer Engineering, combinando Python, Flutter/Dart y C/C++ con administración de entornos Linux y bases de datos.',
-    tags: ['Python', 'Flutter', 'Dart', 'C / C++'],
-    children: []
-  },
+
+  /* ---- Contacto ---- */
   contacto: {
     id: 'contacto',
     parent: 'root',
     code: 'BR://CONTACTO',
-    title: 'CANALES & UBICACIÓN',
+    title: 'CONTACTO',
     subtitle: 'Granada / Palma del Río (Córdoba) · GitHub & contacto directo',
-    coords: { x: 71, y: 67 },
+    coords: { x: 77, y: 70 },
     confidential: false,
     summary: `Disponible para oportunidades de desarrollo de software e ingeniería de computadores. Contacto directo: ${CONTACT_EMAIL}.`,
     tags: ['Granada', 'Palma del Río', 'GitHub'],
@@ -1061,7 +1096,7 @@ function renderScene(nodeId) {
   const centerY = childNodes.length > 0 ? 49 : 31;
 
   html += `
-    <div class="scattered-node hub-node rounded-xl p-4 md:p-5 w-[min(82vw,420px)]"
+    <div class="scattered-node hub-node ${node.id === 'root' ? '' : 'free-card'} rounded-xl p-4 md:p-5 w-[min(82vw,420px)]"
          data-drag-key="hub"
          style="${nodeStyle(node.id, 'hub', centerX, centerY)}"
          onclick="handleCenterClick('${node.id}', event)">
@@ -1081,6 +1116,7 @@ function renderScene(nodeId) {
             </div>
           `
       }
+      ${node.id === 'root' ? `<div class="mt-3 pt-2.5 border-t border-emerald-400/25 text-[10px] font-bold tracking-widest text-amber-300">▸ CLIC AQUÍ · CURRÍCULUM [ACCESO RESTRINGIDO]</div>` : ''}
     </div>
   `;
 
@@ -1307,9 +1343,9 @@ function resetLayout() {
 
 function handleCenterClick(nodeId, event) {
   event.stopPropagation();
-  const node = PORTFOLIO_TREE[nodeId];
-  if (node && node.children && node.children.length > 0) {
-    diveIntoNode(node.children[0], event);
+  // Solo el nodo central de la raíz abre el apartado exclusivo del currículum
+  if (nodeId === 'root') {
+    diveIntoNode('curriculum', event);
   }
 }
 

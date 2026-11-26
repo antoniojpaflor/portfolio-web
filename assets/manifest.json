@@ -5,6 +5,11 @@
     "kind": "image"
   },
   {
+    "name": "demo_prover9mace4.mp4",
+    "path": "assets/demo_prover9mace4.mp4",
+    "kind": "video"
+  },
+  {
     "name": "gesture-glove-bg.mp4",
     "path": "assets/gesture-glove-bg.mp4",
     "kind": "video"

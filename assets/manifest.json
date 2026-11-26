@@ -10,6 +10,11 @@
         "kind":  "video"
     },
     {
+        "path":  "assets/prueba-rotombot.mp4",
+        "name":  "prueba-rotombot.mp4",
+        "kind":  "video"
+    },
+    {
         "path":  "assets/rotom-largo.mp4",
         "name":  "rotom-largo.mp4",
         "kind":  "video"

@@ -521,16 +521,26 @@ function ensureAudioContext() {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return null;
     const ctx = new AudioCtx();
+
+    // Compresor suave para subir volumen sin distorsionar
+    const compressor = ctx.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-16, ctx.currentTime);
+    compressor.knee.setValueAtTime(12, ctx.currentTime);
+    compressor.ratio.setValueAtTime(4, ctx.currentTime);
+    compressor.attack.setValueAtTime(0.005, ctx.currentTime);
+    compressor.release.setValueAtTime(0.15, ctx.currentTime);
+    compressor.connect(ctx.destination);
+
     const master = ctx.createGain();
-    master.gain.value = 0.85;
-    master.connect(ctx.destination);
+    master.gain.value = 1.0; // Antes: 0.85
+    master.connect(compressor);
 
     const bgm = ctx.createGain();
     bgm.gain.value = 0.0001;
     bgm.connect(master);
 
     const sfx = ctx.createGain();
-    sfx.gain.value = 0.9;
+    sfx.gain.value = 1.0; // Antes: 0.9
     sfx.connect(master);
 
     soundEngine.ctx = ctx;
@@ -562,7 +572,7 @@ async function startAmbientBgm() {
   if (hasCustomTrack) {
     const audio = new Audio('assets/bgm.mp3');
     audio.loop = true;
-    audio.volume = soundEngine.ducked ? 0.07 : 0.24;
+    audio.volume = soundEngine.ducked ? 0.15 : 0.55;
     audio.play().catch(() => {});
     soundEngine.customAudioEl = audio;
     return;
@@ -572,7 +582,7 @@ async function startAmbientBgm() {
   const now = ctx.currentTime;
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(320, now);
+  filter.frequency.setValueAtTime(520, now);
   filter.Q.setValueAtTime(1.8, now);
   filter.connect(soundEngine.bgmGain);
 
@@ -608,7 +618,7 @@ async function startAmbientBgm() {
   });
 
   // Fade-in suave
-  const targetBgm = soundEngine.ducked ? 0.015 : 0.065;
+  const targetBgm = soundEngine.ducked ? 0.07 : 0.28;
   soundEngine.bgmGain.gain.cancelScheduledValues(now);
   soundEngine.bgmGain.gain.setValueAtTime(0.0001, now);
   soundEngine.bgmGain.gain.exponentialRampToValueAtTime(targetBgm, now + 1.8);
@@ -643,11 +653,11 @@ function setBgmDucked(isDucked) {
   soundEngine.ducked = isDucked;
   if (!soundEngine.enabled) return;
   if (soundEngine.customAudioEl) {
-    soundEngine.customAudioEl.volume = isDucked ? 0.06 : 0.24;
+    soundEngine.customAudioEl.volume = isDucked ? 0.15 : 0.55;
   }
   if (soundEngine.ctx && soundEngine.bgmGain) {
     const now = soundEngine.ctx.currentTime;
-    const target = isDucked ? 0.014 : 0.065;
+    const target = isDucked ? 0.07 : 0.28;
     soundEngine.bgmGain.gain.cancelScheduledValues(now);
     soundEngine.bgmGain.gain.setTargetAtTime(target, now, 0.25);
   }
@@ -701,7 +711,7 @@ function playSfx(type) {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(1180, now);
     osc.frequency.exponentialRampToValueAtTime(1520, now + 0.028);
-    g.gain.setValueAtTime(0.022, now);
+    g.gain.setValueAtTime(0.09, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.032);
     osc.connect(g);
     g.connect(soundEngine.sfxGain);
@@ -716,7 +726,7 @@ function playSfx(type) {
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(860, now);
     osc.frequency.exponentialRampToValueAtTime(420, now + 0.045);
-    g.gain.setValueAtTime(0.055, now);
+    g.gain.setValueAtTime(0.22, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
     osc.connect(g);
     g.connect(soundEngine.sfxGain);
@@ -731,7 +741,7 @@ function playSfx(type) {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(320, now);
     osc.frequency.exponentialRampToValueAtTime(510, now + 0.035);
-    g.gain.setValueAtTime(0.04, now);
+    g.gain.setValueAtTime(0.18, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
     osc.connect(g);
     g.connect(soundEngine.sfxGain);
@@ -746,7 +756,7 @@ function playSfx(type) {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(280, now);
     osc.frequency.exponentialRampToValueAtTime(145, now + 0.045);
-    g.gain.setValueAtTime(0.045, now);
+    g.gain.setValueAtTime(0.20, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
     osc.connect(g);
     g.connect(soundEngine.sfxGain);
@@ -766,7 +776,7 @@ function playSfx(type) {
     osc.frequency.exponentialRampToValueAtTime(480, now + 0.21);
     osc2.frequency.setValueAtTime(480, now);
     osc2.frequency.exponentialRampToValueAtTime(960, now + 0.19);
-    g.gain.setValueAtTime(0.07, now);
+    g.gain.setValueAtTime(0.26, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
     osc.connect(g);
     osc2.connect(g);
@@ -784,7 +794,7 @@ function playSfx(type) {
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(560, now);
     osc.frequency.exponentialRampToValueAtTime(200, now + 0.17);
-    g.gain.setValueAtTime(0.065, now);
+    g.gain.setValueAtTime(0.24, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
     osc.connect(g);
     g.connect(soundEngine.sfxGain);
@@ -801,7 +811,7 @@ function playSfx(type) {
     osc2.type = 'sine';
     osc1.frequency.setValueAtTime(770, now);
     osc2.frequency.setValueAtTime(1336, now);
-    g.gain.setValueAtTime(0.055, now);
+    g.gain.setValueAtTime(0.20, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
     osc1.connect(g);
     osc2.connect(g);
@@ -821,7 +831,7 @@ function playSfx(type) {
       const st = now + i * 0.065;
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq, st);
-      g.gain.setValueAtTime(0.065, st);
+      g.gain.setValueAtTime(0.24, st);
       g.gain.exponentialRampToValueAtTime(0.0001, st + 0.22);
       osc.connect(g);
       g.connect(soundEngine.sfxGain);
@@ -841,7 +851,7 @@ function playSfx(type) {
       osc.frequency.setValueAtTime(145, st);
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(340, st);
-      g.gain.setValueAtTime(0.08, st);
+      g.gain.setValueAtTime(0.28, st);
       g.gain.exponentialRampToValueAtTime(0.0001, st + 0.085);
       osc.connect(filter);
       filter.connect(g);

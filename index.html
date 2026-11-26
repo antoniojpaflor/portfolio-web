@@ -9,7 +9,21 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
 <style>
+  /* Fuente Monocraft (local si la añades a assets/fonts/ o instalada en el sistema, con fallback a CDN y JetBrains Mono) */
+  @font-face {
+    font-family: 'Monocraft';
+    src:
+      local('Monocraft'),
+      url('assets/fonts/Monocraft.woff2') format('woff2'),
+      url('assets/fonts/Monocraft.otf') format('opentype'),
+      url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft@main/dist/Monocraft.otf') format('opentype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
+    --font-main: 'Monocraft', 'JetBrains Mono', monospace;
     --phosphor: #39ff7a;
     --phosphor-dim: #199b49;
     --phosphor-dark: #06180d;
@@ -46,7 +60,11 @@
     overflow: hidden;
     background: #010302;
     color: var(--phosphor);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-main);
+  }
+
+  button, input, textarea, select {
+    font-family: inherit;
   }
 
   #crtTubeShell {
@@ -300,6 +318,9 @@
             <button id="btnResetLayout" onclick="resetLayout()" title="Recolocar los cuadros de esta pantalla" class="hidden sm:inline-block px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
               ORDENAR
             </button>
+            <button id="btnAudioToggle" onclick="toggleAudio()" title="Música de fondo y efectos de sonido" class="px-2.5 py-1 rounded border border-emerald-400/45 text-[#39ff7a] hover:border-[#39ff7a] transition cursor-pointer">
+              AUDIO: ON
+            </button>
             <button id="btnBgToggle" onclick="toggleBgIntensity()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
               BG_FEED: ON
             </button>
@@ -465,7 +486,400 @@
 
 <script>
 /* ============================================================================
-   0. INTERNACIONALIZACIÓN (ESPAÑOL / INGLÉS)
+   0. MOTOR DE AUDIO CRT (MÚSICA AMBIENTAL GENERATIVA + EFECTOS DE INTERACCIÓN)
+   - Funciona sin archivos externos vía Web Audio API
+   - Si existe assets/bgm.mp3 en tu repo, lo reproduce automáticamente en bucle
+   ============================================================================ */
+const soundEngine = {
+  enabled: localStorage.getItem('crt_portfolio_audio') !== 'off',
+  ctx: null,
+  masterGain: null,
+  bgmGain: null,
+  sfxGain: null,
+  bgmStarted: false,
+  customAudioEl: null,
+  chimeTimer: null,
+  lastHoverTs: 0,
+  ducked: false
+};
+
+function updateAudioButtonUI() {
+  const btn = document.getElementById('btnAudioToggle');
+  if (!btn) return;
+  if (soundEngine.enabled) {
+    btn.textContent = 'AUDIO: ON';
+    btn.className = 'px-2.5 py-1 rounded border border-emerald-400/45 text-[#39ff7a] hover:border-[#39ff7a] transition cursor-pointer';
+  } else {
+    btn.textContent = 'AUDIO: OFF';
+    btn.className = 'px-2.5 py-1 rounded border border-emerald-400/30 text-emerald-200/60 hover:border-[#39ff7a] transition cursor-pointer';
+  }
+}
+
+function ensureAudioContext() {
+  if (!soundEngine.enabled) return null;
+  if (!soundEngine.ctx) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    const ctx = new AudioCtx();
+    const master = ctx.createGain();
+    master.gain.value = 0.85;
+    master.connect(ctx.destination);
+
+    const bgm = ctx.createGain();
+    bgm.gain.value = 0.0001;
+    bgm.connect(master);
+
+    const sfx = ctx.createGain();
+    sfx.gain.value = 0.9;
+    sfx.connect(master);
+
+    soundEngine.ctx = ctx;
+    soundEngine.masterGain = master;
+    soundEngine.bgmGain = bgm;
+    soundEngine.sfxGain = sfx;
+  }
+  if (soundEngine.ctx.state === 'suspended') {
+    soundEngine.ctx.resume().catch(() => {});
+  }
+  return soundEngine.ctx;
+}
+
+async function startAmbientBgm() {
+  if (!soundEngine.enabled || soundEngine.bgmStarted) return;
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  soundEngine.bgmStarted = true;
+
+  // Comprobar si existe un assets/bgm.mp3 personalizado en el repositorio
+  let hasCustomTrack = false;
+  try {
+    const headRes = await fetch('assets/bgm.mp3', { method: 'HEAD' });
+    hasCustomTrack = headRes.ok;
+  } catch (_) {
+    hasCustomTrack = false;
+  }
+
+  if (hasCustomTrack) {
+    const audio = new Audio('assets/bgm.mp3');
+    audio.loop = true;
+    audio.volume = soundEngine.ducked ? 0.07 : 0.24;
+    audio.play().catch(() => {});
+    soundEngine.customAudioEl = audio;
+    return;
+  }
+
+  // Sintetizador ambiental CRT (acorde D-minor9 cálido filtrado + LFO + destellos pentatónicos)
+  const now = ctx.currentTime;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(320, now);
+  filter.Q.setValueAtTime(1.8, now);
+  filter.connect(soundEngine.bgmGain);
+
+  // LFO lento modulando el filtro para respiración orgánica
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.type = 'sine';
+  lfo.frequency.setValueAtTime(0.09, now);
+  lfoGain.gain.setValueAtTime(115, now);
+  lfo.connect(lfoGain);
+  lfoGain.connect(filter.frequency);
+  lfo.start(now);
+
+  // Voces armónicas suaves (D2, A2, E3, F3) + ligero zumbido de tubo CRT (55Hz)
+  const voices = [
+    { freq: 73.42, type: 'triangle', gain: 0.22, detune: -4 },
+    { freq: 110.00, type: 'sine', gain: 0.20, detune: 3 },
+    { freq: 164.81, type: 'triangle', gain: 0.13, detune: -5 },
+    { freq: 174.61, type: 'sine', gain: 0.11, detune: 4 },
+    { freq: 55.00, type: 'sine', gain: 0.08, detune: 0 }
+  ];
+
+  voices.forEach((v) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = v.type;
+    osc.frequency.setValueAtTime(v.freq, now);
+    osc.detune.setValueAtTime(v.detune, now);
+    g.gain.setValueAtTime(v.gain, now);
+    osc.connect(g);
+    g.connect(filter);
+    osc.start(now);
+  });
+
+  // Fade-in suave
+  const targetBgm = soundEngine.ducked ? 0.015 : 0.065;
+  soundEngine.bgmGain.gain.cancelScheduledValues(now);
+  soundEngine.bgmGain.gain.setValueAtTime(0.0001, now);
+  soundEngine.bgmGain.gain.exponentialRampToValueAtTime(targetBgm, now + 1.8);
+
+  // Notas ambientales esporádicas en escala D-Dorian
+  const scale = [293.66, 329.63, 349.23, 440.00, 523.25, 587.33, 659.25];
+  const scheduleNextChime = () => {
+    const delay = 3600 + Math.random() * 4800;
+    soundEngine.chimeTimer = setTimeout(() => {
+      if (soundEngine.enabled && soundEngine.ctx && soundEngine.ctx.state === 'running' && !document.hidden) {
+        const cNow = soundEngine.ctx.currentTime;
+        const note = scale[Math.floor(Math.random() * scale.length)];
+        const osc = soundEngine.ctx.createOscillator();
+        const g = soundEngine.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(note, cNow);
+        g.gain.setValueAtTime(0.0001, cNow);
+        g.gain.exponentialRampToValueAtTime(0.032, cNow + 0.18);
+        g.gain.exponentialRampToValueAtTime(0.0001, cNow + 2.4);
+        osc.connect(g);
+        g.connect(soundEngine.bgmGain);
+        osc.start(cNow);
+        osc.stop(cNow + 2.5);
+      }
+      scheduleNextChime();
+    }, delay);
+  };
+  scheduleNextChime();
+}
+
+function setBgmDucked(isDucked) {
+  soundEngine.ducked = isDucked;
+  if (!soundEngine.enabled) return;
+  if (soundEngine.customAudioEl) {
+    soundEngine.customAudioEl.volume = isDucked ? 0.06 : 0.24;
+  }
+  if (soundEngine.ctx && soundEngine.bgmGain) {
+    const now = soundEngine.ctx.currentTime;
+    const target = isDucked ? 0.014 : 0.065;
+    soundEngine.bgmGain.gain.cancelScheduledValues(now);
+    soundEngine.bgmGain.gain.setTargetAtTime(target, now, 0.25);
+  }
+}
+
+function toggleAudio() {
+  soundEngine.enabled = !soundEngine.enabled;
+  localStorage.setItem('crt_portfolio_audio', soundEngine.enabled ? 'on' : 'off');
+  updateAudioButtonUI();
+
+  if (soundEngine.enabled) {
+    ensureAudioContext();
+    if (!soundEngine.bgmStarted) {
+      startAmbientBgm();
+    } else {
+      if (soundEngine.customAudioEl) soundEngine.customAudioEl.play().catch(() => {});
+      if (soundEngine.ctx && soundEngine.bgmGain) {
+        const now = soundEngine.ctx.currentTime;
+        soundEngine.bgmGain.gain.setTargetAtTime(soundEngine.ducked ? 0.014 : 0.065, now, 0.2);
+      }
+    }
+    playSfx('click');
+  } else {
+    if (soundEngine.customAudioEl) {
+      try { soundEngine.customAudioEl.pause(); } catch (_) {}
+    }
+    if (soundEngine.ctx && soundEngine.bgmGain) {
+      const now = soundEngine.ctx.currentTime;
+      soundEngine.bgmGain.gain.setTargetAtTime(0.0001, now, 0.1);
+    }
+  }
+}
+
+function playSfx(type) {
+  if (!soundEngine.enabled) return;
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  if (!soundEngine.bgmStarted) {
+    startAmbientBgm();
+  }
+
+  const now = ctx.currentTime;
+
+  if (type === 'hover') {
+    const ms = performance.now();
+    if (ms - soundEngine.lastHoverTs < 65) return;
+    soundEngine.lastHoverTs = ms;
+
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1180, now);
+    osc.frequency.exponentialRampToValueAtTime(1520, now + 0.028);
+    g.gain.setValueAtTime(0.022, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.032);
+    osc.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.035);
+    return;
+  }
+
+  if (type === 'click') {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(860, now);
+    osc.frequency.exponentialRampToValueAtTime(420, now + 0.045);
+    g.gain.setValueAtTime(0.055, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+    osc.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.055);
+    return;
+  }
+
+  if (type === 'grab') {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(510, now + 0.035);
+    g.gain.setValueAtTime(0.04, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+    osc.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.045);
+    return;
+  }
+
+  if (type === 'drop') {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(145, now + 0.045);
+    g.gain.setValueAtTime(0.045, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+    osc.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.055);
+    return;
+  }
+
+  if (type === 'dive') {
+    const osc = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'triangle';
+    osc2.type = 'sine';
+    osc.frequency.setValueAtTime(240, now);
+    osc.frequency.exponentialRampToValueAtTime(640, now + 0.14);
+    osc.frequency.exponentialRampToValueAtTime(480, now + 0.21);
+    osc2.frequency.setValueAtTime(480, now);
+    osc2.frequency.exponentialRampToValueAtTime(960, now + 0.19);
+    g.gain.setValueAtTime(0.07, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    osc.connect(g);
+    osc2.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc.start(now);
+    osc2.start(now);
+    osc.stop(now + 0.23);
+    osc2.stop(now + 0.23);
+    return;
+  }
+
+  if (type === 'ascend') {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(560, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + 0.17);
+    g.gain.setValueAtTime(0.065, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+    osc.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.19);
+    return;
+  }
+
+  if (type === 'keypad') {
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc1.type = 'sine';
+    osc2.type = 'sine';
+    osc1.frequency.setValueAtTime(770, now);
+    osc2.frequency.setValueAtTime(1336, now);
+    g.gain.setValueAtTime(0.055, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    osc1.connect(g);
+    osc2.connect(g);
+    g.connect(soundEngine.sfxGain);
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.065);
+    osc2.stop(now + 0.065);
+    return;
+  }
+
+  if (type === 'granted') {
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      const st = now + i * 0.065;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, st);
+      g.gain.setValueAtTime(0.065, st);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.22);
+      osc.connect(g);
+      g.connect(soundEngine.sfxGain);
+      osc.start(st);
+      osc.stop(st + 0.23);
+    });
+    return;
+  }
+
+  if (type === 'denied') {
+    [0, 0.11].forEach((offset) => {
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const g = ctx.createGain();
+      const st = now + offset;
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(145, st);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(340, st);
+      g.gain.setValueAtTime(0.08, st);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.085);
+      osc.connect(filter);
+      filter.connect(g);
+      g.connect(soundEngine.sfxGain);
+      osc.start(st);
+      osc.stop(st + 0.09);
+    });
+  }
+}
+
+function setupAudioListeners() {
+  updateAudioButtonUI();
+
+  const unlockOnce = () => {
+    if (soundEngine.enabled && !soundEngine.bgmStarted) {
+      startAmbientBgm();
+    }
+    window.removeEventListener('pointerdown', unlockOnce);
+    window.removeEventListener('keydown', unlockOnce);
+  };
+  window.addEventListener('pointerdown', unlockOnce, { passive: true });
+  window.addEventListener('keydown', unlockOnce, { passive: true });
+
+  // Sonido sutil al pasar el cursor sobre nodos o botones interactivos
+  let lastHoveredEl = null;
+  document.addEventListener('pointerover', (e) => {
+    const target = e.target.closest('.scattered-node, header button, .door-key');
+    if (target && target !== lastHoveredEl) {
+      lastHoveredEl = target;
+      playSfx('hover');
+    } else if (!target) {
+      lastHoveredEl = null;
+    }
+  }, { passive: true });
+}
+
+/* ============================================================================
+   1. INTERNACIONALIZACIÓN (ESPAÑOL / INGLÉS)
    ============================================================================ */
 let currentLang = localStorage.getItem('crt_portfolio_lang') === 'en' ? 'en' : 'es';
 
@@ -627,6 +1041,7 @@ function applyStaticLanguageUI() {
 }
 
 function toggleLanguage() {
+  playSfx('click');
   currentLang = currentLang === 'es' ? 'en' : 'es';
   localStorage.setItem('crt_portfolio_lang', currentLang);
   applyStaticLanguageUI();
@@ -635,7 +1050,7 @@ function toggleLanguage() {
 }
 
 /* ============================================================================
-   1. ESTRUCTURA DE RAMAS Y NODOS (BILINGÜE ES / EN)
+   2. ESTRUCTURA DE RAMAS Y NODOS (BILINGÜE ES / EN)
    ============================================================================ */
 const DEV_PIN = '6451';
 const CONTACT_EMAIL = 'antoniojpaflor@gmail.com';
@@ -857,7 +1272,7 @@ const PORTFOLIO_TREE = {
 };
 
 /* ============================================================================
-   2. ESTADO DE NAVEGACIÓN, MODO DESARROLLADOR (PAD 6451) E INDEXEDDB
+   3. ESTADO DE NAVEGACIÓN, MODO DESARROLLADOR (PAD 6451) E INDEXEDDB
    ============================================================================ */
 let currentNodeId = 'root';
 let navStack = ['root'];
@@ -943,6 +1358,7 @@ async function saveVaultItem(item) {
 }
 
 async function toggleFileConfidential(id) {
+  playSfx('click');
   const target = vaultItems.find((m) => m.id === id);
   if (!target) return;
   await saveVaultItem({ ...target, confidential: !target.confidential });
@@ -950,6 +1366,7 @@ async function toggleFileConfidential(id) {
 }
 
 async function deleteVaultItem(id) {
+  playSfx('click');
   if (!dbInstance) await openVaultDB();
   return new Promise((resolve) => {
     const tx = dbInstance.transaction('media', 'readwrite');
@@ -974,9 +1391,10 @@ async function saveNodeMetaToDB(nodeId, summary, confidential) {
 }
 
 /* ============================================================================
-   3. TECLADO DE PUERTA (PIN 6451) & MODO DESARROLLADOR
+   4. TECLADO DE PUERTA (PIN 6451) & MODO DESARROLLADOR
    ============================================================================ */
 function handleDevButton() {
+  playSfx('click');
   if (isDevMode) {
     isDevMode = false;
     updateModeUI();
@@ -994,12 +1412,14 @@ function openDoorPad() {
 }
 
 function closeDoorPad() {
+  playSfx('click');
   padBuffer = '';
   document.getElementById('doorPadModal').classList.add('hidden');
 }
 
 function pressPadKey(digit) {
   if (padBuffer.length >= 4) return;
+  playSfx('keypad');
   padBuffer += digit;
   updatePadDisplay(t('keyAccepted'));
   if (padBuffer.length === 4) {
@@ -1008,21 +1428,25 @@ function pressPadKey(digit) {
 }
 
 function clearPadCode() {
+  playSfx('keypad');
   padBuffer = '';
   updatePadDisplay(t('codeCleared'));
 }
 
 function submitPadCode() {
   if (padBuffer === DEV_PIN) {
+    playSfx('granted');
     isDevMode = true;
     updateModeUI();
     updatePadDisplay(t('accessGranted'));
     setTimeout(() => {
-      closeDoorPad();
+      padBuffer = '';
+      document.getElementById('doorPadModal').classList.add('hidden');
       syncBackgroundPool();
       renderScene(currentNodeId);
     }, 320);
   } else {
+    playSfx('denied');
     updatePadDisplay(t('accessDenied'));
     padBuffer = '';
   }
@@ -1056,11 +1480,12 @@ function updateModeUI() {
 }
 
 /* ============================================================================
-   4. MOTOR DE FONDO ULTRA-LIGERO (CANVAS 192x108 + ROTACIÓN DE TODOS LOS MEDIOS)
-   - Decodifica como máximo 2 vídeos simultáneos (1 si hay un vídeo principal activo)
-   - Recorre el 100% de las imágenes y vídeos disponibles (manifest + bóveda)
-   - Baja a 3 FPS durante vídeo principal y RESTAURA automáticamente a 12 FPS al parar/salir
-   - Encuadra la parte inferior de los vídeos verticales (focusY = 1.0 cuando sh > sw)
+   5. MOTOR DE FONDO ULTRA-LIGERO (CANVAS 192x108 + SIN REPETICIONES + ALEATORIEDAD)
+   - Nunca repite el mismo vídeo o imagen en varios cuadrantes a la vez
+   - Cada cuadrante rota de forma independiente en tiempos aleatorios
+   - Los vídeos arrancan en un segundo aleatorio de su duración
+   - Encuadra la parte inferior de vídeos verticales (focusY = 1.0 cuando sh > sw)
+   - Restaura automáticamente los 12 FPS al detener/salir de un vídeo principal
    ============================================================================ */
 const BG_SLOTS_LAYOUT = [
   { x: 0.04, y: 0.06, w: 0.50, h: 0.48, freqX: 0.21, freqY: 0.17, phase: 0.0 },
@@ -1073,16 +1498,18 @@ const bgEngine = {
   canvas: null,
   ctx: null,
   pool: [],
-  poolCursor: 0,
+  recentHistory: [],
   slots: [],
-  rotateCursor: 0,
   lastDrawTs: 0,
-  lastRotateTs: 0,
   lastSanityTs: 0,
   rafId: null,
   mainVideoPlayingCount: 0,
   poolSignature: ''
 };
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
 
 function recountMainVideos() {
   const videos = document.querySelectorAll('#scatteredStage video, #viewerBody video');
@@ -1095,9 +1522,9 @@ function recountMainVideos() {
   const changed = bgEngine.mainVideoPlayingCount !== playing;
   bgEngine.mainVideoPlayingCount = playing;
   if (changed) {
-    // Reiniciar lastDrawTs garantiza restauración inmediata a 12 FPS sin esperar 330ms
     bgEngine.lastDrawTs = 0;
     syncBackgroundVideoPlayback();
+    setBgmDucked(playing > 0);
   }
 }
 
@@ -1132,12 +1559,24 @@ function createMediaHandle(asset) {
     v.preload = 'auto';
     v.setAttribute('playsinline', '');
     v.setAttribute('muted', '');
+
+    v.addEventListener('loadedmetadata', () => {
+      // Arrancar cada aparición del vídeo en un instante aleatorio
+      if (Number.isFinite(v.duration) && v.duration > 2.5) {
+        try {
+          v.currentTime = Math.random() * Math.max(0.5, v.duration - 1.5);
+        } catch (_) {}
+      }
+    }, { once: true });
+
     v.addEventListener('loadeddata', () => {
       handle.ready = true;
     }, { once: true });
+
     v.addEventListener('error', () => {
       handle.ready = false;
     }, { once: true });
+
     v.play().catch(() => {});
     handle.el = v;
   } else {
@@ -1165,23 +1604,57 @@ function countActiveSlotVideos(excludeSlotIdx = -1) {
   return count;
 }
 
-function pickNextAssetForSlot(slotIdx) {
+function getActiveSlotSrcs(excludeSlotIdx = -1) {
+  const used = new Set();
+  bgEngine.slots.forEach((slot, idx) => {
+    if (idx === excludeSlotIdx) return;
+    if (slot.current && slot.current.src) used.add(slot.current.src);
+    if (slot.prev && slot.prev.src) used.add(slot.prev.src);
+  });
+  // Tampoco repetir inmediatamente lo que estaba en el propio slot
+  const selfSlot = bgEngine.slots[excludeSlotIdx];
+  if (selfSlot && selfSlot.current && selfSlot.current.src) {
+    used.add(selfSlot.current.src);
+  }
+  return used;
+}
+
+function pickRandomDistinctAsset(slotIdx) {
   const pool = bgEngine.pool;
   if (pool.length === 0) return null;
 
+  const usedSrcs = getActiveSlotSrcs(slotIdx);
   const maxVideos = bgEngine.mainVideoPlayingCount > 0 ? 1 : 2;
   const activeVideos = countActiveSlotVideos(slotIdx);
 
-  for (let attempt = 0; attempt < pool.length; attempt++) {
-    const candidate = pool[bgEngine.poolCursor % pool.length];
-    bgEngine.poolCursor = (bgEngine.poolCursor + 1) % pool.length;
-    if (candidate.kind === 'video' && activeVideos >= maxVideos) {
-      const hasImages = pool.some((item) => item.kind === 'image');
-      if (hasImages) continue;
-    }
-    return candidate;
+  // 1. Filtrar exclusivamente medios que NO estén ya en pantalla en ningún otro slot
+  let candidates = pool.filter((item) => !usedSrcs.has(item.src));
+  if (candidates.length === 0) {
+    // Nunca duplicar el mismo archivo en dos cuadrantes simultáneamente
+    return null;
   }
-  return pool[0];
+
+  // 2. Respetar el límite de vídeos simultáneos si hay imágenes disponibles
+  if (activeVideos >= maxVideos) {
+    const nonVideo = candidates.filter((item) => item.kind !== 'video');
+    if (nonVideo.length > 0) {
+      candidates = nonVideo;
+    } else {
+      return null;
+    }
+  }
+
+  // 3. Priorizar medios que no hayan salido recientemente
+  const recentSet = new Set(bgEngine.recentHistory.slice(-Math.max(1, Math.floor(pool.length * 0.6))));
+  const freshCandidates = candidates.filter((item) => !recentSet.has(item.src));
+  const selectionPool = freshCandidates.length > 0 ? freshCandidates : candidates;
+
+  const chosen = selectionPool[Math.floor(Math.random() * selectionPool.length)];
+  bgEngine.recentHistory.push(chosen.src);
+  if (bgEngine.recentHistory.length > Math.max(8, pool.length * 2)) {
+    bgEngine.recentHistory.shift();
+  }
+  return chosen;
 }
 
 function syncBackgroundVideoPlayback() {
@@ -1242,40 +1715,44 @@ function syncBackgroundPool() {
 
   bgEngine.poolSignature = sig;
   bgEngine.pool = newPool;
-  bgEngine.poolCursor = 0;
-  bgEngine.rotateCursor = 0;
+  bgEngine.recentHistory = [];
 
   bgEngine.slots.forEach((s) => {
     releaseMediaHandle(s.current);
     releaseMediaHandle(s.prev);
   });
 
-  bgEngine.slots = BG_SLOTS_LAYOUT.map((layout, idx) => {
-    const asset = pickNextAssetForSlot(idx);
-    return {
-      layout,
-      current: asset ? createMediaHandle(asset) : null,
-      prev: null,
-      fadeStart: 0
-    };
+  const now = performance.now();
+  // Orden aleatorio de inicialización de slots para que los medios no siempre caigan en el mismo cuadrante
+  const slotOrder = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+  bgEngine.slots = BG_SLOTS_LAYOUT.map((layout) => ({
+    layout,
+    current: null,
+    prev: null,
+    fadeStart: 0,
+    fadeDuration: randomBetween(950, 1550),
+    nextRotateAt: now + randomBetween(3500, 10500)
+  }));
+
+  slotOrder.forEach((idx) => {
+    const asset = pickRandomDistinctAsset(idx);
+    bgEngine.slots[idx].current = asset ? createMediaHandle(asset) : null;
   });
 
   syncBackgroundVideoPlayback();
 }
 
-function rotateOneBackgroundSlot(now) {
-  if (bgEngine.pool.length <= BG_SLOTS_LAYOUT.length) return;
-  const idx = bgEngine.rotateCursor % bgEngine.slots.length;
-  bgEngine.rotateCursor = (bgEngine.rotateCursor + 1) % bgEngine.slots.length;
-
+function rotateSlotRandomly(idx, now) {
   const slot = bgEngine.slots[idx];
-  const nextAsset = pickNextAssetForSlot(idx);
-  if (!nextAsset) return;
+  if (!slot) return;
 
+  const nextAsset = pickRandomDistinctAsset(idx);
   releaseMediaHandle(slot.prev);
   slot.prev = slot.current;
-  slot.current = createMediaHandle(nextAsset);
+  slot.current = nextAsset ? createMediaHandle(nextAsset) : null;
   slot.fadeStart = now;
+  slot.fadeDuration = randomBetween(950, 1550);
+  slot.nextRotateAt = now + randomBetween(4200, 11800);
   syncBackgroundVideoPlayback();
 }
 
@@ -1288,8 +1765,7 @@ function drawCover(ctx, el, dx, dy, dw, dh, customFocusY) {
   const cw = dw / scale;
   const ch = dh / scale;
   const sx = (sw - cw) * 0.5;
-  // Si el vídeo o imagen es vertical (sh > sw), enfocamos la parte inferior (1.0)
-  // para mostrar el contenido de abajo en lugar de recortarlo; si es horizontal, centramos (0.5).
+  // Vídeos/imágenes verticales enfocan la parte inferior (1.0); horizontales se centran (0.5)
   const focusY = typeof customFocusY === 'number'
     ? customFocusY
     : (sh > sw ? 1.0 : 0.5);
@@ -1298,21 +1774,31 @@ function drawCover(ctx, el, dx, dy, dw, dh, customFocusY) {
   return true;
 }
 
-function drawFallbackGlow(ctx, dx, dy, dw, dh, t, idx) {
+function drawTelemetryPlaceholder(ctx, dx, dy, dw, dh, t, idx) {
   const g = ctx.createLinearGradient(dx, dy, dx + dw, dy + dh);
-  const pulse = 0.16 + 0.08 * Math.sin(t * 0.8 + idx);
+  const pulse = 0.12 + 0.06 * Math.sin(t * 0.9 + idx * 1.7);
   g.addColorStop(0, `rgba(57, 255, 122, ${pulse.toFixed(3)})`);
-  g.addColorStop(1, 'rgba(3, 18, 9, 0.55)');
+  g.addColorStop(1, 'rgba(3, 18, 9, 0.45)');
   ctx.fillStyle = g;
   ctx.fillRect(dx, dy, dw, dh);
+
+  // Onda de osciloscopio CRT sutil cuando un cuadrante está en espera
+  ctx.strokeStyle = 'rgba(57, 255, 122, 0.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  const midY = dy + dh * 0.5;
+  for (let x = 0; x <= dw; x += 6) {
+    const wy = midY + Math.sin(t * 2.2 + x * 0.12 + idx) * (dh * 0.12);
+    if (x === 0) ctx.moveTo(dx + x, wy);
+    else ctx.lineTo(dx + x, wy);
+  }
+  ctx.stroke();
 }
 
 function renderBgFrame(now) {
   bgEngine.rafId = requestAnimationFrame(renderBgFrame);
   if (document.hidden) return;
 
-  // Autocomprobación periódica: si el vídeo principal se desmontó al cambiar de nodo,
-  // restaurar inmediatamente los FPS y la velocidad normal del fondo.
   if (bgEngine.mainVideoPlayingCount > 0 && now - bgEngine.lastSanityTs > 450) {
     bgEngine.lastSanityTs = now;
     recountMainVideos();
@@ -1323,9 +1809,13 @@ function renderBgFrame(now) {
   if (now - bgEngine.lastDrawTs < targetInterval) return;
   bgEngine.lastDrawTs = now;
 
-  if (bgEngine.pool.length > BG_SLOTS_LAYOUT.length && now - bgEngine.lastRotateTs > 6500) {
-    bgEngine.lastRotateTs = now;
-    rotateOneBackgroundSlot(now);
+  // Cada cuadrante evalúa su propio temporizador aleatorio independiente
+  if (bgEngine.pool.length > 0) {
+    bgEngine.slots.forEach((slot, idx) => {
+      if (now >= slot.nextRotateAt) {
+        rotateSlotRandomly(idx, now);
+      }
+    });
   }
 
   const canvas = bgEngine.canvas;
@@ -1350,7 +1840,8 @@ function renderBgFrame(now) {
     const dw = L.w * cw;
     const dh = L.h * ch;
 
-    const fadeProgress = slot.prev ? Math.min(1, (now - slot.fadeStart) / 1100) : 1;
+    const fadeDur = slot.fadeDuration || 1100;
+    const fadeProgress = slot.prev ? Math.min(1, (now - slot.fadeStart) / fadeDur) : 1;
     if (slot.prev && fadeProgress >= 1) {
       releaseMediaHandle(slot.prev);
       slot.prev = null;
@@ -1374,8 +1865,8 @@ function renderBgFrame(now) {
     }
 
     if (!drewSomething) {
-      ctx.globalAlpha = 0.7;
-      drawFallbackGlow(ctx, dx, dy, dw, dh, t, idx);
+      ctx.globalAlpha = 0.72;
+      drawTelemetryPlaceholder(ctx, dx, dy, dw, dh, t, idx);
     }
 
     ctx.restore();
@@ -1433,6 +1924,7 @@ async function loadRepoManifest() {
 }
 
 function toggleBgIntensity() {
+  playSfx('click');
   document.body.classList.toggle('bg-dim');
   const btn = document.getElementById('btnBgToggle');
   const isDim = document.body.classList.contains('bg-dim');
@@ -1440,7 +1932,7 @@ function toggleBgIntensity() {
 }
 
 /* ============================================================================
-   5. VISOR DIRECTO EN PANTALLA (SIN DESCARGAR)
+   6. VISOR DIRECTO EN PANTALLA (SIN DESCARGAR)
    ============================================================================ */
 function getNodeMediaItems(nodeId) {
   const fromVault = vaultItems
@@ -1497,8 +1989,12 @@ function openInlineViewerById(itemId) {
   if (!item) return;
   const parentNode = PORTFOLIO_TREE[item.nodeId];
   const isRestricted = Boolean((item.confidential || (parentNode && parentNode.confidential)) && !isDevMode);
-  if (isRestricted) return;
+  if (isRestricted) {
+    playSfx('denied');
+    return;
+  }
 
+  playSfx('dive');
   document.getElementById('viewerTitle').textContent = item.name;
   const body = document.getElementById('viewerBody');
 
@@ -1516,6 +2012,7 @@ function openInlineViewerById(itemId) {
 }
 
 function closeViewerModal() {
+  playSfx('ascend');
   const body = document.getElementById('viewerBody');
   const vid = body.querySelector('video');
   if (vid) {
@@ -1527,7 +2024,7 @@ function closeViewerModal() {
 }
 
 /* ============================================================================
-   6. MODO RESTRINGIDO VISUAL (PREVISUALIZACIÓN BLURREADA ESTILO SCRIBD / PRENSA)
+   7. MODO RESTRINGIDO VISUAL (PREVISUALIZACIÓN BLURREADA ESTILO SCRIBD / PRENSA)
    ============================================================================ */
 function renderPaywallOverlay(titleText, subtitleText) {
   const subject = encodeURIComponent(`${t('mailSubjectPrefix')}${titleText}`);
@@ -1541,6 +2038,7 @@ function renderPaywallOverlay(titleText, subtitleText) {
         ${escapeHtml(subtitleText)}
       </p>
       <a href="mailto:${CONTACT_EMAIL}?subject=${subject}"
+         onclick="playSfx('click')"
          class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded border border-[#39ff7a]/70 bg-[#051a0d] text-[#39ff7a] hover:bg-emerald-400/20 text-[10px] font-bold tracking-wider transition">
         ${t('requestAt')} ${CONTACT_EMAIL}
       </a>
@@ -1602,7 +2100,7 @@ function renderRestrictedMediaCard(m, key, style) {
 }
 
 /* ============================================================================
-   7. RENDERIZADO DE NODOS Y ZOOM DE INMERSIÓN
+   8. RENDERIZADO DE NODOS Y ZOOM DE INMERSIÓN
    ============================================================================ */
 function renderScene(nodeId) {
   const node = PORTFOLIO_TREE[nodeId] || PORTFOLIO_TREE.root;
@@ -1761,7 +2259,6 @@ function renderScene(nodeId) {
   }
 
   stage.innerHTML = html;
-  // Recalcular vídeos activos tras reconstruir el escenario (restaura FPS si se salió de un vídeo)
   recountMainVideos();
 }
 
@@ -1833,6 +2330,7 @@ function onDragMove(e) {
   if (!dragState.moved) {
     if (Math.hypot(dx, dy) < 5) return;
     dragState.moved = true;
+    playSfx('grab');
     dragState.el.classList.add('dragging');
     document.body.classList.add('drag-active');
     zTop += 1;
@@ -1857,6 +2355,7 @@ function endDrag(e) {
   if (!dragState || e.pointerId !== dragState.pointerId) return;
 
   if (dragState.moved) {
+    playSfx('drop');
     dragState.el.classList.remove('dragging');
     document.body.classList.remove('drag-active');
     const key = dragState.el.dataset.dragKey;
@@ -1869,6 +2368,7 @@ function endDrag(e) {
 }
 
 function resetLayout() {
+  playSfx('click');
   Object.keys(layoutState).forEach((k) => {
     if (k.startsWith(`${currentNodeId}|`)) delete layoutState[k];
   });
@@ -1885,6 +2385,7 @@ function handleCenterClick(nodeId, event) {
 function diveIntoNode(targetId, event) {
   if (isTransitioning || !PORTFOLIO_TREE[targetId]) return;
   isTransitioning = true;
+  playSfx('dive');
 
   const root = document.getElementById('viewportRoot');
   const rect = event?.currentTarget?.getBoundingClientRect();
@@ -1913,6 +2414,7 @@ function diveIntoNode(targetId, event) {
 function ascendLevel() {
   if (isTransitioning || navStack.length <= 1) return;
   isTransitioning = true;
+  playSfx('ascend');
 
   const root = document.getElementById('viewportRoot');
   root.style.setProperty('--zoom-x', '50%');
@@ -1930,6 +2432,7 @@ function ascendLevel() {
 
 function jumpToBreadcrumb(index) {
   if (index < 0 || index >= navStack.length) return;
+  if (index < navStack.length - 1) playSfx('ascend');
   navStack = navStack.slice(0, index + 1);
   renderScene(navStack[navStack.length - 1]);
 }
@@ -1955,13 +2458,14 @@ function updateBreadcrumb() {
 }
 
 /* ============================================================================
-   8. BÓVEDA MODAL & TECLADO FÍSICO
+   9. BÓVEDA MODAL & TECLADO FÍSICO
    ============================================================================ */
 function openVaultModal(preselectNodeId) {
   if (!isDevMode) {
     openDoorPad();
     return;
   }
+  playSfx('click');
   const sel = document.getElementById('vaultTargetNode');
   const target = preselectNodeId || (PORTFOLIO_TREE[currentNodeId] ? currentNodeId : 'freestyle-pica');
   if ([...sel.options].some((o) => o.value === target)) {
@@ -1972,6 +2476,7 @@ function openVaultModal(preselectNodeId) {
 }
 
 function closeVaultModal() {
+  playSfx('click');
   document.getElementById('vaultModal').classList.add('hidden');
 }
 
@@ -1984,6 +2489,7 @@ function syncNodeEditorFromSelect() {
 }
 
 async function saveNodeEdits() {
+  playSfx('click');
   const selId = document.getElementById('vaultTargetNode').value;
   const node = PORTFOLIO_TREE[selId];
   if (!node) return;
@@ -2095,8 +2601,9 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ============================================================================
-   9. ARRANQUE
+   10. ARRANQUE
    ============================================================================ */
+setupAudioListeners();
 applyStaticLanguageUI();
 updateModeUI();
 setupDragging();

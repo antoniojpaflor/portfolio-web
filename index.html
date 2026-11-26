@@ -139,23 +139,28 @@
       to bottom,
       rgba(0, 0, 0, 0) 0px,
       rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.34) 3px,
-      rgba(0, 0, 0, 0.34) 4px
+      rgba(0, 0, 0, 0.36) 3px,
+      rgba(0, 0, 0, 0.36) 4px
     );
   }
 
-  /* Marco y vineteo de monitor antiguo en los bordes */
+  /* Bordes, bisel y curvatura de monitor CRT antiguo bien marcados */
   #crtBezelFrame {
     position: fixed;
     inset: 0;
-    z-index: 5;
+    z-index: 25;
     pointer-events: none;
-    border: 14px solid #040b06;
-    border-radius: 26px;
+    border-style: solid;
+    border-color: #050d08;
+    border-top-width: 20px;
+    border-bottom-width: 24px;
+    border-left-width: 22px;
+    border-right-width: 22px;
+    border-radius: 38px;
     box-shadow:
-      inset 0 0 135px rgba(0, 0, 0, 0.92),
-      inset 0 0 36px rgba(57, 255, 122, 0.12),
-      0 0 0 3px #010402;
+      inset 0 0 155px 24px rgba(0, 0, 0, 0.94),
+      inset 0 0 42px rgba(57, 255, 122, 0.16),
+      0 0 0 10px #020503;
   }
 
   /* Escena principal 100vh con zoom de inmersión fuerte */
@@ -325,13 +330,27 @@
     </div>
   </div>
 
-  <!-- 4. Modal de Bóveda Local (solo modo desarrollador) -->
+  <!-- 4. Visor directo en pantalla (imágenes, vídeos, PDFs) sin descargar -->
+  <div id="viewerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl h-[84vh] flex flex-col rounded-xl border border-[#39ff7a]/65 bg-[#041209]/95 shadow-[0_0_50px_rgba(57,255,122,0.22)]">
+      <div class="px-5 py-3 border-b border-emerald-400/30 flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <div class="text-[10px] text-emerald-300/75">SCREEN_VIEWER // DIRECT_RENDER</div>
+          <h3 id="viewerTitle" class="text-sm font-bold text-[#39ff7a] truncate">ARCHIVO</h3>
+        </div>
+        <button type="button" onclick="closeViewerModal()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-xs hover:bg-emerald-400/15 shrink-0 cursor-pointer">[X] CERRAR</button>
+      </div>
+      <div id="viewerBody" class="flex-1 p-4 flex items-center justify-center overflow-hidden bg-black/50"></div>
+    </div>
+  </div>
+
+  <!-- 5. Modal de Bóveda Local (solo modo desarrollador) -->
   <div id="vaultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-[#39ff7a]/60 bg-[#041209]/95 shadow-[0_0_50px_rgba(57,255,122,0.2)]">
       <div class="px-5 py-3.5 border-b border-emerald-400/30 flex items-center justify-between">
         <div>
           <h2 class="text-sm font-bold tracking-widest text-[#39ff7a]">BÓVEDA LOCAL // DEV_EDIT</h2>
-          <p class="text-[11px] text-emerald-300/75">Añade imágenes/vídeos a las secciones, edita textos o marca nodos como confidenciales.</p>
+          <p class="text-[11px] text-emerald-300/75">Marca como confidenciales archivos concretos o nodos enteros, y gestiona sus medios.</p>
         </div>
         <button onclick="closeVaultModal()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-xs hover:bg-emerald-400/15 cursor-pointer">[X] CERRAR</button>
       </div>
@@ -358,27 +377,32 @@
           </div>
         </div>
 
-        <!-- Editor de sección y confidencialidad -->
+        <label class="inline-flex items-center gap-2 cursor-pointer text-amber-300 text-[11px] font-bold">
+          <input id="newUploadConfidential" type="checkbox" class="accent-[#39ff7a] w-4 h-4" />
+          <span>SUBIR LOS NUEVOS ARCHIVOS COMO CONFIDENCIALES</span>
+        </label>
+
+        <!-- Editor de sección y confidencialidad de nodo -->
         <div class="p-3.5 rounded-lg border border-emerald-400/30 bg-black/45 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-[#39ff7a] tracking-wider">CONFIGURACIÓN DE SECCIÓN</span>
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-[#39ff7a] tracking-wider">CONFIGURACIÓN DEL NODO</span>
             <label class="inline-flex items-center gap-2 cursor-pointer text-amber-300 font-bold">
               <input id="editNodeConfidential" type="checkbox" class="accent-[#39ff7a] w-4 h-4" />
-              <span>MARCAR COMO CONFIDENCIAL (CENSURAR PÚBLICO)</span>
+              <span>MARCAR NODO ENTERO COMO CONFIDENCIAL</span>
             </label>
           </div>
 
           <div>
-            <label class="block text-[10px] text-emerald-300/75 mb-1">RESUMEN DE LA SECCIÓN</label>
+            <label class="block text-[10px] text-emerald-300/75 mb-1">RESUMEN DEL NODO</label>
             <textarea id="editNodeSummary" rows="2" class="w-full px-3 py-2 rounded bg-[#071e10] border border-emerald-400/35 text-emerald-100 outline-none"></textarea>
           </div>
 
           <button type="button" onclick="saveNodeEdits()" class="px-3 py-1.5 rounded bg-[#39ff7a] text-[#041209] font-extrabold text-[11px] hover:brightness-110 cursor-pointer">
-            GUARDAR CAMBIOS DE SECCIÓN
+            GUARDAR CAMBIOS DEL NODO
           </button>
         </div>
 
-        <!-- Lista de medios guardados -->
+        <!-- Lista de archivos guardados con toggle confidencial por archivo -->
         <div id="vaultItemsList" class="space-y-2"></div>
       </div>
     </div>
@@ -534,7 +558,7 @@ let navStack = ['root'];
 let isTransitioning = false;
 let isDevMode = false;
 let padBuffer = '';
-let vaultItems = [];
+let vaultItems = []; // { id, nodeId, name, type, dataUrl, confidential }
 let dbInstance = null;
 
 function openVaultDB() {
@@ -564,7 +588,10 @@ async function loadVaultFromDB() {
       const tx = db.transaction('media', 'readonly');
       const req = tx.objectStore('media').getAll();
       req.onsuccess = () => {
-        vaultItems = req.result || [];
+        vaultItems = (req.result || []).map((item) => ({
+          ...item,
+          confidential: Boolean(item.confidential)
+        }));
         document.getElementById('vaultCountBadge').textContent = vaultItems.length;
         renderVaultList();
         renderBackgroundMediaWall();
@@ -603,6 +630,13 @@ async function saveVaultItem(item) {
       resolve();
     };
   });
+}
+
+async function toggleFileConfidential(id) {
+  const target = vaultItems.find((m) => m.id === id);
+  if (!target) return;
+  await saveVaultItem({ ...target, confidential: !target.confidential });
+  renderScene(currentNodeId);
 }
 
 async function deleteVaultItem(id) {
@@ -683,8 +717,7 @@ function submitPadCode() {
 }
 
 function updatePadDisplay(msg) {
-  const padded = padBuffer.padEnd(4, '-');
-  document.getElementById('padDisplay').textContent = padded;
+  document.getElementById('padDisplay').textContent = padBuffer.padEnd(4, '-');
   document.getElementById('padFeedback').textContent = msg;
 }
 
@@ -746,8 +779,9 @@ function renderBackgroundMediaWall() {
 
   const vaultVisuals = vaultItems
     .filter((m) => {
+      if (m.confidential && !isDevMode) return false;
       const parentNode = PORTFOLIO_TREE[m.nodeId];
-      if (!isDevMode && parentNode && parentNode.confidential) return false;
+      if (parentNode && parentNode.confidential && !isDevMode) return false;
       return m.type.startsWith('video/') || m.type.startsWith('image/');
     })
     .map((m) => ({
@@ -822,16 +856,45 @@ function toggleBgIntensity() {
 }
 
 /* ============================================================================
-   5. RENDERIZADO DE NODOS, CENSURA CONFIDENCIAL Y ZOOM FUERTE
+   5. VISOR DIRECTO EN PANTALLA (SIN DESCARGAR)
    ============================================================================ */
-function renderConfidentialNotice() {
+function openInlineViewerById(itemId) {
+  const item = vaultItems.find((m) => m.id === itemId);
+  if (!item) return;
+  if (item.confidential && !isDevMode) return;
+
+  document.getElementById('viewerTitle').textContent = item.name;
+  const body = document.getElementById('viewerBody');
+
+  if (item.type.startsWith('image/')) {
+    body.innerHTML = `<img src="${item.dataUrl}" alt="${escapeHtml(item.name)}" class="max-w-full max-h-full object-contain rounded border border-emerald-400/35" />`;
+  } else if (item.type.startsWith('video/')) {
+    body.innerHTML = `<video src="${item.dataUrl}" controls autoplay playsinline class="max-w-full max-h-full rounded border border-emerald-400/35 bg-black"></video>`;
+  } else if (item.type === 'application/pdf') {
+    body.innerHTML = `<iframe src="${item.dataUrl}" title="${escapeHtml(item.name)}" class="w-full h-full rounded border border-emerald-400/35 bg-white"></iframe>`;
+  } else {
+    body.innerHTML = `<div class="text-xs text-emerald-200">Vista previa directa no disponible para este formato (${escapeHtml(item.type)}).</div>`;
+  }
+
+  document.getElementById('viewerModal').classList.remove('hidden');
+}
+
+function closeViewerModal() {
+  document.getElementById('viewerModal').classList.add('hidden');
+  document.getElementById('viewerBody').innerHTML = '';
+}
+
+/* ============================================================================
+   6. RENDERIZADO DE NODOS, CENSURA INDEPENDIENTE Y ZOOM FUERTE
+   ============================================================================ */
+function renderConfidentialNotice(scopeLabel) {
   return `
-    <div class="mt-2.5 p-3 rounded-lg border border-amber-400/50 bg-black/80 text-amber-200 space-y-1.5">
-      <div class="text-[11px] font-extrabold tracking-widest text-amber-300">
-        [CONTENIDO CENSURADO // CONFIDENCIAL]
+    <div class="mt-2 p-3 rounded-lg border border-amber-400/50 bg-black/85 text-amber-200 space-y-1">
+      <div class="text-[10px] font-extrabold tracking-widest text-amber-300">
+        [CENSURADO // ${scopeLabel} CONFIDENCIAL]
       </div>
       <p class="text-[11px] leading-relaxed text-emerald-100/85">
-        Este contenido está marcado como confidencial. Si te interesa consultarlo, solicítalo por correo a
+        Contenido confidencial. Si te interesa consultarlo, solicítalo por correo a
         <span class="font-bold text-[#39ff7a] underline">${CONTACT_EMAIL}</span>.
       </p>
     </div>
@@ -861,12 +924,12 @@ function renderScene(nodeId) {
     { x: 50, y: 76 }
   ];
 
-  const isCensoredForVisitor = Boolean(node.confidential && !isDevMode);
+  const isNodeCensored = Boolean(node.confidential && !isDevMode);
 
   let html = '';
 
   const centerX = 50;
-  const centerY = childNodes.length > 0 ? 48 : 34;
+  const centerY = childNodes.length > 0 ? 48 : 31;
 
   html += `
     <div class="scattered-node hub-node rounded-xl p-4 md:p-5 w-[min(90vw,440px)]"
@@ -874,13 +937,13 @@ function renderScene(nodeId) {
          onclick="handleCenterClick('${node.id}', event)">
       <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-1">
         <span>${node.code}</span>
-        <span>${node.confidential ? 'CONFIDENCIAL' : (childNodes.length > 0 ? childNodes.length + ' RAMAS' : 'HOJA_ACTIVA')}</span>
+        <span>${node.confidential ? 'NODO CONFIDENCIAL' : (childNodes.length > 0 ? childNodes.length + ' RAMAS' : 'HOJA_ACTIVA')}</span>
       </div>
       <h1 class="text-base md:text-lg font-extrabold tracking-wide text-[#39ff7a] crt-glow">${node.title}</h1>
       <p class="text-xs text-emerald-100/85 mt-1">${node.subtitle}</p>
       ${
-        isCensoredForVisitor
-          ? renderConfidentialNotice()
+        isNodeCensored
+          ? renderConfidentialNotice('NODO')
           : `
             <p class="text-xs text-emerald-200/75 mt-2.5 leading-relaxed">${escapeHtml(node.summary)}</p>
             <div class="flex flex-wrap gap-1.5 mt-3">
@@ -903,12 +966,12 @@ function renderScene(nodeId) {
               onclick="diveIntoNode('${child.id}', event)">
         <div class="flex items-center justify-between text-[10px] text-emerald-300/75 mb-1">
           <span>${child.code}</span>
-          <span>${childCensored ? 'CENSURADO' : (grandCount > 0 ? '▸ ' + grandCount + ' SUB' : '▸ ABRIR')}</span>
+          <span>${childCensored ? 'CONFIDENCIAL' : (grandCount > 0 ? '▸ ' + grandCount + ' SUB' : '▸ ABRIR')}</span>
         </div>
         <div class="text-sm font-bold text-[#39ff7a] crt-glow">${child.title}</div>
         ${
           childCensored
-            ? `<div class="text-[11px] text-amber-300 mt-1">[CONFIDENCIAL · PEDIR A ${CONTACT_EMAIL}]</div>`
+            ? `<div class="text-[11px] text-amber-300 mt-1">[CENSURADO · PEDIR A ${CONTACT_EMAIL}]</div>`
             : `
               <div class="text-[11px] text-emerald-100/75 mt-1 line-clamp-2">${child.subtitle}</div>
               <div class="flex flex-wrap gap-1 mt-2">
@@ -920,29 +983,52 @@ function renderScene(nodeId) {
     `;
   });
 
+  // En nodos hoja: mostrar contenido directamente en pantalla sin descargar, respetando confidencialidad de nodo y archivo
   if (childNodes.length === 0) {
     const attached = vaultItems.filter((m) => m.nodeId === node.id);
     html += `
-      <div class="scattered-node rounded-xl p-4 w-[min(92vw,540px)]"
-           style="left:50%; top:71%;">
-        <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-2">
-          <span>MEDIA_ATTACHED // ${node.id.toUpperCase()}</span>
-          ${isDevMode ? `<button type="button" onclick="openVaultModal('${node.id}')" class="underline text-[#39ff7a] cursor-pointer">+ EDITAR / AÑADIR</button>` : `<span>SOLO_LECTURA</span>`}
+      <div class="scattered-node rounded-xl p-4 w-[min(92vw,620px)] max-h-[42vh] flex flex-col"
+           style="left:50%; top:69%;">
+        <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-2 shrink-0">
+          <span>CONTENIDO_EN_PANTALLA // ${node.id.toUpperCase()}</span>
+          ${isDevMode ? `<button type="button" onclick="openVaultModal('${node.id}')" class="underline text-[#39ff7a] cursor-pointer">+ GESTIONAR</button>` : `<span>VISOR_DIRECTO</span>`}
         </div>
-        ${
-          isCensoredForVisitor
-            ? `<p class="text-xs text-amber-200/90">Archivos restringidos por confidencialidad. Escríbeme a <span class="text-[#39ff7a] font-bold">${CONTACT_EMAIL}</span> si te interesa verlos.</p>`
-            : attached.length === 0
-              ? `<p class="text-xs text-emerald-200/70">Sin archivos adjuntos en este nodo todavía.</p>`
-              : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 inner-scroll">
-                  ${attached.map((m) => `
-                    <div class="p-2 rounded border border-emerald-400/30 bg-black/50 flex items-center justify-between gap-2 text-[11px]">
-                      <span class="truncate text-emerald-100">${escapeHtml(m.name)}</span>
-                      <span class="text-[#39ff7a] shrink-0">${m.type.split('/')[0] || 'FILE'}</span>
-                    </div>
-                  `).join('')}
-                </div>`
-        }
+        <div class="inner-scroll space-y-2.5 pr-1">
+          ${
+            isNodeCensored
+              ? renderConfidentialNotice('NODO')
+              : attached.length === 0
+                ? `<p class="text-xs text-emerald-200/70">Sin archivos adjuntos en este nodo todavía.</p>`
+                : attached.map((m) => {
+                    const fileCensored = Boolean(m.confidential && !isDevMode);
+                    if (fileCensored) {
+                      return renderConfidentialNotice('ARCHIVO');
+                    }
+                    let inlinePreview = '';
+                    if (m.type.startsWith('image/')) {
+                      inlinePreview = `<img src="${m.dataUrl}" alt="${escapeHtml(m.name)}" onclick="openInlineViewerById('${m.id}')" class="w-full max-h-44 object-contain rounded border border-emerald-400/25 bg-black/60 cursor-pointer" />`;
+                    } else if (m.type.startsWith('video/')) {
+                      inlinePreview = `<video src="${m.dataUrl}" controls muted playsinline class="w-full max-h-44 rounded border border-emerald-400/25 bg-black"></video>`;
+                    } else if (m.type === 'application/pdf') {
+                      inlinePreview = `<iframe src="${m.dataUrl}" title="${escapeHtml(m.name)}" class="w-full h-44 rounded border border-emerald-400/25 bg-white"></iframe>`;
+                    }
+                    return `
+                      <div class="p-2.5 rounded-lg border border-emerald-400/30 bg-black/55 space-y-2">
+                        <div class="flex items-center justify-between gap-2 text-[11px]">
+                          <span class="font-bold text-[#39ff7a] truncate">${escapeHtml(m.name)}</span>
+                          <div class="flex items-center gap-2 shrink-0">
+                            ${m.confidential ? `<span class="px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-300 text-[10px]">CONFIDENCIAL</span>` : ''}
+                            <button type="button" onclick="openInlineViewerById('${m.id}')" class="px-2 py-0.5 rounded border border-emerald-400/40 text-[#39ff7a] hover:bg-emerald-400/15 text-[10px] cursor-pointer">
+                              PANTALLA COMPLETA
+                            </button>
+                          </div>
+                        </div>
+                        ${inlinePreview}
+                      </div>
+                    `;
+                  }).join('')
+          }
+        </div>
       </div>
     `;
   }
@@ -1030,7 +1116,7 @@ function updateBreadcrumb() {
 }
 
 /* ============================================================================
-   6. BÓVEDA MODAL (EDICIÓN + CONFIDENCIALIDAD) & TECLADO FÍSICO
+   7. BÓVEDA MODAL (CONFIDENCIALIDAD POR ARCHIVO Y POR NODO) & TECLADO FÍSICO
    ============================================================================ */
 function openVaultModal(preselectNodeId) {
   if (!isDevMode) {
@@ -1076,6 +1162,7 @@ function handleVaultFiles(event) {
   if (!isDevMode) return;
   const files = Array.from(event.target.files || []);
   const targetNode = document.getElementById('vaultTargetNode').value;
+  const markConfidential = document.getElementById('newUploadConfidential').checked;
 
   files.forEach((file) => {
     const reader = new FileReader();
@@ -1085,6 +1172,7 @@ function handleVaultFiles(event) {
         nodeId: targetNode,
         name: file.name,
         type: file.type || 'application/octet-stream',
+        confidential: markConfidential,
         dataUrl: reader.result
       });
       renderScene(currentNodeId);
@@ -1107,14 +1195,20 @@ function renderVaultList() {
   list.innerHTML = vaultItems
     .map(
       (item) => `
-      <div class="p-2.5 rounded border border-emerald-400/30 bg-black/50 flex items-center justify-between gap-3">
+      <div class="p-2.5 rounded border border-emerald-400/30 bg-black/50 flex items-center justify-between gap-2">
         <div class="min-w-0">
           <div class="font-bold text-[#39ff7a] truncate">${escapeHtml(item.name)}</div>
-          <div class="text-[10px] text-emerald-300/75">RAMA: ${item.nodeId} · TIPO: ${item.type}</div>
+          <div class="text-[10px] text-emerald-300/75">RAMA: ${item.nodeId} · ${item.confidential ? 'CONFIDENCIAL' : 'PÚBLICO'}</div>
         </div>
-        <button type="button" onclick="deleteVaultItem('${item.id}')" class="px-2 py-1 rounded border border-red-400/40 text-red-300 hover:bg-red-500/15 text-[11px] shrink-0 cursor-pointer">
-          BORRAR
-        </button>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button type="button" onclick="toggleFileConfidential('${item.id}')"
+                  class="px-2 py-1 rounded border ${item.confidential ? 'border-amber-400 text-amber-300 bg-amber-400/15' : 'border-emerald-400/40 text-emerald-200'} text-[10px] font-bold cursor-pointer">
+            ${item.confidential ? 'CONFIDENCIAL' : 'HACER CONFID.'}
+          </button>
+          <button type="button" onclick="deleteVaultItem('${item.id}')" class="px-2 py-1 rounded border border-red-400/40 text-red-300 hover:bg-red-500/15 text-[10px] cursor-pointer">
+            BORRAR
+          </button>
+        </div>
       </div>
     `
     )
@@ -1131,6 +1225,7 @@ function escapeHtml(str) {
 
 document.addEventListener('keydown', (e) => {
   const padOpen = !document.getElementById('doorPadModal').classList.contains('hidden');
+  const viewerOpen = !document.getElementById('viewerModal').classList.contains('hidden');
   const vaultOpen = !document.getElementById('vaultModal').classList.contains('hidden');
 
   if (padOpen) {
@@ -1147,7 +1242,9 @@ document.addEventListener('keydown', (e) => {
   }
 
   if (e.key === 'Escape') {
-    if (vaultOpen) {
+    if (viewerOpen) {
+      closeViewerModal();
+    } else if (vaultOpen) {
       closeVaultModal();
     } else {
       ascendLevel();
@@ -1156,7 +1253,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ============================================================================
-   7. ARRANQUE
+   8. ARRANQUE
    ============================================================================ */
 updateModeUI();
 renderScene('root');

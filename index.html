@@ -32,7 +32,7 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Escenario de fondo desordenado, superpuesto y en movimiento continuo */
+  /* Fondo multimedia flotante, superpuesto y desenfocado */
   #bgWallStage {
     position: fixed;
     inset: 0;
@@ -89,42 +89,34 @@
       linear-gradient(135deg, rgba(57, 255, 122, 0.12), rgba(2, 16, 8, 0.72));
   }
 
-  .drift-a {
-    animation: driftAnimA 19s ease-in-out infinite alternate;
-  }
-  .drift-b {
-    animation: driftAnimB 24s ease-in-out infinite alternate;
-  }
-  .drift-c {
-    animation: driftAnimC 16s ease-in-out infinite alternate;
-  }
+  .drift-a { animation: driftAnimA 19s ease-in-out infinite alternate; }
+  .drift-b { animation: driftAnimB 24s ease-in-out infinite alternate; }
+  .drift-c { animation: driftAnimC 16s ease-in-out infinite alternate; }
 
   @keyframes driftAnimA {
     0%   { transform: translate3d(-3%, -2%, 0) rotate(-3deg) scale(1); }
     50%  { transform: translate3d(3.5%, 2%, 0) rotate(1.5deg) scale(1.07); }
     100% { transform: translate3d(-1.5%, 3.5%, 0) rotate(-1deg) scale(1.03); }
   }
-
   @keyframes driftAnimB {
     0%   { transform: translate3d(3%, -2.5%, 0) rotate(3.5deg) scale(1.05); }
     50%  { transform: translate3d(-3.5%, 1.5%, 0) rotate(-2deg) scale(0.98); }
     100% { transform: translate3d(2%, 3%, 0) rotate(2deg) scale(1.08); }
   }
-
   @keyframes driftAnimC {
     0%   { transform: translate3d(0%, 3%, 0) rotate(-2.5deg) scale(1.02); }
     50%  { transform: translate3d(-3%, -2.5%, 0) rotate(3deg) scale(1.1); }
     100% { transform: translate3d(3%, -1%, 0) rotate(-1.5deg) scale(1); }
   }
 
-  /* Capa verde fosforica + vineteo CRT */
+  /* Capas de tinte verde y scanlines */
   #greenTintOverlay {
     position: fixed;
     inset: 0;
     z-index: 2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.1) 0%, rgba(3, 15, 8, 0.54) 100%),
+      radial-gradient(circle at 50% 50%, rgba(24, 110, 52, 0.1) 0%, rgba(3, 15, 8, 0.52) 100%),
       linear-gradient(180deg, rgba(57, 255, 122, 0.08) 0%, rgba(4, 24, 12, 0.2) 50%, rgba(2, 12, 6, 0.34) 100%);
     mix-blend-mode: screen;
   }
@@ -138,7 +130,6 @@
     mix-blend-mode: multiply;
   }
 
-  /* Scanlines y curvatura CRT sutil */
   #crtScanlines {
     position: fixed;
     inset: 0;
@@ -148,13 +139,26 @@
       to bottom,
       rgba(0, 0, 0, 0) 0px,
       rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.26) 3px,
-      rgba(0, 0, 0, 0.26) 4px
+      rgba(0, 0, 0, 0.34) 3px,
+      rgba(0, 0, 0, 0.34) 4px
     );
-    box-shadow: inset 0 0 95px rgba(0, 0, 0, 0.72);
   }
 
-  /* Escena principal 100vh con animacion de inmersion/zoom */
+  /* Marco y vineteo de monitor antiguo en los bordes */
+  #crtBezelFrame {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    border: 14px solid #040b06;
+    border-radius: 26px;
+    box-shadow:
+      inset 0 0 135px rgba(0, 0, 0, 0.92),
+      inset 0 0 36px rgba(57, 255, 122, 0.12),
+      0 0 0 3px #010402;
+  }
+
+  /* Escena principal 100vh con zoom de inmersión fuerte */
   #viewportRoot {
     position: relative;
     z-index: 10;
@@ -162,85 +166,105 @@
     height: 100vh;
     overflow: hidden;
     transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
-    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease;
+    transition: transform 0.36s cubic-bezier(0.12, 0.92, 0.24, 1), opacity 0.26s ease, filter 0.26s ease;
   }
 
   #viewportRoot.zoom-diving {
-    transform: scale(1.22);
-    opacity: 0.18;
+    transform: scale(1.68);
+    opacity: 0.06;
+    filter: blur(3px);
   }
 
   #viewportRoot.zoom-ascending {
-    transform: scale(0.84);
-    opacity: 0.25;
+    transform: scale(0.68);
+    opacity: 0.12;
+    filter: blur(2px);
   }
 
-  /* Nodos dispersos en pantalla */
+  /* Nodos dispersos */
   .scattered-node {
     position: absolute;
     transform: translate(-50%, -50%);
     cursor: pointer;
     z-index: 15;
-    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-    background: rgba(5, 22, 12, 0.82);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    background: rgba(5, 22, 12, 0.84);
     backdrop-filter: blur(6px);
     border: 1px solid rgba(57, 255, 122, 0.45);
     box-shadow: 0 0 20px rgba(57, 255, 122, 0.12), inset 0 0 14px rgba(57, 255, 122, 0.06);
   }
 
   .scattered-node:hover {
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: translate(-50%, -50%) scale(1.06);
     border-color: var(--phosphor);
-    background: rgba(8, 36, 19, 0.92);
-    box-shadow: 0 0 28px rgba(57, 255, 122, 0.32), inset 0 0 18px rgba(57, 255, 122, 0.14);
+    background: rgba(8, 36, 19, 0.94);
+    box-shadow: 0 0 30px rgba(57, 255, 122, 0.34), inset 0 0 18px rgba(57, 255, 122, 0.15);
   }
 
   .scattered-node.hub-node {
     border-width: 1.5px;
-    border-color: rgba(57, 255, 122, 0.75);
-    box-shadow: 0 0 36px rgba(57, 255, 122, 0.24), inset 0 0 22px rgba(57, 255, 122, 0.1);
+    border-color: rgba(57, 255, 122, 0.78);
+    box-shadow: 0 0 38px rgba(57, 255, 122, 0.24), inset 0 0 22px rgba(57, 255, 122, 0.1);
   }
 
   .crt-glow {
     text-shadow: 0 0 10px rgba(57, 255, 122, 0.45);
   }
 
-  /* Scroll interno solo dentro de paneles de detalle o modal de boveda */
+  /* Pad numérico estilo control de acceso de puerta */
+  .door-keypad-housing {
+    background: linear-gradient(165deg, #16201a 0%, #0a100d 55%, #060908 100%);
+    border: 2px solid rgba(57, 255, 122, 0.45);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.85),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 35px rgba(57, 255, 122, 0.15);
+  }
+
+  .door-key {
+    background: linear-gradient(180deg, #1b2820 0%, #0e1612 100%);
+    border: 1px solid rgba(57, 255, 122, 0.35);
+    box-shadow: 0 4px 0 #050806, inset 0 1px 0 rgba(57, 255, 122, 0.18);
+    transition: transform 0.07s ease, background 0.12s ease, border-color 0.12s ease;
+  }
+
+  .door-key:hover {
+    border-color: #39ff7a;
+    background: linear-gradient(180deg, #24382c 0%, #132018 100%);
+  }
+
+  .door-key:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #050806;
+  }
+
   .inner-scroll {
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #39ff7a #06180d;
   }
-
-  .inner-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .inner-scroll::-webkit-scrollbar-track {
-    background: #06180d;
-  }
-
-  .inner-scroll::-webkit-scrollbar-thumb {
-    background: #39ff7a;
-    border-radius: 3px;
-  }
+  .inner-scroll::-webkit-scrollbar { width: 6px; }
+  .inner-scroll::-webkit-scrollbar-track { background: #06180d; }
+  .inner-scroll::-webkit-scrollbar-thumb { background: #39ff7a; border-radius: 3px; }
 </style>
 </head>
 <body>
 
-  <!-- 1. Fondo multimedia flotante, superpuesto y desenfocado + filtro verde -->
+  <!-- 1. Fondo + CRT + Bisel de monitor antiguo -->
   <div id="bgWallStage" aria-hidden="true">
     <div id="projectMediaWall"></div>
   </div>
   <div id="greenMultiplyLayer" aria-hidden="true"></div>
   <div id="greenTintOverlay" aria-hidden="true"></div>
   <div id="crtScanlines" aria-hidden="true"></div>
+  <div id="crtBezelFrame" aria-hidden="true"></div>
 
   <!-- 2. Escena principal 100vh -->
   <div id="viewportRoot">
-    <header class="fixed top-0 left-0 right-0 z-30 h-12 px-4 md:px-6 flex items-center justify-between border-b border-emerald-400/30 bg-black/75 backdrop-blur-md text-xs">
+    <header class="fixed top-0 left-0 right-0 z-30 h-12 px-4 md:px-6 flex items-center justify-between border-b border-emerald-400/30 bg-black/80 backdrop-blur-md text-xs">
       <div class="flex items-center gap-2 min-w-0">
-        <span class="inline-block w-2 h-2 rounded-full bg-[#39ff7a] animate-pulse shrink-0"></span>
+        <span id="modeIndicatorDot" class="inline-block w-2 h-2 rounded-full bg-emerald-400/60 shrink-0"></span>
+        <span id="sessionRoleTag" class="px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0">VISITOR_MODE</span>
         <nav id="breadcrumbBar" class="flex items-center gap-1.5 truncate font-bold tracking-wider"></nav>
       </div>
 
@@ -251,50 +275,110 @@
         <button id="btnBgToggle" onclick="toggleBgIntensity()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-emerald-200 hover:border-[#39ff7a] transition cursor-pointer">
           BG_FEED: ON
         </button>
-        <button onclick="openVaultModal()" class="px-2.5 py-1 rounded border border-[#39ff7a] bg-emerald-400/15 text-[#39ff7a] font-bold hover:bg-emerald-400/25 transition cursor-pointer">
+        <button id="btnVaultHeader" onclick="openVaultModal()" class="hidden px-2.5 py-1 rounded border border-[#39ff7a] bg-emerald-400/15 text-[#39ff7a] font-bold hover:bg-emerald-400/25 transition cursor-pointer">
           + MEDIA_VAULT (<span id="vaultCountBadge">0</span>)
+        </button>
+        <button id="btnDevPadToggle" onclick="handleDevButton()" class="px-2.5 py-1 rounded border border-emerald-400/50 bg-emerald-950/70 text-[#39ff7a] font-bold hover:border-[#39ff7a] transition cursor-pointer">
+          KEYPAD [LOCKED]
         </button>
       </div>
     </header>
 
     <main id="scatteredStage" class="relative w-full h-full pt-12"></main>
 
-    <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-4 md:px-6 flex items-center justify-between border-t border-emerald-400/20 bg-black/70 backdrop-blur-sm text-[11px] text-emerald-300/80">
+    <footer class="fixed bottom-0 left-0 right-0 z-20 h-9 px-4 md:px-6 flex items-center justify-between border-t border-emerald-400/20 bg-black/75 backdrop-blur-sm text-[11px] text-emerald-300/80">
       <span id="statusHint">CLIC EN UN NODO PARA INMERSIÓN · [ESC] PARA ASCENDER</span>
       <span class="hidden sm:inline">ING. COMPUTADORES · ETSIIT UGR · GRANADA / PALMA DEL RÍO</span>
     </footer>
   </div>
 
-  <!-- 3. Modal de Bóveda Local (IndexedDB) -->
+  <!-- 3. Pad de acceso estilo teclado de puerta -->
+  <div id="doorPadModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="door-keypad-housing w-full max-w-[270px] rounded-2xl p-5 text-center">
+      <div class="flex items-center justify-between text-[10px] tracking-widest text-emerald-300/75 mb-2">
+        <span>ACCESS_CTRL // 01</span>
+        <button type="button" onclick="closeDoorPad()" class="text-emerald-300/80 hover:text-[#39ff7a] cursor-pointer">[X]</button>
+      </div>
+
+      <div class="text-[11px] font-bold tracking-widest text-[#39ff7a] mb-2">DOOR ENTRY KEYPAD</div>
+
+      <div id="padDisplay" class="h-10 mb-3 rounded-lg bg-[#030b06] border border-emerald-400/40 flex items-center justify-center text-lg font-extrabold tracking-[0.45em] text-[#39ff7a]">
+        ----
+      </div>
+
+      <div id="padFeedback" class="h-4 text-[10px] text-emerald-200/80 mb-3">INTRODUCE CÓDIGO DE ACCESO</div>
+
+      <div class="grid grid-cols-3 gap-2.5 text-sm font-bold">
+        <button type="button" onclick="pressPadKey('1')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">1</button>
+        <button type="button" onclick="pressPadKey('2')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">2</button>
+        <button type="button" onclick="pressPadKey('3')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">3</button>
+        <button type="button" onclick="pressPadKey('4')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">4</button>
+        <button type="button" onclick="pressPadKey('5')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">5</button>
+        <button type="button" onclick="pressPadKey('6')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">6</button>
+        <button type="button" onclick="pressPadKey('7')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">7</button>
+        <button type="button" onclick="pressPadKey('8')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">8</button>
+        <button type="button" onclick="pressPadKey('9')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">9</button>
+        <button type="button" onclick="clearPadCode()" class="door-key h-11 rounded-lg text-amber-300 text-xs cursor-pointer">CLR</button>
+        <button type="button" onclick="pressPadKey('0')" class="door-key h-11 rounded-lg text-[#39ff7a] cursor-pointer">0</button>
+        <button type="button" onclick="submitPadCode()" class="door-key h-11 rounded-lg text-emerald-950 bg-[#39ff7a] hover:brightness-110 text-xs font-extrabold cursor-pointer">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Modal de Bóveda Local (solo modo desarrollador) -->
   <div id="vaultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-[#39ff7a]/60 bg-[#041209]/95 shadow-[0_0_50px_rgba(57,255,122,0.2)]">
       <div class="px-5 py-3.5 border-b border-emerald-400/30 flex items-center justify-between">
         <div>
-          <h2 class="text-sm font-bold tracking-widest text-[#39ff7a]">BÓVEDA LOCAL // INDEXED_DB</h2>
-          <p class="text-[11px] text-emerald-300/75">Los vídeos e imágenes se integran en el fondo verde desenfocado y en los nodos.</p>
+          <h2 class="text-sm font-bold tracking-widest text-[#39ff7a]">BÓVEDA LOCAL // DEV_EDIT</h2>
+          <p class="text-[11px] text-emerald-300/75">Añade imágenes/vídeos a las secciones, edita textos o marca nodos como confidenciales.</p>
         </div>
         <button onclick="closeVaultModal()" class="px-2.5 py-1 rounded border border-emerald-400/40 text-xs hover:bg-emerald-400/15 cursor-pointer">[X] CERRAR</button>
       </div>
 
-      <div class="p-5 inner-scroll space-y-4 text-xs">
+      <div class="p-5 inner-scroll space-y-5 text-xs">
+        <!-- Subida de archivos a una rama -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] text-emerald-300/80 mb-1">RAMA DESTINO</label>
-            <select id="vaultTargetNode" class="w-full px-3 py-2 rounded bg-[#071e10] border border-emerald-400/40 text-[#39ff7a] outline-none">
+            <label class="block text-[11px] text-emerald-300/80 mb-1">SECCIÓN / NODO DESTINO</label>
+            <select id="vaultTargetNode" onchange="syncNodeEditorFromSelect()" class="w-full px-3 py-2 rounded bg-[#071e10] border border-emerald-400/40 text-[#39ff7a] outline-none">
               <option value="freestyle-pica">Freestyle Pica (Flutter / Dart)</option>
-              <option value="prover9-mace4">Prover9-Mace4 GUI (Python / Tkinter)</option>
+              <option value="prover9-mace4">Prover9-Mace4 GUI (Python)</option>
               <option value="gesture-glove">GestureGlove (ESP32 / C++)</option>
               <option value="rotombot">Rotombot (Arduino / C++)</option>
               <option value="etsiit-ugr">ETSIIT UGR & TFG</option>
-              <option value="big-school">BIG school & Formación</option>
+              <option value="big-school">BIG school</option>
+              <option value="perfil">Stack & Perfil Técnico</option>
+              <option value="contacto">Canales & Ubicación</option>
             </select>
           </div>
           <div>
-            <label class="block text-[11px] text-emerald-300/80 mb-1">ARCHIVO (MP4, WEBM, PNG, JPG, PDF)</label>
+            <label class="block text-[11px] text-emerald-300/80 mb-1">AÑADIR IMAGEN / VÍDEO / PDF</label>
             <input id="vaultFileInput" type="file" accept="video/*,image/*,application/pdf" multiple onchange="handleVaultFiles(event)" class="w-full px-2.5 py-1.5 rounded bg-[#071e10] border border-emerald-400/40 text-emerald-200 file:mr-2 file:px-2 file:py-0.5 file:rounded file:border-0 file:bg-[#39ff7a] file:text-[#041209] file:font-bold file:text-[11px] cursor-pointer" />
           </div>
         </div>
 
+        <!-- Editor de sección y confidencialidad -->
+        <div class="p-3.5 rounded-lg border border-emerald-400/30 bg-black/45 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-[#39ff7a] tracking-wider">CONFIGURACIÓN DE SECCIÓN</span>
+            <label class="inline-flex items-center gap-2 cursor-pointer text-amber-300 font-bold">
+              <input id="editNodeConfidential" type="checkbox" class="accent-[#39ff7a] w-4 h-4" />
+              <span>MARCAR COMO CONFIDENCIAL (CENSURAR PÚBLICO)</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-[10px] text-emerald-300/75 mb-1">RESUMEN DE LA SECCIÓN</label>
+            <textarea id="editNodeSummary" rows="2" class="w-full px-3 py-2 rounded bg-[#071e10] border border-emerald-400/35 text-emerald-100 outline-none"></textarea>
+          </div>
+
+          <button type="button" onclick="saveNodeEdits()" class="px-3 py-1.5 rounded bg-[#39ff7a] text-[#041209] font-extrabold text-[11px] hover:brightness-110 cursor-pointer">
+            GUARDAR CAMBIOS DE SECCIÓN
+          </button>
+        </div>
+
+        <!-- Lista de medios guardados -->
         <div id="vaultItemsList" class="space-y-2"></div>
       </div>
     </div>
@@ -304,6 +388,9 @@
 /* ============================================================================
    1. ESTRUCTURA DE RAMAS Y NODOS
    ============================================================================ */
+const DEV_PIN = '6451';
+const CONTACT_EMAIL = 'antoniojpaflor@gmail.com';
+
 const PORTFOLIO_TREE = {
   root: {
     id: 'root',
@@ -312,6 +399,7 @@ const PORTFOLIO_TREE = {
     subtitle: 'Graduado en Ingeniería Informática · Especialidad en Ingeniería de Computadores (UGR)',
     coords: { x: 50, y: 47 },
     isHub: true,
+    confidential: false,
     summary: 'Desarrollo de software, sistemas embebidos, lógica computacional y aplicaciones móviles. Base en Granada y Palma del Río (Córdoba).',
     tags: ['Python', 'Flutter', 'Dart', 'C / C++', 'ESP32 / Arduino', 'Linux / SQL'],
     children: ['proyectos', 'formacion', 'perfil', 'contacto']
@@ -323,6 +411,7 @@ const PORTFOLIO_TREE = {
     title: 'PROYECTOS & SISTEMAS',
     subtitle: 'Aplicaciones móviles, herramientas de lógica, hardware embebido y robótica',
     coords: { x: 24, y: 28 },
+    confidential: false,
     summary: 'Selección de proyectos técnicos desarrollados con enfoque práctico y arquitectura modular.',
     tags: ['FLUTTER', 'PYTHON', 'C++', 'ESP32'],
     children: ['freestyle-pica', 'prover9-mace4', 'gesture-glove', 'rotombot']
@@ -334,6 +423,7 @@ const PORTFOLIO_TREE = {
     title: 'FREESTYLE PICA',
     subtitle: 'App móvil de entrenamiento de freestyle rap en Flutter y Dart',
     coords: { x: 22, y: 26 },
+    confidential: false,
     summary: 'Aplicación móvil para entrenar improvisación con modos 100% libre, libre con palabras y formato FMS, detección de rimas asonantes y consonantes y gestión de sesiones.',
     tags: ['Flutter', 'Dart', 'Mobile', 'Rimas'],
     children: []
@@ -345,6 +435,7 @@ const PORTFOLIO_TREE = {
     title: 'PROVER9-MACE4 GUI',
     subtitle: 'Interfaz gráfica en Python para demostración automática de teoremas y modelos finitos',
     coords: { x: 76, y: 26 },
+    confidential: false,
     summary: 'Entorno visual en Python para redactar fórmulas de lógica de primer orden, ejecutar Prover9 y Mace4, inspeccionar demostraciones y contramodelos y gestionar archivos.',
     tags: ['Python', 'Lógica de Primer Orden', 'GUI', 'Automatización'],
     children: []
@@ -356,6 +447,7 @@ const PORTFOLIO_TREE = {
     title: 'GESTUREGLOVE',
     subtitle: 'Controlador inalámbrico gestual e inercial sobre ESP32 en C/C++',
     coords: { x: 24, y: 70 },
+    confidential: false,
     summary: 'Prototipo de guante / mando híbrido basado en microcontrolador ESP32 con lectura inercial y gestual para interacción y control de dispositivos.',
     tags: ['C / C++', 'ESP32', 'Sensores IMU', 'Wireless'],
     children: []
@@ -367,6 +459,7 @@ const PORTFOLIO_TREE = {
     title: 'ROTOMBOT',
     subtitle: 'Robot autónomo de combate / sumo programado en C/C++ sobre Arduino',
     coords: { x: 75, y: 70 },
+    confidential: false,
     summary: 'Robot autónomo equipado con tracción por motores DC, detección de borde/línea, sensores de distancia y parachoques de contacto para maniobras reactivas en arena.',
     tags: ['C / C++', 'Arduino', 'Robótica', 'Sensores'],
     children: []
@@ -378,6 +471,7 @@ const PORTFOLIO_TREE = {
     title: 'FORMACIÓN & UGR',
     subtitle: 'Grado en Ingeniería Informática (Ingeniería de Computadores) y prácticas en UGR',
     coords: { x: 76, y: 28 },
+    confidential: false,
     summary: 'Graduado en Ingeniería Informática con especialidad en Ingeniería de Computadores en la ETSIIT (Universidad de Granada), con experiencia en mantenimiento de servidores/BD y scripts en Python.',
     tags: ['ETSIIT UGR', 'Ing. Computadores', 'Python', 'Linux / MariaDB'],
     children: ['etsiit-ugr', 'big-school']
@@ -389,6 +483,7 @@ const PORTFOLIO_TREE = {
     title: 'GRADO ING. INFORMÁTICA · UGR',
     subtitle: 'Especialidad en Ingeniería de Computadores · ETSIIT Granada',
     coords: { x: 30, y: 42 },
+    confidential: false,
     summary: 'Grado completado en la Escuela Técnica Superior de Ingenierías Informática y de Telecomunicación (UGR), con TFG defendido y prácticas extracurriculares trabajando con Linux, MariaDB, Apache y scripts en Python.',
     tags: ['Grado Completado', 'Ing. de Computadores', 'Python', 'MariaDB / Linux'],
     children: []
@@ -400,6 +495,7 @@ const PORTFOLIO_TREE = {
     title: 'BIG SCHOOL & ESPECIALIZACIÓN',
     subtitle: 'Formación complementaria en desarrollo y arquitectura de software',
     coords: { x: 70, y: 56 },
+    confidential: false,
     summary: 'Formación adicional orientada a desarrollo de aplicaciones, buenas prácticas de programación y resolución de problemas técnicos.',
     tags: ['BIG school', 'Software', 'Desarrollo'],
     children: []
@@ -411,6 +507,7 @@ const PORTFOLIO_TREE = {
     title: 'STACK & PERFIL TÉCNICO',
     subtitle: 'Lenguajes principales, sistemas y enfoque de ingeniería',
     coords: { x: 26, y: 72 },
+    confidential: false,
     summary: 'Perfil enfocado en puestos de Junior Software Engineer / Computer Engineering, combinando Python, Flutter/Dart y C/C++ con administración de entornos Linux y bases de datos.',
     tags: ['Python', 'Flutter', 'Dart', 'C / C++'],
     children: []
@@ -422,28 +519,34 @@ const PORTFOLIO_TREE = {
     title: 'CANALES & UBICACIÓN',
     subtitle: 'Granada / Palma del Río (Córdoba) · GitHub & contacto directo',
     coords: { x: 74, y: 72 },
-    summary: 'Disponible para oportunidades de desarrollo de software e ingeniería de computadores. Repositorio y código en GitHub.',
+    confidential: false,
+    summary: `Disponible para oportunidades de desarrollo de software e ingeniería de computadores. Contacto directo: ${CONTACT_EMAIL}.`,
     tags: ['Granada', 'Palma del Río', 'GitHub'],
     children: []
   }
 };
 
 /* ============================================================================
-   2. ESTADO DE NAVEGACIÓN + INDEXEDDB
+   2. ESTADO DE NAVEGACIÓN, MODO DESARROLLADOR (PAD 6451) E INDEXEDDB
    ============================================================================ */
 let currentNodeId = 'root';
 let navStack = ['root'];
 let isTransitioning = false;
+let isDevMode = false;
+let padBuffer = '';
 let vaultItems = [];
 let dbInstance = null;
 
 function openVaultDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open('AntonioParrasVaultDB', 1);
+    const req = indexedDB.open('AntonioParrasVaultDB', 2);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('media')) {
         db.createObjectStore('media', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('nodeMeta')) {
+        db.createObjectStore('nodeMeta', { keyPath: 'nodeId' });
       }
     };
     req.onsuccess = (e) => {
@@ -457,15 +560,30 @@ function openVaultDB() {
 async function loadVaultFromDB() {
   try {
     const db = await openVaultDB();
-    return new Promise((resolve) => {
+    await new Promise((resolve) => {
       const tx = db.transaction('media', 'readonly');
-      const store = tx.objectStore('media');
-      const req = store.getAll();
+      const req = tx.objectStore('media').getAll();
       req.onsuccess = () => {
         vaultItems = req.result || [];
         document.getElementById('vaultCountBadge').textContent = vaultItems.length;
         renderVaultList();
         renderBackgroundMediaWall();
+        resolve();
+      };
+      req.onerror = () => resolve();
+    });
+
+    await new Promise((resolve) => {
+      const tx = db.transaction('nodeMeta', 'readonly');
+      const req = tx.objectStore('nodeMeta').getAll();
+      req.onsuccess = () => {
+        (req.result || []).forEach((meta) => {
+          if (PORTFOLIO_TREE[meta.nodeId]) {
+            if (typeof meta.summary === 'string') PORTFOLIO_TREE[meta.nodeId].summary = meta.summary;
+            if (typeof meta.confidential === 'boolean') PORTFOLIO_TREE[meta.nodeId].confidential = meta.confidential;
+          }
+        });
+        renderScene(currentNodeId);
         resolve();
       };
       req.onerror = () => resolve();
@@ -499,8 +617,101 @@ async function deleteVaultItem(id) {
   });
 }
 
+async function saveNodeMetaToDB(nodeId, summary, confidential) {
+  if (!dbInstance) await openVaultDB();
+  return new Promise((resolve) => {
+    const tx = dbInstance.transaction('nodeMeta', 'readwrite');
+    tx.objectStore('nodeMeta').put({ nodeId, summary, confidential });
+    tx.oncomplete = () => {
+      loadVaultFromDB();
+      resolve();
+    };
+  });
+}
+
 /* ============================================================================
-   3. FONDO MULTIMEDIA DESORDENADO, SUPERPUESTO Y EN MOVIMIENTO CONTINUO
+   3. TECLADO DE PUERTA (PIN 6451) & MODO DESARROLLADOR
+   ============================================================================ */
+function handleDevButton() {
+  if (isDevMode) {
+    isDevMode = false;
+    updateModeUI();
+    renderScene(currentNodeId);
+  } else {
+    openDoorPad();
+  }
+}
+
+function openDoorPad() {
+  padBuffer = '';
+  updatePadDisplay('INTRODUCE CÓDIGO DE ACCESO');
+  document.getElementById('doorPadModal').classList.remove('hidden');
+}
+
+function closeDoorPad() {
+  padBuffer = '';
+  document.getElementById('doorPadModal').classList.add('hidden');
+}
+
+function pressPadKey(digit) {
+  if (padBuffer.length >= 4) return;
+  padBuffer += digit;
+  updatePadDisplay('TECLA ACEPTADA');
+  if (padBuffer.length === 4) {
+    submitPadCode();
+  }
+}
+
+function clearPadCode() {
+  padBuffer = '';
+  updatePadDisplay('CÓDIGO BORRADO');
+}
+
+function submitPadCode() {
+  if (padBuffer === DEV_PIN) {
+    isDevMode = true;
+    updateModeUI();
+    updatePadDisplay('ACCESO CONCEDIDO // DEV_MODE');
+    setTimeout(() => {
+      closeDoorPad();
+      renderScene(currentNodeId);
+    }, 350);
+  } else {
+    updatePadDisplay('CÓDIGO DENEGADO');
+    padBuffer = '';
+  }
+}
+
+function updatePadDisplay(msg) {
+  const padded = padBuffer.padEnd(4, '-');
+  document.getElementById('padDisplay').textContent = padded;
+  document.getElementById('padFeedback').textContent = msg;
+}
+
+function updateModeUI() {
+  const tag = document.getElementById('sessionRoleTag');
+  const dot = document.getElementById('modeIndicatorDot');
+  const vaultBtn = document.getElementById('btnVaultHeader');
+  const padBtn = document.getElementById('btnDevPadToggle');
+
+  if (isDevMode) {
+    tag.textContent = 'ROOT_DEV';
+    tag.className = 'px-1.5 py-0.5 rounded border border-[#39ff7a] bg-emerald-400/20 text-[10px] font-extrabold text-[#39ff7a] shrink-0';
+    dot.className = 'inline-block w-2 h-2 rounded-full bg-[#39ff7a] animate-pulse shrink-0';
+    vaultBtn.classList.remove('hidden');
+    padBtn.textContent = 'LOCK_DEV';
+  } else {
+    tag.textContent = 'VISITOR_MODE';
+    tag.className = 'px-1.5 py-0.5 rounded border border-emerald-400/35 text-[10px] text-emerald-200/85 shrink-0';
+    dot.className = 'inline-block w-2 h-2 rounded-full bg-emerald-400/50 shrink-0';
+    vaultBtn.classList.add('hidden');
+    padBtn.textContent = 'KEYPAD [LOCKED]';
+  }
+  updateBreadcrumb();
+}
+
+/* ============================================================================
+   4. FONDO MULTIMEDIA DESORDENADO, SUPERPUESTO Y EN MOVIMIENTO CONTINUO
    ============================================================================ */
 const FLOATING_SLOTS = [
   { left: '4%',  top: '6%',  w: '44%', h: '42%', anim: 'drift-a', z: 1, title: 'FREESTYLE PICA // DART ENGINE' },
@@ -534,7 +745,11 @@ function renderBackgroundMediaWall() {
   if (!wall) return;
 
   const vaultVisuals = vaultItems
-    .filter((m) => m.type.startsWith('video/') || m.type.startsWith('image/'))
+    .filter((m) => {
+      const parentNode = PORTFOLIO_TREE[m.nodeId];
+      if (!isDevMode && parentNode && parentNode.confidential) return false;
+      return m.type.startsWith('video/') || m.type.startsWith('image/');
+    })
     .map((m) => ({
       src: m.dataUrl,
       kind: m.type.startsWith('video/') ? 'video' : 'image',
@@ -607,8 +822,22 @@ function toggleBgIntensity() {
 }
 
 /* ============================================================================
-   4. NAVEGACIÓN DISPERSA, ZOOM DE INMERSIÓN Y [ESC]
+   5. RENDERIZADO DE NODOS, CENSURA CONFIDENCIAL Y ZOOM FUERTE
    ============================================================================ */
+function renderConfidentialNotice() {
+  return `
+    <div class="mt-2.5 p-3 rounded-lg border border-amber-400/50 bg-black/80 text-amber-200 space-y-1.5">
+      <div class="text-[11px] font-extrabold tracking-widest text-amber-300">
+        [CONTENIDO CENSURADO // CONFIDENCIAL]
+      </div>
+      <p class="text-[11px] leading-relaxed text-emerald-100/85">
+        Este contenido está marcado como confidencial. Si te interesa consultarlo, solicítalo por correo a
+        <span class="font-bold text-[#39ff7a] underline">${CONTACT_EMAIL}</span>.
+      </p>
+    </div>
+  `;
+}
+
 function renderScene(nodeId) {
   const node = PORTFOLIO_TREE[nodeId] || PORTFOLIO_TREE.root;
   currentNodeId = node.id;
@@ -632,45 +861,61 @@ function renderScene(nodeId) {
     { x: 50, y: 76 }
   ];
 
+  const isCensoredForVisitor = Boolean(node.confidential && !isDevMode);
+
   let html = '';
 
   const centerX = 50;
   const centerY = childNodes.length > 0 ? 48 : 34;
 
   html += `
-    <div class="scattered-node hub-node rounded-xl p-4 md:p-5 w-[min(90vw,430px)]"
+    <div class="scattered-node hub-node rounded-xl p-4 md:p-5 w-[min(90vw,440px)]"
          style="left:${centerX}%; top:${centerY}%;"
          onclick="handleCenterClick('${node.id}', event)">
       <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-1">
         <span>${node.code}</span>
-        <span>${childNodes.length > 0 ? childNodes.length + ' RAMAS' : 'HOJA_ACTIVA'}</span>
+        <span>${node.confidential ? 'CONFIDENCIAL' : (childNodes.length > 0 ? childNodes.length + ' RAMAS' : 'HOJA_ACTIVA')}</span>
       </div>
       <h1 class="text-base md:text-lg font-extrabold tracking-wide text-[#39ff7a] crt-glow">${node.title}</h1>
       <p class="text-xs text-emerald-100/85 mt-1">${node.subtitle}</p>
-      <p class="text-xs text-emerald-200/75 mt-2.5 leading-relaxed">${node.summary}</p>
-      <div class="flex flex-wrap gap-1.5 mt-3">
-        ${(node.tags || []).map((t) => `<span class="px-2 py-0.5 text-[10px] rounded border border-emerald-400/40 bg-emerald-950/70 text-[#39ff7a]">${t}</span>`).join('')}
-      </div>
+      ${
+        isCensoredForVisitor
+          ? renderConfidentialNotice()
+          : `
+            <p class="text-xs text-emerald-200/75 mt-2.5 leading-relaxed">${escapeHtml(node.summary)}</p>
+            <div class="flex flex-wrap gap-1.5 mt-3">
+              ${(node.tags || []).map((t) => `<span class="px-2 py-0.5 text-[10px] rounded border border-emerald-400/40 bg-emerald-950/70 text-[#39ff7a]">${t}</span>`).join('')}
+            </div>
+          `
+      }
     </div>
   `;
 
   childNodes.forEach((child, idx) => {
     const pos = child.coords || spreadPresets[idx % spreadPresets.length];
     const grandCount = (child.children || []).length;
+    const childCensored = Boolean(child.confidential && !isDevMode);
+
     html += `
       <button type="button"
-              class="scattered-node rounded-xl p-3.5 md:p-4 w-[min(44vw,270px)] text-left"
+              class="scattered-node rounded-xl p-3.5 md:p-4 w-[min(44vw,275px)] text-left"
               style="left:${pos.x}%; top:${pos.y}%;"
               onclick="diveIntoNode('${child.id}', event)">
         <div class="flex items-center justify-between text-[10px] text-emerald-300/75 mb-1">
           <span>${child.code}</span>
-          <span>${grandCount > 0 ? '▸ ' + grandCount + ' SUB' : '▸ ABRIR'}</span>
+          <span>${childCensored ? 'CENSURADO' : (grandCount > 0 ? '▸ ' + grandCount + ' SUB' : '▸ ABRIR')}</span>
         </div>
         <div class="text-sm font-bold text-[#39ff7a] crt-glow">${child.title}</div>
-        <div class="text-[11px] text-emerald-100/75 mt-1 line-clamp-2">${child.subtitle}</div>
-        <div class="flex flex-wrap gap-1 mt-2">
-          ${(child.tags || []).slice(0, 3).map((t) => `<span class="px-1.5 py-0.5 text-[10px] rounded bg-emerald-400/10 text-emerald-200">${t}</span>`).join('')}
-        </div>
+        ${
+          childCensored
+            ? `<div class="text-[11px] text-amber-300 mt-1">[CONFIDENCIAL · PEDIR A ${CONTACT_EMAIL}]</div>`
+            : `
+              <div class="text-[11px] text-emerald-100/75 mt-1 line-clamp-2">${child.subtitle}</div>
+              <div class="flex flex-wrap gap-1 mt-2">
+                ${(child.tags || []).slice(0, 3).map((t) => `<span class="px-1.5 py-0.5 text-[10px] rounded bg-emerald-400/10 text-emerald-200">${t}</span>`).join('')}
+              </div>
+            `
+        }
       </button>
     `;
   });
@@ -682,19 +927,21 @@ function renderScene(nodeId) {
            style="left:50%; top:71%;">
         <div class="flex items-center justify-between text-[11px] text-emerald-300/80 mb-2">
           <span>MEDIA_ATTACHED // ${node.id.toUpperCase()}</span>
-          <button type="button" onclick="openVaultModal('${node.id}')" class="underline text-[#39ff7a] cursor-pointer">+ AÑADIR ARCHIVO</button>
+          ${isDevMode ? `<button type="button" onclick="openVaultModal('${node.id}')" class="underline text-[#39ff7a] cursor-pointer">+ EDITAR / AÑADIR</button>` : `<span>SOLO_LECTURA</span>`}
         </div>
         ${
-          attached.length === 0
-            ? `<p class="text-xs text-emerald-200/70">Sin archivos locales en este nodo todavía. Puedes adjuntar vídeos, imágenes o PDFs desde <span class="text-[#39ff7a]">+ MEDIA_VAULT</span>.</p>`
-            : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 inner-scroll">
-                ${attached.map((m) => `
-                  <div class="p-2 rounded border border-emerald-400/30 bg-black/50 flex items-center justify-between gap-2 text-[11px]">
-                    <span class="truncate text-emerald-100">${escapeHtml(m.name)}</span>
-                    <span class="text-[#39ff7a] shrink-0">${m.type.split('/')[0] || 'FILE'}</span>
-                  </div>
-                `).join('')}
-              </div>`
+          isCensoredForVisitor
+            ? `<p class="text-xs text-amber-200/90">Archivos restringidos por confidencialidad. Escríbeme a <span class="text-[#39ff7a] font-bold">${CONTACT_EMAIL}</span> si te interesa verlos.</p>`
+            : attached.length === 0
+              ? `<p class="text-xs text-emerald-200/70">Sin archivos adjuntos en este nodo todavía.</p>`
+              : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 inner-scroll">
+                  ${attached.map((m) => `
+                    <div class="p-2 rounded border border-emerald-400/30 bg-black/50 flex items-center justify-between gap-2 text-[11px]">
+                      <span class="truncate text-emerald-100">${escapeHtml(m.name)}</span>
+                      <span class="text-[#39ff7a] shrink-0">${m.type.split('/')[0] || 'FILE'}</span>
+                    </div>
+                  `).join('')}
+                </div>`
         }
       </div>
     `;
@@ -736,7 +983,7 @@ function diveIntoNode(targetId, event) {
         isTransitioning = false;
       });
     });
-  }, 220);
+  }, 240);
 }
 
 function ascendLevel() {
@@ -765,10 +1012,11 @@ function jumpToBreadcrumb(index) {
 
 function updateBreadcrumb() {
   const bar = document.getElementById('breadcrumbBar');
+  const rootLabel = isDevMode ? 'ROOT_DEV' : 'ROOT';
   bar.innerHTML = navStack
     .map((id, idx) => {
       const n = PORTFOLIO_TREE[id];
-      const label = idx === 0 ? 'ROOT' : (n ? n.title.split(' ')[0] : id.toUpperCase());
+      const label = idx === 0 ? rootLabel : (n ? n.title.split(' ')[0] : id.toUpperCase());
       const active = idx === navStack.length - 1;
       return `
         <button type="button" onclick="jumpToBreadcrumb(${idx})"
@@ -782,15 +1030,19 @@ function updateBreadcrumb() {
 }
 
 /* ============================================================================
-   5. BÓVEDA MODAL & UTILIDADES
+   6. BÓVEDA MODAL (EDICIÓN + CONFIDENCIALIDAD) & TECLADO FÍSICO
    ============================================================================ */
 function openVaultModal(preselectNodeId) {
-  if (preselectNodeId) {
-    const sel = document.getElementById('vaultTargetNode');
-    if ([...sel.options].some((o) => o.value === preselectNodeId)) {
-      sel.value = preselectNodeId;
-    }
+  if (!isDevMode) {
+    openDoorPad();
+    return;
   }
+  const sel = document.getElementById('vaultTargetNode');
+  const target = preselectNodeId || (PORTFOLIO_TREE[currentNodeId] ? currentNodeId : 'freestyle-pica');
+  if ([...sel.options].some((o) => o.value === target)) {
+    sel.value = target;
+  }
+  syncNodeEditorFromSelect();
   document.getElementById('vaultModal').classList.remove('hidden');
 }
 
@@ -798,7 +1050,30 @@ function closeVaultModal() {
   document.getElementById('vaultModal').classList.add('hidden');
 }
 
+function syncNodeEditorFromSelect() {
+  const selId = document.getElementById('vaultTargetNode').value;
+  const node = PORTFOLIO_TREE[selId];
+  if (!node) return;
+  document.getElementById('editNodeSummary').value = node.summary || '';
+  document.getElementById('editNodeConfidential').checked = Boolean(node.confidential);
+}
+
+async function saveNodeEdits() {
+  const selId = document.getElementById('vaultTargetNode').value;
+  const node = PORTFOLIO_TREE[selId];
+  if (!node) return;
+
+  const summary = document.getElementById('editNodeSummary').value.trim();
+  const confidential = document.getElementById('editNodeConfidential').checked;
+
+  node.summary = summary || node.summary;
+  node.confidential = confidential;
+
+  await saveNodeMetaToDB(selId, node.summary, node.confidential);
+}
+
 function handleVaultFiles(event) {
+  if (!isDevMode) return;
   const files = Array.from(event.target.files || []);
   const targetNode = document.getElementById('vaultTargetNode').value;
 
@@ -855,8 +1130,23 @@ function escapeHtml(str) {
 }
 
 document.addEventListener('keydown', (e) => {
+  const padOpen = !document.getElementById('doorPadModal').classList.contains('hidden');
+  const vaultOpen = !document.getElementById('vaultModal').classList.contains('hidden');
+
+  if (padOpen) {
+    if (/^[0-9]$/.test(e.key)) {
+      pressPadKey(e.key);
+    } else if (e.key === 'Backspace' || e.key === 'Delete') {
+      clearPadCode();
+    } else if (e.key === 'Enter') {
+      submitPadCode();
+    } else if (e.key === 'Escape') {
+      closeDoorPad();
+    }
+    return;
+  }
+
   if (e.key === 'Escape') {
-    const vaultOpen = !document.getElementById('vaultModal').classList.contains('hidden');
     if (vaultOpen) {
       closeVaultModal();
     } else {
@@ -866,8 +1156,9 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ============================================================================
-   6. ARRANQUE
+   7. ARRANQUE
    ============================================================================ */
+updateModeUI();
 renderScene('root');
 loadRepoManifest();
 loadVaultFromDB();

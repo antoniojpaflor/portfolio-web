@@ -32,14 +32,16 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Tubo CRT curvo con caída suave en bordes y esquinas */
+  /* Contenedor de pantalla completa con curvatura sutil de tubo CRT */
   #crtTubeShell {
     position: fixed;
-    inset: 6px;
-    border-radius: 34px;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
     background: var(--crt-bg);
-    box-shadow: 0 0 0 6px #020503, 0 0 40px rgba(0, 0, 0, 0.9);
+    transform: perspective(1100px) scale(1.012);
+    transform-origin: center center;
   }
 
   /* Fondo multimedia flotante, superpuesto y desenfocado */
@@ -154,23 +156,27 @@
     );
   }
 
-  /* Caída suave curvada de monitor antiguo en bordes y esquinas (sin corte duro) */
-  #crtSoftCurvature {
-    position: absolute;
+  /* Curvatura suave de tubo CRT en toda la pantalla */
+  #crtFullScreenCurve {
+    position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 25;
     pointer-events: none;
-    border-radius: 34px;
-    background: radial-gradient(
-      ellipse 88% 84% at 50% 50%,
-      rgba(0, 0, 0, 0) 56%,
-      rgba(2, 8, 4, 0.34) 78%,
-      rgba(1, 5, 2, 0.76) 93%,
-      rgba(0, 0, 0, 0.95) 100%
-    );
+    border-radius: 44px / 36px;
+    background:
+      radial-gradient(
+        ellipse 96% 92% at 50% 50%,
+        rgba(0, 0, 0, 0) 58%,
+        rgba(2, 8, 4, 0.26) 79%,
+        rgba(1, 5, 2, 0.68) 93%,
+        rgba(0, 0, 0, 0.94) 100%
+      );
     box-shadow:
-      inset 0 0 95px 18px rgba(0, 0, 0, 0.78),
-      inset 0 0 28px rgba(57, 255, 122, 0.09);
+      inset 0 0 110px 24px rgba(0, 0, 0, 0.72),
+      inset 0 0 24px rgba(57, 255, 122, 0.08),
+      0 0 0 12px #020503;
   }
 
   /* Escena principal 100vh con zoom de inmersión fuerte */
@@ -180,6 +186,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    border-radius: 38px / 30px;
     transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
     transition: transform 0.36s cubic-bezier(0.12, 0.92, 0.24, 1), opacity 0.26s ease, filter 0.26s ease;
   }
@@ -265,15 +272,24 @@
 </head>
 <body>
 
+  <!-- Filtro SVG de curvatura radial de lente CRT -->
+  <svg width="0" height="0" style="position:fixed;pointer-events:none;" aria-hidden="true">
+    <defs>
+      <filter id="crtCurveWarp" x="-5%" y="-5%" width="110%" height="110%">
+        <feImage id="crtDisplacementMap" result="map" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><defs><radialGradient id='g' cx='50%' cy='50%' r='70%'><stop offset='0%' stop-color='rgb(128,128,128)'/><stop offset='75%' stop-color='rgb(128,128,128)'/><stop offset='100%' stop-color='rgb(165,165,165)'/></radialGradient></defs><rect width='200' height='200' fill='url(%23g)'/></svg>" />
+        <feDisplacementMap in="SourceGraphic" in2="map" scale="14" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
   <div id="crtTubeShell">
-    <!-- 1. Fondo + CRT + Caída suave curvada en bordes -->
+    <!-- 1. Fondo + CRT + Curvatura en toda la pantalla -->
     <div id="bgWallStage" aria-hidden="true">
       <div id="projectMediaWall"></div>
     </div>
     <div id="greenMultiplyLayer" aria-hidden="true"></div>
     <div id="greenTintOverlay" aria-hidden="true"></div>
     <div id="crtScanlines" aria-hidden="true"></div>
-    <div id="crtSoftCurvature" aria-hidden="true"></div>
 
     <!-- 2. Escena principal 100vh -->
     <div id="viewportRoot">
@@ -308,6 +324,9 @@
       </footer>
     </div>
   </div>
+
+  <!-- Capa envolvente de curvatura y caída suave en toda la pantalla -->
+  <div id="crtFullScreenCurve" aria-hidden="true"></div>
 
   <!-- 3. Pad de acceso estilo teclado de puerta -->
   <div id="doorPadModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
